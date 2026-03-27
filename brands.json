@@ -1,0 +1,242 @@
+{
+    "brands": {
+        "hbc-soap": {
+            "name": "HBC Soap",
+            "active": true,
+            "meta": {
+                "ad_account_id": "act_YOUR_ACCOUNT_ID",
+                "campaign_filter": "Soap",
+                "start_date": "2026-02-27",
+                "end_date": "2026-03-27",
+                "budget": 500000,
+                "regions": {
+                    "Tamil Nadu": {
+                        "budget": 166667
+                    },
+                    "Karnataka": {
+                        "budget": 166668
+                    },
+                    "Telangana": {
+                        "budget": 0
+                    },
+                    "Maharashtra": {
+                        "budget": 166665
+                    }
+                },
+                "targets": {
+                    "reach": 7936508,
+                    "impressions": 48257882,
+                    "engagement": 2380957,
+                    "thruplay": 367003,
+                    "cpm": 10.36,
+                    "cpr": 21,
+                    "cpe": 0.07,
+                    "cpv": 0.45,
+                    "er": 0.1959,
+                    "vtr": 0.1005
+                }
+            },
+            "youtube": {
+                "customer_id": "YOUR_CUSTOMER_ID",
+                "campaign_filter": "Soap",
+                "start_date": "2026-02-06",
+                "end_date": "2026-03-05",
+                "budget": 1000000,
+                "regions": {
+                    "Tamil Nadu": {
+                        "budget": 153333
+                    },
+                    "Karnataka": {
+                        "budget": 333333
+                    },
+                    "Telangana": {
+                        "budget": 313333
+                    },
+                    "Maharashtra": {
+                        "budget": 200001
+                    }
+                },
+                "targets": {
+                    "impressions": 19011388,
+                    "views": 10171092,
+                    "cpv": 0.1,
+                    "vtr": 0.535
+                }
+            },
+            "schedule": {
+                "daily": "09:00",
+                "weekly": "monday 09:00",
+                "monthly": "1st 09:00"
+            }
+        },
+        "hbc-shampoo": {
+            "name": "HBC Shampoo",
+            "active": true,
+            "meta": {
+                "ad_account_id": "act_YOUR_ACCOUNT_ID",
+                "campaign_filter": "Shampoo",
+                "start_date": "2026-03-01",
+                "end_date": "2026-04-30",
+                "budget": 800000,
+                "regions": {
+                    "Delhi NCR": {
+                        "budget": 200000
+                    },
+                    "Mumbai": {
+                        "budget": 200000
+                    },
+                    "Bangalore": {
+                        "budget": 200000
+                    },
+                    "Kolkata": {
+                        "budget": 200000
+                    }
+                },
+                "targets": {
+                    "reach": 10000000,
+                    "impressions": 60000000,
+                    "engagement": 3000000,
+                    "thruplay": 500000,
+                    "cpm": 9.5,
+                    "cpr": 18,
+                    "cpe": 0.06,
+                    "cpv": 0.4,
+                    "er": 0.2,
+                    "vtr": 0.12
+                }
+            },
+            "youtube": {
+                "customer_id": "YOUR_CUSTOMER_ID",
+                "campaign_filter": "Shampoo",
+                "start_date": "2026-03-01",
+                "end_date": "2026-04-30",
+                "budget": 1200000,
+                "regions": {
+                    "Delhi NCR": {
+                        "budget": 300000
+                    },
+                    "Mumbai": {
+                        "budget": 300000
+                    },
+                    "Bangalore": {
+                        "budget": 300000
+                    },
+                    "Kolkata": {
+                        "budget": 300000
+                    }
+                },
+                "targets": {
+                    "impressions": 25000000,
+                    "views": 13000000,
+                    "cpv": 0.09,
+                    "vtr": 0.55
+                }
+            },
+            "schedule": {
+                "daily": "09:30",
+                "weekly": "monday 09:30",
+                "monthly": "1st 09:30"
+            }
+        },
+        "hbc-facewash": {
+            "name": "HBC Facewash",
+            "active": true,
+            "meta": {
+                "ad_account_id": "act_",
+                "campaign_filter": "Facewash",
+                "start_date": "2026-04-01",
+                "end_date": "2026-05-31",
+                "budget": 300000,
+                "regions": {
+                    "Delhi NCR": {
+                        "budget": 150000
+                    },
+                    "Pune": {
+                        "budget": 150000
+                    }
+                },
+                "targets": {
+                    "reach": 5000000,
+                    "impressions": 30000000,
+                    "engagement": 0,
+                    "thruplay": 0,
+                    "cpm": 0,
+                    "cpr": 0,
+                    "cpe": 0,
+                    "cpv": 0,
+                    "er": 0,
+                    "vtr": 0
+                }
+            },
+            "youtube": {
+                "customer_id": "",
+                "campaign_filter": "Facewash",
+                "start_date": "2026-04-01",
+                "end_date": "2026-05-31",
+                "budget": 500000,
+                "regions": {
+                    "Delhi NCR": {
+                        "budget": 250000
+                    },
+                    "Pune": {
+                        "budget": 250000
+                    }
+                },
+                "targets": {
+                    "impressions": 0,
+                    "views": 8000000,
+                    "cpv": 0.06,
+                    "vtr": 0
+                }
+            },
+            "schedule": {
+                "daily": "10:00",
+                "weekly": "tuesday 10:00",
+                "monthly": "1st 10:00"
+            }
+        }
+    },
+    "_template": {
+        "name": "Brand Name",
+        "active": false,
+        "meta": {
+            "ad_account_id": "act_",
+            "campaign_filter": "",
+            "start_date": "",
+            "end_date": "",
+            "budget": 0,
+            "regions": {},
+            "targets": {
+                "reach": 0,
+                "impressions": 0,
+                "engagement": 0,
+                "thruplay": 0,
+                "cpm": 0,
+                "cpr": 0,
+                "cpe": 0,
+                "cpv": 0,
+                "er": 0,
+                "vtr": 0
+            }
+        },
+        "youtube": {
+            "customer_id": "",
+            "campaign_filter": "",
+            "start_date": "",
+            "end_date": "",
+            "budget": 0,
+            "regions": {},
+            "targets": {
+                "impressions": 0,
+                "views": 0,
+                "cpv": 0,
+                "vtr": 0
+            }
+        },
+        "schedule": {
+            "daily": "09:00",
+            "weekly": "monday 09:00",
+            "monthly": "1st 09:00"
+        }
+    }
+}
