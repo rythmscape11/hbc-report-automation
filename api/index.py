@@ -19,6 +19,8 @@ import traceback
 import copy
 import base64
 import io
+import html as html_module
+import secrets
 from datetime import datetime
 from pathlib import Path
 
@@ -48,25 +50,78 @@ app = Flask(
     static_folder=os.path.join(PROJ_DIR, "static") if os.path.exists(os.path.join(PROJ_DIR, "static")) else None,
 )
 
+# Security: Limit upload size to 50MB
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+
 # In-memory log buffer (resets on cold start, persists during warm invocations)
 _logs = []
 
+# In-memory CSRF token storage (session/IP-based)
+_csrf_tokens = {}
 
-def add_log(msg, level="info"):
+
+def add_log(msg, level="info", request_info=None):
+    """Add log with optional request info for audit trail."""
     ts = datetime.now().strftime("%H:%M:%S")
-    _logs.append({"time": ts, "level": level, "message": msg})
+    msg_with_audit = msg
+    if request_info:
+        msg_with_audit = f"{msg} [IP: {request_info.get('ip', 'unknown')}, Method: {request_info.get('method', 'unknown')}, Path: {request_info.get('path', 'unknown')}]"
+    _logs.append({"time": ts, "level": level, "message": msg_with_audit})
     if len(_logs) > 300:
         del _logs[:len(_logs) - 300]
-    logger.info(msg)
+    logger.info(msg_with_audit)
+
+
+# ── Security Headers Middleware ──────────────────────────────────
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com"
+    return response
+
+
+# ── CSRF Token Generation ────────────────────────────────────────
+def get_client_key():
+    """Get unique identifier for client (IP-based for simplicity)."""
+    return request.remote_addr or "unknown"
+
+
+def generate_csrf_token():
+    """Generate a new CSRF token."""
+    token = secrets.token_urlsafe(32)
+    client_key = get_client_key()
+    _csrf_tokens[client_key] = token
+    return token
+
+
+def verify_csrf(f):
+    """Decorator to verify CSRF token (soft validation - logs warning but allows)."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Only check CSRF on POST/PUT/DELETE
+        if request.method in ['POST', 'PUT', 'DELETE']:
+            client_key = get_client_key()
+            token_header = request.headers.get('X-CSRF-Token')
+            expected_token = _csrf_tokens.get(client_key)
+
+            if not token_header or token_header != expected_token:
+                add_log(f"CSRF validation warning for {request.path} from {client_key}", "warn")
+
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # ── Security Helpers ─────────────────────────────────────────────────
 
 def sanitize(val, max_len=500):
-    """Strip HTML tags and limit string length."""
+    """Escape HTML entities and limit string length."""
     if not isinstance(val, str):
         return val
-    val = re.sub(r'<[^>]+>', '', val)
+    val = html_module.escape(val, quote=True)
     return val[:max_len]
 
 
@@ -95,16 +150,12 @@ def require_api_key(f):
         if not api_key_env:
             return f(*args, **kwargs)
 
-        # Check for API key in header
+        # Check for API key in header only (never in query parameters)
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             provided_key = auth_header[7:]
             if provided_key == api_key_env:
                 return f(*args, **kwargs)
-
-        # Check for API key in query parameter
-        if request.args.get("api_key") == api_key_env:
-            return f(*args, **kwargs)
 
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -317,6 +368,15 @@ def index():
     return render_template("dashboard.html")
 
 
+# ── Routes: CSRF Token ───────────────────────────────────────────
+
+@app.route("/api/csrf-token", methods=["GET"])
+def api_csrf_token():
+    """Generate and return a CSRF token for client."""
+    token = generate_csrf_token()
+    return jsonify({"csrf_token": token})
+
+
 # ── Routes: Status ───────────────────────────────────────────────────
 
 @app.route("/api/status")
@@ -382,6 +442,7 @@ def api_get_config():
 
 
 @app.route("/api/config", methods=["POST"])
+@require_api_key
 def api_save_config():
     """Config saving is not supported on Vercel — use Vercel Dashboard."""
     return jsonify({
@@ -466,11 +527,20 @@ def api_get_brand(slug):
 
 
 @app.route("/api/brands", methods=["POST"])
+@require_api_key
 def api_create_brand():
     data = request.json
-    slug = data.pop("slug", "").strip().lower().replace(" ", "-")
+    slug = sanitize(data.pop("slug", "")).strip().lower().replace(" ", "-")
     if not slug:
         return jsonify({"error": "Slug is required"}), 400
+
+    # Sanitize all user inputs
+    if "name" in data:
+        data["name"] = sanitize(data["name"])
+    if "currency" in data:
+        data["currency"] = sanitize(data["currency"], max_len=10)
+    if "description" in data:
+        data["description"] = sanitize(data["description"], max_len=1000)
 
     # Extract imported data and mappings before creating brand
     imported_data = data.pop("_imported_data", None)
@@ -492,38 +562,68 @@ def api_create_brand():
         except Exception as e:
             add_log(f"Error storing imported data for {slug}: {e}", "error")
 
-    add_log(f"Brand created: {data.get('name', slug)}", "success")
+    add_log(f"Brand created: {data.get('name', slug)}", "success", {
+        "ip": request.remote_addr,
+        "method": request.method,
+        "path": request.path
+    })
     return jsonify(brand), 201
 
 
 @app.route("/api/brands/<slug>", methods=["PUT"])
+@require_api_key
 def api_update_brand(slug):
     data = request.json
+
+    # Sanitize all user inputs
+    if "name" in data:
+        data["name"] = sanitize(data["name"])
+    if "currency" in data:
+        data["currency"] = sanitize(data["currency"], max_len=10)
+    if "description" in data:
+        data["description"] = sanitize(data["description"], max_len=1000)
+
     brand = update_brand(slug, data)
     if brand:
-        add_log(f"Brand updated: {brand.get('name', slug)}")
+        add_log(f"Brand updated: {brand.get('name', slug)}", "success", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
         return jsonify(brand)
     return jsonify({"error": "Brand not found"}), 404
 
 
 @app.route("/api/brands/<slug>", methods=["DELETE"])
+@require_api_key
 def api_delete_brand(slug):
     if delete_brand(slug):
-        add_log(f"Brand deleted: {slug}")
+        add_log(f"Brand deleted: {slug}", "success", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
         return jsonify({"ok": True})
     return jsonify({"error": "Brand not found"}), 404
 
 
 @app.route("/api/brands/<slug>/toggle", methods=["POST"])
+@require_api_key
 def api_toggle_brand(slug):
     active = request.json.get("active", True)
     toggle_brand(slug, active)
+    add_log(f"Brand toggle: {slug} -> {active}", "info", {
+        "ip": request.remote_addr,
+        "method": request.method,
+        "path": request.path
+    })
     return jsonify({"ok": True})
 
 
 # ── Routes: Run Pipeline ─────────────────────────────────────────────
 
 @app.route("/api/run", methods=["POST"])
+@require_api_key
 def api_run():
     """Run pipeline synchronously (no threading in serverless)."""
     data = request.json or {}
@@ -575,21 +675,31 @@ def api_get_template(name):
 
 
 @app.route("/api/templates/<name>", methods=["PUT"])
+@require_api_key
 def api_save_template(name):
     """Save/update a custom template."""
     data = request.json
     if not data:
         return jsonify({"error": "Template data required"}), 400
     result = save_template(name, data)
-    add_log(f"Template saved: {name}", "success")
+    add_log(f"Template saved: {name}", "success", {
+        "ip": request.remote_addr,
+        "method": request.method,
+        "path": request.path
+    })
     return jsonify({"ok": True, "template": result})
 
 
 @app.route("/api/templates/<name>", methods=["DELETE"])
+@require_api_key
 def api_delete_template(name):
     """Delete a custom template."""
     if delete_template(name):
-        add_log(f"Template deleted: {name}")
+        add_log(f"Template deleted: {name}", "success", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
         return jsonify({"ok": True})
     return jsonify({"error": "Cannot delete default template or template not found"}), 400
 
@@ -618,35 +728,55 @@ def api_preview_template():
 @app.route("/api/cron/daily")
 def cron_daily():
     """Vercel Cron: runs daily reports for all active brands."""
-    # Verify cron secret (optional security)
-    auth = request.headers.get("Authorization")
+    # CRON_SECRET is mandatory
     cron_secret = os.environ.get("CRON_SECRET")
-    if cron_secret and auth != f"Bearer {cron_secret}":
+    if not cron_secret:
+        add_log("CRON endpoint called but CRON_SECRET not configured", "error")
+        return jsonify({"error": "CRON_SECRET not configured"}), 403
+
+    auth = request.headers.get("Authorization")
+    if auth != f"Bearer {cron_secret}":
+        add_log(f"Unauthorized cron/daily request from {request.remote_addr}", "warn")
         return jsonify({"error": "Unauthorized"}), 401
 
     results = run_all_brands("daily", dry_run=False)
+    add_log(f"Cron job executed: daily", "success")
     return jsonify({"ok": True, "type": "daily", "results": results})
 
 
 @app.route("/api/cron/weekly")
 def cron_weekly():
-    auth = request.headers.get("Authorization")
+    # CRON_SECRET is mandatory
     cron_secret = os.environ.get("CRON_SECRET")
-    if cron_secret and auth != f"Bearer {cron_secret}":
+    if not cron_secret:
+        add_log("CRON endpoint called but CRON_SECRET not configured", "error")
+        return jsonify({"error": "CRON_SECRET not configured"}), 403
+
+    auth = request.headers.get("Authorization")
+    if auth != f"Bearer {cron_secret}":
+        add_log(f"Unauthorized cron/weekly request from {request.remote_addr}", "warn")
         return jsonify({"error": "Unauthorized"}), 401
 
     results = run_all_brands("weekly", dry_run=False)
+    add_log(f"Cron job executed: weekly", "success")
     return jsonify({"ok": True, "type": "weekly", "results": results})
 
 
 @app.route("/api/cron/monthly")
 def cron_monthly():
-    auth = request.headers.get("Authorization")
+    # CRON_SECRET is mandatory
     cron_secret = os.environ.get("CRON_SECRET")
-    if cron_secret and auth != f"Bearer {cron_secret}":
+    if not cron_secret:
+        add_log("CRON endpoint called but CRON_SECRET not configured", "error")
+        return jsonify({"error": "CRON_SECRET not configured"}), 403
+
+    auth = request.headers.get("Authorization")
+    if auth != f"Bearer {cron_secret}":
+        add_log(f"Unauthorized cron/monthly request from {request.remote_addr}", "warn")
         return jsonify({"error": "Unauthorized"}), 401
 
     results = run_all_brands("monthly", dry_run=False)
+    add_log(f"Cron job executed: monthly", "success")
     return jsonify({"ok": True, "type": "monthly", "results": results})
 
 
@@ -665,9 +795,17 @@ def api_scheduler():
 # ── Routes: Reports & Downloads ──────────────────────────────────────
 
 @app.route("/api/download/<filename>")
+@require_api_key
 def api_download(filename):
+    # Prevent path traversal attacks
+    filename = os.path.basename(filename)
     path = os.path.join(REPORTS_DIR, filename)
     if os.path.exists(path):
+        add_log(f"File downloaded: {filename}", "success", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
         return send_file(path, as_attachment=True, download_name=filename)
     return jsonify({"error": "File not found. Reports on Vercel are stored in /tmp and may be cleared between requests."}), 404
 

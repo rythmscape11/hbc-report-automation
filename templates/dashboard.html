@@ -39,6 +39,38 @@
             --glass-border: #D0E3F0;
         }
 
+        [data-theme="dark"] {
+            --primary: #4DA8DA;
+            --bg: #0F1419;
+            --bg-card: #1A2332;
+            --bg-card-hover: #243447;
+            --card: #1A2332;
+            --text: #E8EAED;
+            --text-secondary: #9AA0A6;
+            --text-muted: #5F6368;
+            --border: #2D3748;
+            --border-hover: #4DA8DA;
+            --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            --glass: #1A2332;
+            --glass-border: #2D3748;
+        }
+
+        /* Skip to Content Link */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            z-index: 100000;
+        }
+        .skip-to-content:focus {
+            top: 0;
+        }
+
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; }
         body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; overflow-x:hidden; }
@@ -59,6 +91,8 @@
         .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; background:#EAF7E3; color:var(--success); border:1px solid rgba(99,175,54,0.3); }
         .status-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation:pulse 2s infinite; }
         .hamburger { display:none; background:none; border:none; color:var(--primary); cursor:pointer; font-size:24px; }
+        .theme-toggle { background:none; border:none; font-size:20px; cursor:pointer; padding:8px; border-radius:var(--radius-sm); transition:all .2s; }
+        .theme-toggle:hover { background:var(--primary-light); }
 
         /* ── Tabs ── */
         .tabs-bar { background:#FFFFFF; border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -146,9 +180,12 @@
         .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
         .spinner-sm { width:16px; height:16px; border-width:2px; }
         .loading-overlay { position:absolute; inset:0; background:rgba(255,255,255,0.8); display:flex; align-items:center; justify-content:center; z-index:10; border-radius:var(--radius); backdrop-filter:blur(2px); }
-        .skeleton { background:linear-gradient(90deg,#E9ECEF 25%,#DEE2E6 50%,#E9ECEF 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--radius-sm); }
+        .skeleton { background:linear-gradient(90deg,#E9ECEF 25%,#DEE2E6 50%,#E9ECEF 75%); background-size:400px 100%; animation:shimmer 1.5s infinite; border-radius:var(--radius-sm); min-height:20px; }
         .skeleton-line { height:14px; margin-bottom:10px; border-radius:4px; }
         .skeleton-line:last-child { width:60%; }
+        .skeleton-chart { height:300px; border-radius:var(--radius); }
+        .skeleton-text { height:16px; margin-bottom:8px; width:80%; }
+        .skeleton-kpi { height:80px; border-radius:var(--radius); }
 
         /* ── Toast ── */
         .toast { position:fixed; top:80px; right:24px; padding:16px 20px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:12px; min-width:320px; z-index:2000; transform:translateX(400px); transition:transform .3s ease; border:1px solid; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
@@ -159,9 +196,11 @@
         .toast.info { background:#E8F4FB; border-color:var(--meta-blue); color:var(--meta-blue); }
 
         /* ── Empty State ── */
-        .empty-state { text-align:center; padding:60px 24px; color:var(--text-secondary); }
+        .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; color:var(--text-muted); text-align:center; min-height:200px; }
+        .empty-state svg { width:48px; height:48px; margin-bottom:12px; opacity:0.4; }
         .empty-state .icon { font-size:48px; margin-bottom:16px; opacity:.5; }
         .empty-state .title { font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px; }
+        .empty-state p { font-size:14px; max-width:300px; }
 
         /* ── Analytics Section Dividers ── */
         .analytics-section-divider { margin:36px 0 20px; padding:14px 20px; border-radius:var(--radius-sm); background:linear-gradient(90deg,var(--primary-light),transparent); border-left:4px solid var(--primary); display:flex; align-items:center; gap:14px; }
@@ -281,24 +320,33 @@
         @keyframes countUp { from{opacity:.5} to{opacity:1} }
 
         /* ── Responsive ── */
-        @media(max-width:1200px) {
-            .hero-grid { grid-template-columns:1fr; gap:40px; }
-            .hero h1 { font-size:40px; }
-            .kpi-grid { grid-template-columns:repeat(2,1fr); }
-        }
-        @media(max-width:992px) {
-            .grid-3 { grid-template-columns:1fr 1fr; }
-            .grid-4 { grid-template-columns:1fr 1fr; }
-            .hero { padding:48px 20px 40px; }
-            .hero h1 { font-size:32px; }
+        @media(max-width:480px) {
+            nav { flex-wrap:wrap; gap:4px; padding:8px; }
+            nav a { font-size:11px; padding:6px 10px; }
+            .hero-section { flex-direction:column; padding:20px; }
+            .hero h1 { font-size:24px; }
+            .stat-card-grid, .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+            .chart-card { padding:12px; }
+            .chart-card h2 { font-size:14px; }
+            .filter-bar { flex-direction:column; }
+            .filter-bar select { width:100%; }
+            .brand-grid { grid-template-columns:1fr; }
+            .section-card { padding:12px; }
+            .hero { padding:32px 12px 24px; }
+            .platform-row { gap:8px; }
+            .platform-pill { padding:8px 12px; font-size:11px; }
+            .container { padding:16px 12px; }
         }
         @media(max-width:768px) {
             .hamburger { display:block; }
             .header-right .status-badge { display:none; }
-            .tabs-inner { padding:10px 16px; }
+            .tabs-inner { padding:10px 16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
             .tab { padding:8px 14px; font-size:13px; }
             .container { padding:20px 16px; }
             .grid,.grid-3,.grid-4 { grid-template-columns:1fr; }
+            .analytics-grid { grid-template-columns:1fr !important; }
+            .stat-card-grid { grid-template-columns:repeat(2,1fr); }
+            .hero-stats { grid-template-columns:1fr 1fr; }
             .kpi-grid { grid-template-columns:1fr 1fr; }
             .hero-grid { grid-template-columns:1fr; }
             .hero h1 { font-size:28px; }
@@ -312,13 +360,22 @@
             .stat-card .value { font-size:22px; }
             .table-wrap { margin:0 -16px; border-radius:0; }
             .modal { width:95%; }
+            .brand-info { grid-template-columns:1fr; }
+            .form-row, .form-row-3, .form-row-4 { grid-template-columns:1fr; }
+            .api-account-item { flex-direction:column; align-items:flex-start; }
+            .quick-actions { flex-wrap:wrap; }
+            .quick-actions .btn { flex:1 1 45%; }
         }
-        @media(max-width:480px) {
-            .hero h1 { font-size:24px; }
-            .hero { padding:32px 12px 24px; }
-            .platform-row { gap:8px; }
-            .platform-pill { padding:8px 12px; font-size:11px; }
-            .container { padding:16px 12px; }
+        @media(max-width:992px) {
+            .grid-3 { grid-template-columns:1fr 1fr; }
+            .grid-4 { grid-template-columns:1fr 1fr; }
+            .hero { padding:48px 20px 40px; }
+            .hero h1 { font-size:32px; }
+        }
+        @media(max-width:1200px) {
+            .hero-grid { grid-template-columns:1fr; gap:40px; }
+            .hero h1 { font-size:40px; }
+            .kpi-grid { grid-template-columns:repeat(2,1fr); }
         }
 
         /* ── Print ── */
@@ -417,39 +474,47 @@
 </head>
 <body>
 
+<!-- ═══ Skip to Content ═══ -->
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+
 <!-- ═══ Header ═══ -->
 <div class="header">
     <div class="header-inner">
-        <a class="logo" href="/">
+        <a class="logo" href="/" aria-label="AdFlow Studio Home">
             <div class="logo-mark">A</div>
             <div class="logo-text">AdFlow <span>Studio</span></div>
         </a>
         <div class="header-right">
-            <div id="statusBadge" class="status-badge">
+            <div id="dataFreshness" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-right:12px;" title="Time since last data refresh">
+                <span style="width:8px;height:8px;border-radius:50%;background:#63AF36;display:inline-block;"></span>
+                <span id="freshnessText">Data: Live</span>
+            </div>
+            <div id="statusBadge" class="status-badge" role="status" aria-live="polite">
                 <span class="status-dot"></span>
                 <span id="statusText">System Online</span>
             </div>
-            <button class="hamburger" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open')">☰</button>
+            <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">☰</button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
         </div>
     </div>
 </div>
 
 <!-- ═══ Tabs ═══ -->
-<div class="tabs-bar">
+<nav class="tabs-bar" role="navigation" aria-label="Main navigation">
     <div class="tabs-inner">
-        <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
-        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
-        <button class="tab" onclick="switchTab('datastudio')">Data Studio</button>
-        <button class="tab" onclick="switchTab('brands')">Brands</button>
-        <button class="tab" onclick="switchTab('api')">API Settings</button>
-        <button class="tab" onclick="switchTab('schedule')">Schedule</button>
-        <button class="tab" onclick="switchTab('templates')">Report Structure</button>
-        <button class="tab" onclick="switchTab('logs')">Logs</button>
+        <button class="tab active" role="tab" aria-selected="true" onclick="switchTab('dashboard')" onkeydown="handleTabKeydown(event, 'dashboard')">Dashboard</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('analytics')" onkeydown="handleTabKeydown(event, 'analytics')">Analytics</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('datastudio')" onkeydown="handleTabKeydown(event, 'datastudio')">Data Studio</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('brands')" onkeydown="handleTabKeydown(event, 'brands')">Brands</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('api')" onkeydown="handleTabKeydown(event, 'api')">API Settings</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('schedule')" onkeydown="handleTabKeydown(event, 'schedule')">Schedule</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('templates')" onkeydown="handleTabKeydown(event, 'templates')">Report Structure</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('logs')" onkeydown="handleTabKeydown(event, 'logs')">Logs</button>
     </div>
-</div>
+</nav>
 
 <!-- ═══ Main Container ═══ -->
-<div class="container">
+<div class="container" id="main-content">
 
     <!-- ===== TAB: DASHBOARD ===== -->
     <div id="tab-dashboard" class="tab-content active">
@@ -494,19 +559,19 @@
 
         <!-- Overview Stats -->
         <div class="grid-4">
-            <div class="stat-card">
+            <div class="stat-card" tabindex="0" role="region" aria-label="Total Brands stat">
                 <div class="label">Total Brands</div>
                 <div id="statTotalBrands" class="value">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" tabindex="0" role="region" aria-label="Active Brands stat">
                 <div class="label">Active Brands</div>
                 <div id="statActiveBrands" class="value ok">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" tabindex="0" role="region" aria-label="Pipeline Status stat">
                 <div class="label">Pipeline Status</div>
                 <div id="statPipelineStatus" class="value">Idle</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" tabindex="0" role="region" aria-label="Last Report time stat">
                 <div class="label">Last Report</div>
                 <div id="statLastReport" class="value" style="font-size:14px;">Never</div>
             </div>
@@ -529,11 +594,11 @@
         <div class="card full-width">
             <h2><span class="icon">⚡</span> Quick Actions</h2>
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="runAllBrands('daily')">Run All (Daily)</button>
-                <button class="btn btn-success" onclick="runAllBrands('weekly')">Run All (Weekly)</button>
-                <button class="btn btn-warning" onclick="runAllBrands('monthly')">Run All (Monthly)</button>
-                <button class="btn btn-outline" onclick="runAllBrands('full')">Run All (Full)</button>
-                <button class="btn btn-outline" onclick="runAllBrands('dryrun')">Dry Run All</button>
+                <button class="btn btn-primary" aria-label="Run all brands daily report" onclick="runAllBrands('daily')">Run All (Daily)</button>
+                <button class="btn btn-success" aria-label="Run all brands weekly report" onclick="runAllBrands('weekly')">Run All (Weekly)</button>
+                <button class="btn btn-warning" aria-label="Run all brands monthly report" onclick="runAllBrands('monthly')">Run All (Monthly)</button>
+                <button class="btn btn-outline" aria-label="Run all brands full report" onclick="runAllBrands('full')">Run All (Full)</button>
+                <button class="btn btn-outline" aria-label="Dry run all brands reports" onclick="runAllBrands('dryrun')">Dry Run All</button>
             </div>
         </div>
 
@@ -591,7 +656,19 @@
                     <option value="video">Video</option>
                     <option value="conversions">Conversions</option>
                 </select>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);">Currency</label>
+                    <select id="currencySelect" onchange="updateCurrencySelector()" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:14px;">
+                        <option value="INR" selected>₹ INR</option>
+                        <option value="USD">$ USD</option>
+                        <option value="EUR">€ EUR</option>
+                        <option value="GBP">£ GBP</option>
+                        <option value="AED">د.إ AED</option>
+                        <option value="SGD">S$ SGD</option>
+                    </select>
+                </div>
                 <button class="btn btn-primary btn-small" onclick="loadAnalytics()" style="padding:10px 20px;">Refresh</button>
+                <button class="btn btn-outline btn-small" onclick="resetAnalyticsFilters()" style="padding:10px 20px;">Reset Filters</button>
                 <button class="btn btn-success btn-small" onclick="showPDFSettings()" style="padding:10px 20px;">⬇ Export PDF</button>
             </div>
         </div>
@@ -1017,6 +1094,32 @@
             </div>
         </div>
 
+        <!-- Alert Rules Configuration -->
+        <div class="card full-width" style="margin-top:24px;">
+            <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">🔔 Alert Rules</h2>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">Get notified when metrics exceed thresholds</p>
+            <div id="alertRules" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;">
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Metric</label>
+                    <select id="alertMetric" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);">
+                        <option>CPM</option><option>CPC</option><option>CTR</option><option>Spend</option><option>Impressions</option><option>ROAS</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Condition</label>
+                    <select id="alertCondition" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);">
+                        <option>exceeds</option><option>drops below</option><option>changes by more than</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Threshold</label>
+                    <input type="number" id="alertThreshold" placeholder="100" style="width:100px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);">
+                </div>
+                <button onclick="addAlertRule()" style="padding:8px 16px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;height:38px;">+ Add Rule</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- Fullscreen Chart Overlay -->
@@ -1262,20 +1365,30 @@
                 <h2><span class="icon">📘</span> Meta API Credentials</h2>
                 <div class="form-group">
                     <label>Access Token</label>
-                    <input type="password" id="META_ACCESS_TOKEN" placeholder="EAAxxxxxxx...">
+                    <div style="display:flex;gap:8px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <input type="password" id="META_ACCESS_TOKEN" placeholder="EAAxxxxxxx..." aria-label="Meta Access Token">
+                        </div>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('META_ACCESS_TOKEN')" aria-label="Toggle Access Token visibility">👁</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Ad Account ID</label>
-                    <input type="text" id="META_AD_ACCOUNT_ID" placeholder="act_123456789">
+                    <input type="text" id="META_AD_ACCOUNT_ID" placeholder="act_123456789" aria-label="Meta Ad Account ID">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>App ID</label>
-                        <input type="text" id="META_APP_ID" placeholder="Optional">
+                        <input type="text" id="META_APP_ID" placeholder="Optional" aria-label="Meta App ID">
                     </div>
                     <div class="form-group">
                         <label>App Secret</label>
-                        <input type="password" id="META_APP_SECRET" placeholder="Optional">
+                        <div style="display:flex;gap:8px;align-items:flex-end;">
+                            <div style="flex:1;">
+                                <input type="password" id="META_APP_SECRET" placeholder="Optional" aria-label="Meta App Secret">
+                            </div>
+                            <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('META_APP_SECRET')" aria-label="Toggle App Secret visibility">👁</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1285,23 +1398,38 @@
                 <h2><span class="icon">📕</span> Google Ads API Credentials</h2>
                 <div class="form-group">
                     <label>Developer Token</label>
-                    <input type="password" id="GOOGLE_ADS_DEVELOPER_TOKEN" placeholder="Your developer token">
+                    <div style="display:flex;gap:8px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <input type="password" id="GOOGLE_ADS_DEVELOPER_TOKEN" placeholder="Your developer token" aria-label="Google Ads Developer Token">
+                        </div>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('GOOGLE_ADS_DEVELOPER_TOKEN')" aria-label="Toggle Developer Token visibility">👁</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Client ID</label>
-                    <input type="text" id="GOOGLE_ADS_CLIENT_ID" placeholder="xxxxx.apps.googleusercontent.com">
+                    <input type="text" id="GOOGLE_ADS_CLIENT_ID" placeholder="xxxxx.apps.googleusercontent.com" aria-label="Google Ads Client ID">
                 </div>
                 <div class="form-group">
                     <label>Client Secret</label>
-                    <input type="password" id="GOOGLE_ADS_CLIENT_SECRET" placeholder="Your client secret">
+                    <div style="display:flex;gap:8px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <input type="password" id="GOOGLE_ADS_CLIENT_SECRET" placeholder="Your client secret" aria-label="Google Ads Client Secret">
+                        </div>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_CLIENT_SECRET')" aria-label="Toggle Client Secret visibility">👁</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Refresh Token</label>
-                    <input type="password" id="GOOGLE_ADS_REFRESH_TOKEN" placeholder="1//xxxxxxx">
+                    <div style="display:flex;gap:8px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <input type="password" id="GOOGLE_ADS_REFRESH_TOKEN" placeholder="1//xxxxxxx" aria-label="Google Ads Refresh Token">
+                        </div>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_REFRESH_TOKEN')" aria-label="Toggle Refresh Token visibility">👁</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Customer ID</label>
-                    <input type="text" id="GOOGLE_ADS_CUSTOMER_ID" placeholder="1234567890">
+                    <input type="text" id="GOOGLE_ADS_CUSTOMER_ID" placeholder="1234567890" aria-label="Google Ads Customer ID">
                 </div>
             </div>
         </div>
@@ -1343,6 +1471,34 @@
             <div class="btn-group">
                 <button class="btn btn-outline" onclick="testEmail()">Send Test Email</button>
             </div>
+        </div>
+
+        <!-- White-Label Settings -->
+        <div class="card full-width" style="margin-top:24px;">
+            <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;">🏷️ White-Label Settings</h2>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">Customize branding for client-facing views</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px;">Company Name</label>
+                    <input type="text" id="wlCompanyName" value="SocialPanga" placeholder="Your agency name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg-card);color:var(--text);">
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px;">Primary Brand Color</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="color" id="wlPrimaryColor" value="#238BC3" style="width:48px;height:38px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="text" id="wlPrimaryColorHex" value="#238BC3" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:monospace;background:var(--bg-card);color:var(--text);" maxlength="7">
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px;">Logo URL</label>
+                    <input type="text" id="wlLogoUrl" placeholder="https://youragency.com/logo.png" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg-card);color:var(--text);">
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px;">Client Portal Domain</label>
+                    <input type="text" id="wlDomain" placeholder="analytics.youragency.com" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg-card);color:var(--text);">
+                </div>
+            </div>
+            <button onclick="applyWhiteLabel()" style="margin-top:16px;padding:10px 24px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;">Preview White-Label</button>
         </div>
 
         <!-- Save Button -->
@@ -1435,9 +1591,44 @@
     <!-- ===== TAB 6: LOGS ===== -->
     <div id="tab-logs" class="tab-content">
         <div class="card full-width">
-            <h2><span class="icon">📋</span> Real-Time Logs</h2>
-            <div class="log-panel" id="logPanel">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 style="margin:0;"><span class="icon">📋</span> Real-Time Logs</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('all')" id="logFilterAll">All</button>
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('info')" id="logFilterInfo">Info</button>
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('warning')" id="logFilterWarning">Warning</button>
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('error')" id="logFilterError">Error</button>
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="clearLogs()" id="logClearBtn">🗑 Clear Logs</button>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <input type="checkbox" id="logAutoScroll" checked style="width:16px;height:16px;cursor:pointer;">
+                <label for="logAutoScroll" style="cursor:pointer;font-size:13px;margin:0;">Auto-scroll to latest</label>
+                <span style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="logCount">0 entries</span>
+            </div>
+            <div class="log-panel" id="logPanel" role="log" aria-live="polite" aria-label="System logs">
                 <div class="log-entry" style="color:#6b7280;">Waiting for activity...</div>
+            </div>
+        </div>
+
+        <!-- Audit Trail -->
+        <div class="card full-width" style="margin-top:24px;">
+            <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">📋 Audit Trail</h2>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">Track all administrative actions</p>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--border);">
+                            <th style="text-align:left;padding:10px 12px;color:var(--text-secondary);font-weight:600;">Timestamp</th>
+                            <th style="text-align:left;padding:10px 12px;color:var(--text-secondary);font-weight:600;">Action</th>
+                            <th style="text-align:left;padding:10px 12px;color:var(--text-secondary);font-weight:600;">User/IP</th>
+                            <th style="text-align:left;padding:10px 12px;color:var(--text-secondary);font-weight:600;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTrailBody">
+                        <tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text-muted);font-style:italic;">Audit trail will populate as actions are performed</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1666,14 +1857,111 @@
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    // ── Multi-Currency Support ──
+    const CURRENCY_RATES = { INR: 1, USD: 0.012, EUR: 0.011, GBP: 0.0094, AED: 0.044, SGD: 0.016 };
+    const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', SGD: 'S$' };
+
+    function updateCurrencySelector() {
+        const selectedCode = document.getElementById('currencySelect').value;
+        const rate = CURRENCY_RATES[selectedCode] || 1;
+        const symbol = CURRENCY_SYMBOLS[selectedCode] || '₹';
+        currentCurrency = { code: selectedCode, symbol: symbol, rate: rate };
+        if (typeof loadAnalytics === 'function') loadAnalytics();
+    }
+
+    function formatCurrencyMulti(amountINR) {
+        const converted = amountINR * (currentCurrency.rate || 1);
+        const sym = currentCurrency.symbol || '₹';
+        if (converted >= 10000000) return sym + (converted / 10000000).toFixed(2) + ' Cr';
+        if (converted >= 100000) return sym + (converted / 100000).toFixed(2) + ' L';
+        if (converted >= 1000) return sym + (converted / 1000).toFixed(1) + 'K';
+        return sym + converted.toFixed(2);
+    }
+
+    // ── White-Label Configuration ──
+    function applyWhiteLabel() {
+        const name = document.getElementById('wlCompanyName').value;
+        const color = document.getElementById('wlPrimaryColor').value;
+        const logoUrl = document.getElementById('wlLogoUrl').value;
+
+        const headerTitle = document.querySelector('.logo-text, header span');
+        if (headerTitle) headerTitle.textContent = name + ' Studio';
+
+        document.documentElement.style.setProperty('--primary', color);
+        document.documentElement.style.setProperty('--primary-dark', color);
+
+        const badge = document.querySelector('.hero-badge, [class*="powered"]');
+        if (badge) badge.textContent = 'Powered by ' + name;
+
+        showToast('White-label preview applied!', 'success');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const colorPicker = document.getElementById('wlPrimaryColor');
+        const colorHex = document.getElementById('wlPrimaryColorHex');
+        if (colorPicker && colorHex) {
+            colorPicker.addEventListener('input', () => colorHex.value = colorPicker.value);
+            colorHex.addEventListener('input', () => { if (/^#[0-9A-Fa-f]{6}$/.test(colorHex.value)) colorPicker.value = colorHex.value; });
+        }
+    });
+
+    // ── Data Freshness Tracking ──
+    let lastDataFetch = Date.now();
+    function updateFreshness() {
+        const diff = Math.floor((Date.now() - lastDataFetch) / 60000);
+        const el = document.getElementById('freshnessText');
+        const dot = el?.previousElementSibling;
+        if (!el) return;
+        if (diff < 5) { el.textContent = 'Data: Live'; dot.style.background = '#63AF36'; }
+        else if (diff < 30) { el.textContent = 'Data: ' + diff + 'm ago'; dot.style.background = '#F59E0B'; }
+        else { el.textContent = 'Data: Stale (' + diff + 'm)'; dot.style.background = '#C32126'; }
+    }
+    setInterval(updateFreshness, 60000);
+
+    // ── Alert Rules Management ──
+    let alertRules = [];
+    function addAlertRule() {
+        const metric = document.getElementById('alertMetric').value;
+        const condition = document.getElementById('alertCondition').value;
+        const threshold = document.getElementById('alertThreshold').value;
+        if (!threshold) { showToast('Please enter a threshold value', 'warning'); return; }
+        alertRules.push({ metric, condition, threshold, active: true, id: Date.now() });
+        renderAlertRules();
+        showToast('Alert rule added', 'success');
+    }
+
+    function removeAlertRule(id) {
+        alertRules = alertRules.filter(r => r.id !== id);
+        renderAlertRules();
+    }
+
+    function renderAlertRules() {
+        const container = document.getElementById('alertRules');
+        if (!container) return;
+        if (alertRules.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;font-style:italic;">No alert rules configured. Add one below.</p>';
+            return;
+        }
+        container.innerHTML = alertRules.map(r =>
+            '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">' +
+            '<span style="font-size:14px;"><strong>' + r.metric + '</strong> ' + r.condition + ' <strong>' + r.threshold + '</strong></span>' +
+            '<button onclick="removeAlertRule(' + r.id + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;" title="Remove rule">✕</button>' +
+            '</div>'
+        ).join('');
+    }
+
     // ── Tab Switching ──
     function switchTab(tab) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+        });
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         // Find the correct tab button by matching its onclick attribute
         document.querySelectorAll('.tab').forEach(t => {
             if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + tab + "'")) {
                 t.classList.add('active');
+                t.setAttribute('aria-selected', 'true');
             }
         });
         document.getElementById('tab-' + tab).classList.add('active');
@@ -3580,7 +3868,19 @@
             return;
         }
 
-        grid.innerHTML = brands.map(brand => `
+        grid.innerHTML = brands.map(brand => {
+            const metaStart = brand.meta?.start_date || '-';
+            const metaEnd = brand.meta?.end_date || '-';
+            const metaPeriod = (metaStart === '-' && metaEnd === '-') ? '<span style="color:var(--text-muted);font-style:italic;">Not set</span>' : `${metaStart} to ${metaEnd}`;
+
+            const ytStart = brand.youtube?.start_date || '-';
+            const ytEnd = brand.youtube?.end_date || '-';
+            const ytPeriod = (ytStart === '-' && ytEnd === '-') ? '<span style="color:var(--text-muted);font-style:italic;">Not set</span>' : `${ytStart} to ${ytEnd}`;
+
+            const metaBudget = brand.meta?.budget && parseInt(brand.meta.budget) > 0 ? `₹${brand.meta.budget}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
+            const ytBudget = brand.youtube?.budget && parseInt(brand.youtube.budget) > 0 ? `₹${brand.youtube.budget}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
+
+            return `
             <div class="brand-card ${!brand.active ? 'inactive' : ''}">
                 <div class="brand-status ${brand.active ? 'active' : 'inactive'}">
                     <span class="brand-status-dot"></span>
@@ -3590,19 +3890,19 @@
                 <div class="brand-info">
                     <div class="brand-info-item">
                         <div class="label">Meta Period</div>
-                        <div class="value">${brand.meta?.start_date || '-'} to ${brand.meta?.end_date || '-'}</div>
+                        <div class="value">${metaPeriod}</div>
                     </div>
                     <div class="brand-info-item">
                         <div class="label">YouTube Period</div>
-                        <div class="value">${brand.youtube?.start_date || '-'} to ${brand.youtube?.end_date || '-'}</div>
+                        <div class="value">${ytPeriod}</div>
                     </div>
                     <div class="brand-info-item">
                         <div class="label">Meta Budget</div>
-                        <div class="value">₹${brand.meta?.budget || '0'}</div>
+                        <div class="value">${metaBudget}</div>
                     </div>
                     <div class="brand-info-item">
                         <div class="label">YouTube Budget</div>
-                        <div class="value">₹${brand.youtube?.budget || '0'}</div>
+                        <div class="value">${ytBudget}</div>
                     </div>
                     <div class="brand-info-item">
                         <div class="label">Regions</div>
@@ -3618,7 +3918,7 @@
                     <button class="btn btn-danger btn-small" onclick="deleteBrand('${brand.slug}')">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     function openBrandModal(brandSlug = null) {
@@ -5971,6 +6271,159 @@
             if (el1 && data.active_brands) el1.textContent = data.active_brands;
             if (el2 && data.charts_available) el2.textContent = data.charts_available + '+';
         } catch(e) {}
+    }
+
+    // ── Dark Mode Toggle ──
+    const themeToggle = document.getElementById('themeToggle');
+    let currentTheme = localStorage.getItem('theme') || 'light';
+
+    if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '☀️';
+    }
+
+    themeToggle?.addEventListener('click', () => {
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        currentTheme = newTheme;
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // ── Password Visibility Toggle ──
+    function togglePasswordVisibility(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        const isPassword = field.type === 'password';
+        field.type = isPassword ? 'text' : 'password';
+        event.target.textContent = isPassword ? '🙈' : '👁';
+    }
+
+    // ── Tab Keyboard Navigation ──
+    function handleTabKeydown(event, tabName) {
+        const tabs = document.querySelectorAll('.tab');
+        const currentIndex = Array.from(tabs).findIndex(t => t.getAttribute('aria-selected') === 'true');
+
+        let targetIndex = currentIndex;
+        if (event.key === 'ArrowRight') {
+            targetIndex = (currentIndex + 1) % tabs.length;
+            event.preventDefault();
+        } else if (event.key === 'ArrowLeft') {
+            targetIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+            event.preventDefault();
+        }
+
+        if (targetIndex !== currentIndex) {
+            const targetTab = tabs[targetIndex];
+            targetTab.focus();
+            targetTab.click();
+        }
+    }
+
+    // ── Keyboard Shortcuts ──
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+            if (e.key === 'Escape') {
+                e.target.blur();
+                e.preventDefault();
+            }
+            return;
+        }
+
+        const tabNames = ['dashboard', 'analytics', 'datastudio', 'brands', 'api', 'schedule', 'templates', 'logs'];
+        const num = parseInt(e.key);
+
+        if (num >= 1 && num <= 8) {
+            switchTab(tabNames[num - 1]);
+            e.preventDefault();
+        }
+
+        if (e.key === '?') {
+            showKeyboardShortcutsModal();
+            e.preventDefault();
+        }
+
+        if (e.key === 'Escape' && document.querySelector('.chart-fullscreen-overlay.active')) {
+            closeFullscreen();
+            e.preventDefault();
+        }
+    });
+
+    function showKeyboardShortcutsModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width:500px;">
+                <div class="modal-header">
+                    <span class="modal-title">Keyboard Shortcuts</span>
+                    <button class="modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;">
+                        <div><strong>1-8</strong><br>Switch tabs</div>
+                        <div><strong>?</strong><br>Show this help</div>
+                        <div><strong>Esc</strong><br>Close fullscreen</div>
+                        <div><strong>Arrow Keys</strong><br>Navigate tabs</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        setTimeout(() => modal.remove(), 8000);
+    }
+
+    function closeFullscreen() {
+        const overlay = document.querySelector('.chart-fullscreen-overlay.active');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    // ── Log Filtering ──
+    let logFilter = 'all';
+    let allLogs = [];
+
+    function filterLogs(type) {
+        logFilter = type;
+        document.querySelectorAll('[id^="logFilter"]').forEach(btn => btn.style.borderColor = 'var(--border)');
+        document.getElementById('logFilter' + (type.charAt(0).toUpperCase() + type.slice(1)))?.style.update?.('-border', 'var(--primary)');
+        renderLogs();
+    }
+
+    function clearLogs() {
+        if (!confirm('Clear all logs?')) return;
+        allLogs = [];
+        document.getElementById('logPanel').innerHTML = '<div class="empty-state" style="min-height:200px;"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>Logs cleared</p></div>';
+        document.getElementById('logCount').textContent = '0 entries';
+    }
+
+    function renderLogs() {
+        const panel = document.getElementById('logPanel');
+        let filtered = logFilter === 'all' ? allLogs : allLogs.filter(l => l.level === logFilter);
+
+        if (filtered.length === 0) {
+            panel.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>No ' + (logFilter === 'all' ? 'logs' : logFilter + ' messages') + '</p></div>';
+            return;
+        }
+
+        panel.innerHTML = filtered.map(l => `
+            <div class="log-entry log-${l.level}">
+                <span class="time">${l.time}</span>
+                <span class="log-${l.level}">[${l.level.toUpperCase()}]</span>
+                <span>${l.message}</span>
+            </div>
+        `).join('');
+
+        if (document.getElementById('logAutoScroll')?.checked) {
+            panel.scrollTop = panel.scrollHeight;
+        }
+    }
+
+    // ── Reset Filter ──
+    function resetAnalyticsFilters() {
+        document.getElementById('analyticsBrandFilter').value = 'all';
+        document.getElementById('analyticsAudience').value = '';
+        document.getElementById('analyticsObjective').value = '';
+        loadAnalytics();
+        showToast('Filters reset', 'success');
     }
 
     // ── Init ──
