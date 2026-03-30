@@ -158,8 +158,9 @@
 
         /* ── Main Content ── */
         .container { max-width:1440px; margin:0 auto; padding:32px; }
-        .tab-content { display:none; animation:fadeIn .4s; }
-        .tab-content.active { display:block; }
+        .tab-content { display:none; opacity:0; }
+        .tab-content.active { display:block; animation:pageFadeIn .3s ease forwards; }
+        @keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
         /* ── Grid Layouts ── */
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
@@ -217,7 +218,9 @@
         .toast.info { background:var(--bg-card-hover); border-color:var(--meta-blue); color:var(--meta-blue); }
 
         /* ── Empty State ── */
-        .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; color:var(--text-muted); text-align:center; min-height:200px; }
+        .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 24px; color:var(--text-muted); text-align:center; min-height:200px; }
+        .empty-state-icon { font-size:48px; margin-bottom:16px; opacity:.45; }
+        .empty-state-action { margin-top:16px; }
         .empty-state svg { width:48px; height:48px; margin-bottom:12px; opacity:0.4; }
         .empty-state .icon { font-size:48px; margin-bottom:16px; opacity:.5; }
         .empty-state .title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; letter-spacing:-0.02em; }
@@ -337,6 +340,12 @@
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        /* Skeleton loading cards */
+        .skeleton-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:20px; }
+        .skeleton-card .skeleton-circle { width:40px; height:40px; border-radius:50%; background:linear-gradient(90deg,var(--border) 25%,var(--bg-card-hover) 50%,var(--border) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; margin-bottom:12px; }
+        .skeleton-card .skeleton-heading { height:20px; width:60%; border-radius:4px; background:linear-gradient(90deg,var(--border) 25%,var(--bg-card-hover) 50%,var(--border) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; margin-bottom:10px; }
+        .skeleton-card .skeleton-text { height:12px; border-radius:3px; background:linear-gradient(90deg,var(--border) 25%,var(--bg-card-hover) 50%,var(--border) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; margin-bottom:8px; }
+        .skeleton-card .skeleton-text:last-child { width:75%; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         @keyframes countUp { from{opacity:.5} to{opacity:1} }
 
@@ -411,6 +420,10 @@
         .csv-preview table { font-size:12px; }
         .csv-preview th { background:var(--bg-card-hover); position:sticky; top:0; z-index:1; }
 
+        
+        /* ── Toggle visibility for API tokens ── */
+        .token-toggle { background:none; border:none; cursor:pointer; font-size:16px; padding:4px 8px; color:var(--text-secondary); transition:color .2s; }
+        .token-toggle:hover { color:var(--primary); }
         /* ── Log panel ── */
         .log-panel { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; font-family:'JetBrains Mono','Courier New',monospace; font-size:12px; max-height:500px; overflow-y:auto; }
         .log-entry { padding:4px 0; border-bottom:1px solid var(--border); }
@@ -515,6 +528,7 @@
                 <span id="statusText">System Online</span>
             </div>
             <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">☰</button>
+            <button onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span style="font-size:13px;">🔍</span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
         </div>
     </div>
@@ -541,7 +555,7 @@
     <div id="tab-dashboard" class="tab-content active">
 
         <!-- Hero Section -->
-        <div class="hero" style="margin:0 0 32px; border-radius:var(--radius-lg);">
+        <div class="hero" id="dashboardHero" style="margin:0 0 24px; border-radius:var(--radius-lg);">
             <div class="hero-grid">
                 <div class="hero-left">
                     <div class="hero-badge">Powered by SocialPanga</div>
@@ -568,7 +582,7 @@
         </div>
 
         <!-- Social Proof -->
-        <div class="proof-strip" style="margin:0 0 28px; border-radius:var(--radius-lg);">
+        <div class="proof-strip" style="margin:0 0 20px; border-radius:var(--radius-lg);">
             <div class="proof-inner">
                 <div class="proof-item"><span class="num">8+</span> Advanced Chart Types</div>
                 <div class="proof-item"><span class="num">5</span> Platform Integrations</div>
@@ -633,20 +647,18 @@
             </div>
         </div>
 
-        <!-- Scheduler / Health -->
-        <div class="grid">
-            <div class="card">
-                <h2><span class="icon">⚙️</span> Scheduler Status</h2>
-                <div id="schedulerInfo" style="font-size:14px;color:var(--text-secondary);">
+        <!-- Scheduler / Health (compact row) -->
+        <div class="grid" style="gap:16px;">
+            <div class="card" style="padding:18px 20px;">
+                <h2 style="font-size:13px;margin-bottom:10px;"><span class="icon">⚙️</span> Scheduler Status</h2>
+                <div id="schedulerInfo" style="font-size:13px;color:var(--text-secondary);">
                     <div class="skeleton skeleton-line"></div>
-                    <div class="skeleton skeleton-line" style="width:60%"></div>
                 </div>
             </div>
-            <div class="card">
-                <h2><span class="icon">📈</span> System Health</h2>
-                <div id="systemHealth" style="font-size:14px;color:var(--text-secondary);">
+            <div class="card" style="padding:18px 20px;">
+                <h2 style="font-size:13px;margin-bottom:10px;"><span class="icon">📈</span> System Health</h2>
+                <div id="systemHealth" style="font-size:13px;color:var(--text-secondary);">
                     <div class="skeleton skeleton-line"></div>
-                    <div class="skeleton skeleton-line" style="width:50%"></div>
                 </div>
             </div>
         </div>
@@ -1209,12 +1221,12 @@
                 <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Drag and drop your data file here</div>
                 <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">or click to select a file</div>
                 <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">XLSX</span>
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">XLS</span>
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">CSV</span>
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">TSV</span>
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">JSON</span>
-                    <span style="background:var(--primary);color:var(--text);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;">XML</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">XLSX</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">XLS</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">CSV</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">TSV</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">JSON</span>
+                    <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;">XML</span>
                 </div>
                 <input type="file" id="csvFileInput" accept=".csv,.tsv,.xlsx,.xls,.json,.xml,.txt,.ods" style="display:none;">
                 <button class="btn btn-primary btn-small" onclick="document.getElementById('csvFileInput').click()">Choose File</button>
@@ -1353,17 +1365,24 @@
 
     <!-- ===== TAB 2: BRANDS ===== -->
     <div id="tab-brands" class="tab-content">
-        <!-- Add New Brand Button -->
-        <div style="margin-bottom:24px;">
-            <button class="btn btn-primary" onclick="openBrandModal()" style="font-size:15px;padding:14px 28px;">
-                + Add New Brand
-            </button>
+        <!-- Brands Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="openBrandModal()">+ Add New Brand</button>
+                <div style="position:relative;">
+                    <input type="text" id="brandSearchInput" placeholder="Search brands..." oninput="filterBrands(this.value)" style="padding:9px 14px 9px 36px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-card);color:var(--text);width:220px;">
+                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;">🔍</span>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);" id="brandCount"></div>
         </div>
 
         <!-- Brands Grid -->
-        <div id="brandsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
-            <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 48px;">
-                Loading brands...
+        <div id="brandsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+            <div style="grid-column: 1/-1; display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:24px;">
+                <div class="skeleton-card"><div class="skeleton-heading"></div><div class="skeleton-text"></div><div class="skeleton-text"></div></div>
+                <div class="skeleton-card"><div class="skeleton-heading"></div><div class="skeleton-text"></div><div class="skeleton-text"></div></div>
+                <div class="skeleton-card"><div class="skeleton-heading"></div><div class="skeleton-text"></div><div class="skeleton-text"></div></div>
             </div>
         </div>
     </div>
@@ -3867,7 +3886,7 @@
                 </div>`
             ).join('');
         } else {
-            document.getElementById('recentReports').innerHTML = '<p style="color:var(--text-secondary);">No reports yet. Generate one using Quick Actions.</p>';
+            document.getElementById('recentReports').innerHTML = '<div class="empty-state" style="min-height:120px;"><div class="empty-state-icon">📄</div><p class="title">No Reports Generated Yet</p><p>Use Quick Actions above to run your first campaign report.</p><div class="empty-state-action"><button class="btn btn-primary btn-small" onclick="document.querySelector(\'.btn-group\').scrollIntoView({behavior:\'smooth\'})">Go to Quick Actions</button></div></div>';
         }
     }
 
@@ -4182,7 +4201,7 @@
                 showToast(brandInEditMode ? 'Brand updated!' : 'Brand created!', 'success');
                 closeBrandModal();
                 loadBrands();
-                fetchStatus();
+                fetchStatus(); updateFreshnessTimestamp();
             } else {
                 const err = await res.json();
                 showToast(err.error || 'Failed to save brand', 'error');
@@ -4216,6 +4235,7 @@
     }
 
     async function runBrandReport(slug, reportType) {
+        if (!confirm('Run ' + reportType + ' report for "' + slug + '"?')) return;
         try {
             const res = await fetch('/api/run', {
                 method: 'POST',
@@ -4239,6 +4259,8 @@
     async function runAllBrands(type) {
         const isDryRun = type === 'dryrun';
         const reportType = isDryRun ? 'daily' : type;
+        const msg = isDryRun ? 'Run a dry run for all brands?' : 'Run ' + reportType + ' reports for ALL brands? This may take a while.';
+        if (!confirm(msg)) return;
 
         try {
             const res = await fetch('/api/run', {
@@ -6452,7 +6474,7 @@
     function clearLogs() {
         if (!confirm('Clear all logs?')) return;
         allLogs = [];
-        document.getElementById('logPanel').innerHTML = '<div class="empty-state" style="min-height:200px;"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>Logs cleared</p></div>';
+        document.getElementById('logPanel').innerHTML = '<div class="empty-state" style="min-height:200px;"><div class="empty-state-icon">✅</div><p class="title">Logs Cleared</p><p>New activity will appear here automatically.</p></div>';
         document.getElementById('logCount').textContent = '0 entries';
     }
 
@@ -6461,7 +6483,7 @@
         let filtered = logFilter === 'all' ? allLogs : allLogs.filter(l => l.level === logFilter);
 
         if (filtered.length === 0) {
-            panel.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>No ' + (logFilter === 'all' ? 'logs' : logFilter + ' messages') + '</p></div>';
+            panel.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p class="title">No ' + (logFilter === 'all' ? 'Logs' : logFilter.charAt(0).toUpperCase() + logFilter.slice(1) + ' Messages') + '</p><p>Activity will appear here as you run reports and manage brands.</p></div>';
             return;
         }
 
@@ -6496,7 +6518,290 @@
     setTimeout(loadAIInsights, 1000);
     setInterval(fetchStatus, 5000);
     setInterval(refreshLogs, 2000);
-</script>
+
+    // ── Active Filter Chips (Phase 3B) ──
+    function updateFilterChips() {
+        const brandFilter = document.getElementById('brandFilter');
+        const chartFilter = document.getElementById('chartFilter');
+        const objFilter = document.getElementById('objectiveFilter');
+        const datePreset = document.getElementById('datePresetSelect');
+        if (!brandFilter) return;
+        let chips = [];
+        if (brandFilter.value) chips.push({ label: 'Brand: ' + brandFilter.options[brandFilter.selectedIndex].text, reset: () => { brandFilter.value = ''; } });
+        if (chartFilter && chartFilter.value) chips.push({ label: 'Chart: ' + chartFilter.options[chartFilter.selectedIndex].text, reset: () => { chartFilter.value = ''; } });
+        if (objFilter && objFilter.value) chips.push({ label: 'Objective: ' + objFilter.options[objFilter.selectedIndex].text, reset: () => { objFilter.value = ''; } });
+        if (datePreset && datePreset.value !== '7') chips.push({ label: 'Range: ' + datePreset.options[datePreset.selectedIndex].text, reset: () => { datePreset.value = '7'; } });
+
+        let container = document.getElementById('analyticsFilterChips');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'analyticsFilterChips';
+            container.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;';
+            const filterBar = document.querySelector('#tab-analytics .card.full-width');
+            if (filterBar) filterBar.appendChild(container);
+        }
+        if (chips.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = chips.map((c, i) =>
+            `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--primary-light);color:var(--primary);border-radius:12px;font-size:11px;font-weight:600;">${c.label} <button onclick="clearFilterChip(${i})" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:14px;line-height:1;">&times;</button></span>`
+        ).join('');
+        window._filterChips = chips;
+    }
+    function clearFilterChip(idx) {
+        if (window._filterChips && window._filterChips[idx]) {
+            window._filterChips[idx].reset();
+            updateFilterChips();
+            if (typeof loadAnalytics === 'function') loadAnalytics();
+        }
+    }
+
+    
+    // ── Global Search (Cmd+K) ──
+    const searchItems = [
+        { label: 'Dashboard', desc: 'Overview, KPIs & quick actions', action: () => switchTab('dashboard'), icon: '📊' },
+        { label: 'Analytics', desc: 'Charts, trends & performance deep-dive', action: () => switchTab('analytics'), icon: '📈' },
+        { label: 'Data Studio', desc: 'Upload files & auto-detect columns', action: () => switchTab('datastudio'), icon: '📋' },
+        { label: 'Brands', desc: 'Manage brand configuration', action: () => switchTab('brands'), icon: '🏷️' },
+        { label: 'API Settings', desc: 'Configure Meta & Google API keys', action: () => switchTab('api'), icon: '🔑' },
+        { label: 'Schedule', desc: 'Scheduler control & job management', action: () => switchTab('schedule'), icon: '⏰' },
+        { label: 'Report Structure', desc: 'Customize report templates & sheets', action: () => switchTab('templates'), icon: '📑' },
+        { label: 'Logs', desc: 'Real-time logs & audit trail', action: () => switchTab('logs'), icon: '📜' },
+        { label: 'Run Daily Report', desc: 'Quick action: run all brands daily', action: () => { switchTab('dashboard'); runAllBrands('daily'); }, icon: '▶️' },
+        { label: 'Run Weekly Report', desc: 'Quick action: run all brands weekly', action: () => { switchTab('dashboard'); runAllBrands('weekly'); }, icon: '▶️' },
+        { label: 'Export PDF', desc: 'Generate PDF report for current view', action: () => { switchTab('analytics'); }, icon: '📥' },
+        { label: 'Toggle Dark Mode', desc: 'Switch between light and dark themes', action: () => document.getElementById('themeToggle').click(), icon: '🌙' },
+        { label: 'Add New Brand', desc: 'Create a new brand configuration', action: () => { switchTab('brands'); setTimeout(() => openBrandModal(), 300); }, icon: '➕' },
+        { label: 'Upload Data', desc: 'Upload CSV/Excel data files', action: () => switchTab('datastudio'), icon: '📤' },
+    ];
+
+    function openGlobalSearch() {
+        document.getElementById('globalSearchOverlay').style.display = 'block';
+        const inp = document.getElementById('globalSearchInput');
+        inp.value = '';
+        inp.focus();
+        handleGlobalSearch('');
+    }
+    function closeGlobalSearch() {
+        document.getElementById('globalSearchOverlay').style.display = 'none';
+    }
+    let searchSelectedIdx = 0;
+    function handleGlobalSearch(q) {
+        const results = document.getElementById('globalSearchResults');
+        const query = q.toLowerCase().trim();
+        let filtered = searchItems;
+        if (query) {
+            filtered = searchItems.filter(item =>
+                item.label.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)
+            );
+        }
+        searchSelectedIdx = 0;
+        if (filtered.length === 0) {
+            results.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No results found</div>';
+            return;
+        }
+        results.innerHTML = filtered.map((item, i) =>
+            `<div class="search-result-item" data-idx="${i}" onclick="selectSearchResult(${i})" onmouseenter="searchSelectedIdx=${i};highlightSearchResult()" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:background .1s;${i===0?'background:var(--primary-light);':''}" >
+                <span style="font-size:18px;width:28px;text-align:center;">${item.icon}</span>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;color:var(--text);">${item.label}</div>
+                    <div style="font-size:11px;color:var(--text-secondary);">${item.desc}</div>
+                </div>
+            </div>`
+        ).join('');
+        window._searchFiltered = filtered;
+    }
+    function highlightSearchResult() {
+        document.querySelectorAll('.search-result-item').forEach((el, i) => {
+            el.style.background = i === searchSelectedIdx ? 'var(--primary-light)' : '';
+        });
+    }
+    function selectSearchResult(idx) {
+        const items = window._searchFiltered || searchItems;
+        if (items[idx]) {
+            closeGlobalSearch();
+            items[idx].action();
+        }
+    }
+    document.addEventListener('keydown', function(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            const overlay = document.getElementById('globalSearchOverlay');
+            if (overlay.style.display === 'none') openGlobalSearch();
+            else closeGlobalSearch();
+        }
+        if (document.getElementById('globalSearchOverlay').style.display !== 'none') {
+            if (e.key === 'Escape') { closeGlobalSearch(); e.preventDefault(); }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const items = document.querySelectorAll('.search-result-item');
+                searchSelectedIdx = Math.min(searchSelectedIdx + 1, items.length - 1);
+                highlightSearchResult();
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                searchSelectedIdx = Math.max(searchSelectedIdx - 1, 0);
+                highlightSearchResult();
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                selectSearchResult(searchSelectedIdx);
+            }
+        }
+    });
+
+    // ── Brand Search Filter (Phase 2B) ──
+    function filterBrands(query) {
+        const cards = document.querySelectorAll('.brand-card');
+        const q = query.toLowerCase();
+        let count = 0;
+        cards.forEach(card => {
+            const name = card.querySelector('.brand-name');
+            if (!name) return;
+            const match = name.textContent.toLowerCase().includes(q);
+            card.style.display = match ? '' : 'none';
+            if (match) count++;
+        });
+        const countEl = document.getElementById('brandCount');
+        if (countEl) countEl.textContent = count + ' brand' + (count !== 1 ? 's' : '');
+    }
+
+    
+    // ── Data Freshness Timestamps (Phase 3C) ──
+    function updateFreshnessTimestamp() {
+        const el = document.getElementById('freshnessText');
+        if (!el) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        el.textContent = 'Updated: ' + timeStr;
+        el.title = 'Last data refresh: ' + now.toLocaleString();
+    }
+    // Hook into fetchStatus to update timestamp
+    const originalFetchStatus = typeof fetchStatus === 'function' ? fetchStatus : null;
+    if (originalFetchStatus) {
+        const wrappedFetchStatus = fetchStatus;
+    }
+
+    
+    // ── Onboarding Checklist (Phase 3D) ──
+    const onboardingSteps = ['api', 'brand', 'data', 'report'];
+    function initOnboarding() {
+        const dismissed = localStorage.getItem('adflow_onboarding_dismissed');
+        if (dismissed === 'true') return;
+        const completed = JSON.parse(localStorage.getItem('adflow_onboarding') || '{}');
+        const allDone = onboardingSteps.every(s => completed[s]);
+        if (allDone) return;
+        document.getElementById('onboardingChecklist').style.display = 'block';
+        updateOnboardingUI();
+    }
+    function markOnboardingStep(step) {
+        const completed = JSON.parse(localStorage.getItem('adflow_onboarding') || '{}');
+        completed[step] = true;
+        localStorage.setItem('adflow_onboarding', JSON.stringify(completed));
+        updateOnboardingUI();
+    }
+    function updateOnboardingUI() {
+        const completed = JSON.parse(localStorage.getItem('adflow_onboarding') || '{}');
+        let count = 0;
+        onboardingSteps.forEach(step => {
+            const el = document.getElementById('ob-' + step);
+            if (!el) return;
+            if (completed[step]) {
+                el.style.background = 'var(--success)';
+                el.style.borderColor = 'var(--success)';
+                el.style.color = '#fff';
+                el.textContent = '✓';
+                count++;
+            }
+        });
+        const progress = document.getElementById('onboardingProgress');
+        if (progress) progress.textContent = count + '/' + onboardingSteps.length;
+        if (count === onboardingSteps.length) {
+            setTimeout(() => {
+                const checklist = document.getElementById('onboardingChecklist');
+                if (checklist) checklist.style.display = 'none';
+            }, 2000);
+        }
+    }
+    function dismissOnboarding() {
+        localStorage.setItem('adflow_onboarding_dismissed', 'true');
+        document.getElementById('onboardingChecklist').style.display = 'none';
+    }
+    // Auto-init after page loads
+    setTimeout(initOnboarding, 1000);
+
+    
+    // ── Error Boundary (Phase 4) ──
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showToast('An unexpected error occurred. Please try again.', 'error');
+    });
+    window.addEventListener('error', function(event) {
+        console.error('Uncaught error:', event.message);
+    });
+
+    // Wrap fetch calls with timeout
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options) {
+        const timeout = 30000; // 30s timeout
+        const controller = new AbortController();
+        const signal = options?.signal || controller.signal;
+        const timer = setTimeout(() => controller.abort(), timeout);
+        return originalFetch(url, { ...options, signal }).finally(() => clearTimeout(timer));
+    };
+
+    </script>
+
+
+<!-- ═══ Global Search Modal (Cmd+K) ═══ -->
+<div id="globalSearchOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;backdrop-filter:blur(4px);animation:pageFadeIn .15s ease;" onclick="if(event.target===this)closeGlobalSearch()">
+    <div style="max-width:560px;margin:120px auto;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px;">
+            <span style="font-size:18px;color:var(--text-muted);">🔍</span>
+            <input type="text" id="globalSearchInput" placeholder="Search pages, brands, actions..." style="flex:1;border:none;outline:none;background:transparent;font-size:15px;color:var(--text);font-family:inherit;font-weight:500;" oninput="handleGlobalSearch(this.value)" autocomplete="off">
+            <kbd style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;font-family:inherit;color:var(--text-muted);">ESC</kbd>
+        </div>
+        <div id="globalSearchResults" style="max-height:340px;overflow-y:auto;padding:8px;">
+            <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">
+                Type to search across pages, brands, and actions
+            </div>
+        </div>
+        <div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;gap:16px;font-size:11px;color:var(--text-muted);">
+            <span>↑↓ Navigate</span><span>↵ Select</span><span>⌘K Open</span>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══ Onboarding Checklist ═══ -->
+<div id="onboardingChecklist" style="display:none;position:fixed;bottom:24px;right:24px;z-index:1000;width:340px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.12);overflow:hidden;">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">🚀</span>
+            <span style="font-size:14px;font-weight:700;color:var(--text);">Getting Started</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span id="onboardingProgress" style="font-size:11px;color:var(--text-secondary);font-weight:600;">0/4</span>
+            <button onclick="dismissOnboarding()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;">&times;</button>
+        </div>
+    </div>
+    <div style="padding:12px 16px;">
+        <div class="onboarding-item" data-step="api" onclick="switchTab('api');markOnboardingStep('api')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s;margin-bottom:4px;">
+            <span id="ob-api" style="width:22px;height:22px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">1</span>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);">Connect API Accounts</div><div style="font-size:11px;color:var(--text-secondary);">Set up Meta & Google Ads credentials</div></div>
+        </div>
+        <div class="onboarding-item" data-step="brand" onclick="switchTab('brands');markOnboardingStep('brand')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s;margin-bottom:4px;">
+            <span id="ob-brand" style="width:22px;height:22px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">2</span>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);">Add Your First Brand</div><div style="font-size:11px;color:var(--text-secondary);">Configure brand with platforms & regions</div></div>
+        </div>
+        <div class="onboarding-item" data-step="data" onclick="switchTab('datastudio');markOnboardingStep('data')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s;margin-bottom:4px;">
+            <span id="ob-data" style="width:22px;height:22px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">3</span>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);">Upload Campaign Data</div><div style="font-size:11px;color:var(--text-secondary);">Import CSV/Excel from your ad platforms</div></div>
+        </div>
+        <div class="onboarding-item" data-step="report" onclick="switchTab('dashboard');markOnboardingStep('report')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s;">
+            <span id="ob-report" style="width:22px;height:22px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">4</span>
+            <div><div style="font-size:13px;font-weight:600;color:var(--text);">Generate First Report</div><div style="font-size:11px;color:var(--text-secondary);">Run a Quick Action to generate analytics</div></div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
