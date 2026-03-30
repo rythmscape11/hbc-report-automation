@@ -58,7 +58,7 @@
             --card: #1A2332;
             --text: #E8EAED;
             --text-secondary: #9AA0A6;
-            --text-muted: #5F6368;
+            --text-muted: #6E7681;
             --border: #2D3748;
             --border-hover: #4DA8DA;
             --shadow: 0 2px 12px rgba(0,0,0,0.3);
@@ -94,6 +94,8 @@
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
+        *:focus-visible { outline:2px solid var(--primary); outline-offset:2px; border-radius:var(--radius-sm); }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
         html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility; }
         body { font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; overflow-x:hidden; font-weight:400; letter-spacing:-0.01em; }
 
@@ -120,7 +122,7 @@
         .tabs-bar { background:var(--bg-card); border-bottom:1px solid var(--border); position:sticky; top:64px; z-index:90; overflow-x:auto; -webkit-overflow-scrolling:touch; }
         .tabs-bar::-webkit-scrollbar { height:0; }
         .tabs-inner { max-width:1440px; margin:0 auto; display:flex; gap:4px; padding:12px 32px; }
-        .tab { padding:9px 20px; background:transparent; border:none; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer; border-radius:var(--radius-sm); transition:all .2s; font-family:inherit; white-space:nowrap; letter-spacing:-0.01em; }
+        .tab { padding:9px 20px; background:transparent; border:none; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer; border-radius:var(--radius-sm); transition:all .2s ease; font-family:inherit; white-space:nowrap; letter-spacing:-0.01em; position:relative; }
         .tab:hover { color:var(--primary); background:var(--primary-light); }
         .tab.active { color:#FFFFFF; background:var(--primary); font-weight:700; }
 
@@ -160,7 +162,7 @@
         /* ── Main Content ── */
         .container { max-width:1440px; margin:0 auto; padding:32px; }
         .tab-content { display:none; opacity:0; }
-        .tab-content.active { display:block; animation:pageFadeIn .3s ease forwards; }
+        .tab-content.active { display:block; animation:pageFadeIn .3s ease forwards; scroll-margin-top:130px; }
         @keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
         /* ── Grid Layouts ── */
@@ -170,7 +172,7 @@
 
         /* ── Cards ── */
         .card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:24px; transition:all .2s ease; position:relative; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-        .card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); }
+        .card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); transform:translateY(-1px); }
         .card h2 { font-size:14px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:10px; color:var(--text); letter-spacing:-0.02em; }
         .card h2 .icon { font-size:18px; }
         .card.full-width { grid-column:1/-1; }
@@ -178,7 +180,8 @@
         /* ── Stat Cards ── */
         .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:22px; text-align:center; transition:all .2s ease; position:relative; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
         .stat-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--primary),var(--primary-dark)); }
-        .stat-card:hover { border-color:var(--border-hover); transform:translateY(-2px); box-shadow:var(--shadow-glow); }
+        .stat-card:hover { border-color:var(--border-hover); transform:translateY(-3px); box-shadow:var(--shadow-glow); }
+        .stat-card { cursor:default; }
         .stat-card .label { font-size:10px; color:var(--text-secondary); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
         .stat-card .value { font-size:26px; font-weight:800; color:var(--primary); letter-spacing:-0.03em; }
         .stat-card .value.ok { color:var(--success); }
@@ -193,6 +196,7 @@
         .btn-success:hover { filter:brightness(1.1); transform:translateY(-2px); }
         .btn-warning { background:var(--warning); color:var(--text); }
         .btn-outline { background:transparent; color:var(--primary); border:2px solid var(--primary); }
+        [data-theme="dark"] .btn-outline { border-color:var(--primary); color:var(--primary); background:rgba(77,168,218,0.08); }
         .btn-outline:hover { background:var(--primary-light); transform:translateY(-2px); }
         .btn-sm { padding:8px 16px; font-size:12px; }
         .btn-group { display:flex; gap:12px; flex-wrap:wrap; }
@@ -217,6 +221,13 @@
         .toast.error { background:var(--danger-bg); border-color:var(--danger); color:var(--danger); }
         .toast.warning { background:var(--warning-bg); border-color:#F8D200; color:var(--warning-text); }
         .toast.info { background:var(--bg-card-hover); border-color:var(--meta-blue); color:var(--meta-blue); }
+        .toast-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; }
+        .toast.success .toast-icon { background:var(--success); color:#fff; }
+        .toast.error .toast-icon { background:var(--danger); color:#fff; }
+        .toast.warning .toast-icon { background:var(--warning); color:#333; }
+        .toast.info .toast-icon { background:var(--meta-blue); color:#fff; }
+        .toast-msg { flex:1; }
+        .toast-progress { position:absolute; bottom:0; left:0; height:3px; border-radius:0 0 10px 10px; background:currentColor; opacity:0.3; }
 
         /* ── Empty State ── */
         .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 24px; color:var(--text-muted); text-align:center; min-height:200px; }
@@ -269,9 +280,16 @@
         .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
         .kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:20px; position:relative; overflow:hidden; transition:all .2s ease; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
         .kpi-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--primary); }
+        .kpi-card[data-color="green"]::after { background:var(--gads-green); }
+        .kpi-card[data-color="red"]::after { background:var(--danger); }
+        .kpi-card[data-color="blue"]::after { background:var(--meta-blue); }
+        .kpi-card[data-color="purple"]::after { background:var(--dv360-purple); }
         .kpi-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+        .kpi-card.skeleton-loading .kpi-label,
+        .kpi-card.skeleton-loading .kpi-value,
+        .kpi-card.skeleton-loading .kpi-delta { background:linear-gradient(90deg,var(--border) 25%,var(--bg) 50%,var(--border) 75%); background-size:400px 100%; animation:shimmer 1.5s infinite; color:transparent !important; border-radius:4px; }
         .kpi-label { font-size:10px; color:var(--text-secondary); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
-        .kpi-value { font-size:22px; font-weight:800; color:var(--primary); margin-top:4px; font-variant-numeric:tabular-nums; letter-spacing:-0.03em; }
+        .kpi-value { font-size:22px; font-weight:800; color:var(--primary); margin-top:4px; font-variant-numeric:tabular-nums; letter-spacing:-0.03em; transition:all .3s ease; }
         .kpi-delta { font-size:10px; font-weight:600; margin-top:4px; letter-spacing:0.01em; }
         .kpi-delta.up { color:var(--success); }
         .kpi-delta.down { color:var(--danger); }
@@ -296,6 +314,8 @@
         th { padding:10px 16px; text-align:left; font-weight:600; color:var(--text-secondary); font-size:10px; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; white-space:nowrap; user-select:none; border-bottom:2px solid var(--border); }
         th:hover { color:var(--primary); }
         td { padding:10px 16px; border-bottom:1px solid var(--border); white-space:nowrap; font-size:13px; }
+        tbody tr { transition:background .15s ease; }
+        tbody tr:hover { background:var(--bg-card-hover); }
         tbody tr:hover { background:var(--bg-card-hover); }
         tbody tr:nth-child(even) { background:var(--bg-card-hover); }
 
@@ -426,8 +446,9 @@
         .token-toggle { background:none; border:none; cursor:pointer; font-size:16px; padding:4px 8px; color:var(--text-secondary); transition:color .2s; }
         .token-toggle:hover { color:var(--primary); }
         /* ── Log panel ── */
-        .log-panel { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; font-family:'JetBrains Mono','Courier New',monospace; font-size:12px; max-height:500px; overflow-y:auto; }
-        .log-entry { padding:4px 0; border-bottom:1px solid var(--border); }
+        .log-panel { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:16px; font-family:'JetBrains Mono','Courier New',monospace; font-size:12px; max-height:500px; overflow-y:auto; counter-reset:log-line; }
+        .log-entry { padding:6px 0 6px 8px; border-bottom:1px solid var(--border); transition:background .15s; }
+        .log-entry:hover { background:var(--bg-card-hover); }
         .log-time { color:var(--text-muted); margin-right:8px; }
         .log-info { color:var(--text-secondary); }
         .log-error { color:var(--danger); }
@@ -435,7 +456,7 @@
 
         /* ── Brand Cards ── */
         .brand-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:24px; transition:all .2s ease; position:relative; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-        .brand-card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); }
+        .brand-card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); transform:translateY(-2px); }
         .brand-card.inactive { opacity:.6; }
         .brand-name { font-size:18px; font-weight:700; color:var(--text); margin-bottom:16px; letter-spacing:-0.02em; }
         .brand-info { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
@@ -446,7 +467,16 @@
         .brand-status.active { background:var(--success-bg); color:var(--success); }
         .brand-status.inactive { background:var(--danger-bg); color:var(--danger); }
         .brand-status-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
-        .brand-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+        .brand-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); align-items:center; }
+        .brand-actions-run { display:flex; gap:4px; flex:1; }
+        .brand-actions-run .btn { background:var(--bg); border:1px solid var(--border); color:var(--text); font-size:11px; padding:6px 12px; border-radius:6px; }
+        .brand-actions-run .btn:hover { background:var(--primary-light); border-color:var(--primary); color:var(--primary); transform:none; box-shadow:none; }
+        .brand-actions-manage { display:flex; gap:4px; margin-left:auto; }
+        .brand-actions-manage .btn { background:transparent; border:1px solid var(--border); padding:6px 10px; border-radius:6px; font-size:11px; }
+        .brand-actions-manage .btn-edit { color:var(--primary); }
+        .brand-actions-manage .btn-edit:hover { background:var(--primary-light); border-color:var(--primary); }
+        .brand-actions-manage .btn-delete { color:var(--danger); }
+        .brand-actions-manage .btn-delete:hover { background:var(--danger-bg); border-color:var(--danger); }
 
         /* ── Extra Button Variants ── */
         .btn-danger { background:var(--danger); color:white; }
@@ -458,9 +488,11 @@
 
         /* ── Chart Cards (Data Studio / Analytics) ── */
         .chart-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:20px; position:relative; overflow:hidden; transition:all .2s ease; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-        .chart-card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); }
+        .chart-card:hover { border-color:var(--border-hover); box-shadow:0 4px 16px rgba(35,139,195,0.08); transform:translateY(-1px); }
         .chart-card h3 { font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; letter-spacing:-0.01em; }
         .chart-card-canvas { position:relative; width:100%; min-height:220px; }
+        .chart-card canvas { transition:opacity .3s ease; }
+        .chart-card:hover canvas { opacity:0.95; }
         .chart-download-btn { position:absolute; top:16px; right:16px; background:var(--primary-light); border:1px solid var(--border); border-radius:4px; padding:5px 12px; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; transition:all .2s; z-index:5; font-family:inherit; }
         .chart-download-btn:hover { background:var(--primary); color:#FFFFFF; }
 
@@ -1585,11 +1617,13 @@
 
     <!-- ===== TAB 4: SCHEDULE ===== -->
     <div id="tab-schedule" class="tab-content">
-        <div class="grid">
-            <div class="card">
-                <h2><span class="icon">⚡</span> Scheduler Control</h2>
-                <div id="schedulerStatus" style="margin-bottom:20px;font-size:14px;color:var(--text-secondary);">
-                    Loading...
+        <div class="card full-width" style="margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+                <div>
+                    <h2 style="margin-bottom:8px;"><span class="icon">⚡</span> Scheduler Control</h2>
+                    <div id="schedulerStatus" style="font-size:14px;color:var(--text-secondary);">
+                        Loading...
+                    </div>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-success" onclick="toggleScheduler('start')" id="btnStartSched">
@@ -1664,6 +1698,13 @@
 
     <!-- ===== TAB 6: LOGS ===== -->
     <div id="tab-logs" class="tab-content">
+        <!-- Log Stats Bar -->
+        <div class="grid-4" style="margin-bottom:20px;">
+            <div class="stat-card" id="logStatTotal"><div class="label">Total Logs</div><div class="value" id="logStatTotalVal">0</div></div>
+            <div class="stat-card" id="logStatInfo" style="cursor:pointer;" onclick="filterLogs('info')"><div class="label">Info</div><div class="value ok" id="logStatInfoVal">0</div></div>
+            <div class="stat-card" id="logStatWarn" style="cursor:pointer;" onclick="filterLogs('warning')"><div class="label">Warnings</div><div class="value warn" id="logStatWarnVal">0</div></div>
+            <div class="stat-card" id="logStatErr" style="cursor:pointer;" onclick="filterLogs('error')"><div class="label">Errors</div><div class="value bad" id="logStatErrVal">0</div></div>
+        </div>
         <div class="card full-width">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <h2 style="margin:0;"><span class="icon">📋</span> Real-Time Logs</h2>
@@ -1687,8 +1728,13 @@
 
         <!-- Audit Trail -->
         <div class="card full-width" style="margin-top:24px;">
-            <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">📋 Audit Trail</h2>
-            <p style="color:var(--text-secondary);margin-bottom:16px;">Track all administrative actions</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div>
+                    <h2 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">📋 Audit Trail</h2>
+                    <p style="color:var(--text-secondary);margin:0;">Track all administrative actions</p>
+                </div>
+                <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;" id="auditCount">0 actions</span>
+            </div>
             <div style="overflow-x:auto;">
                 <table style="width:100%;border-collapse:collapse;font-size:13px;">
                     <thead>
@@ -1700,7 +1746,11 @@
                         </tr>
                     </thead>
                     <tbody id="auditTrailBody">
-                        <tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text-muted);font-style:italic;">Audit trail will populate as actions are performed</td></tr>
+                        <tr><td colspan="4" style="padding:40px 20px;text-align:center;">
+                            <div style="font-size:36px;opacity:0.3;margin-bottom:8px;">🔒</div>
+                            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">No Actions Recorded</div>
+                            <div style="font-size:13px;color:var(--text-muted);">Audit trail will populate as administrative actions are performed</div>
+                        </td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1924,11 +1974,15 @@
     ];
 
     // ── Toast ──
-    function showToast(msg, type = 'info') {
+    function showToast(msg, type = 'info', duration = 3500) {
         const t = document.getElementById('toast');
-        t.textContent = msg;
+        const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+        t.innerHTML = '<span class="toast-icon">' + (icons[type] || 'ℹ') + '</span><span class="toast-msg">' + msg + '</span><div class="toast-progress"></div>';
         t.className = 'toast ' + type + ' show';
-        setTimeout(() => t.classList.remove('show'), 3000);
+        const bar = t.querySelector('.toast-progress');
+        if (bar) { bar.style.transition = 'none'; bar.style.width = '100%'; requestAnimationFrame(() => { bar.style.transition = 'width ' + duration + 'ms linear'; bar.style.width = '0%'; }); }
+        clearTimeout(t._timeout);
+        t._timeout = setTimeout(() => t.classList.remove('show'), duration);
     }
 
     // ── Multi-Currency Support ──
@@ -3984,12 +4038,16 @@
                     </div>
                 </div>
                 <div class="brand-actions">
-                    <button class="btn btn-primary btn-small" onclick="runBrandReport('${brand.slug}', 'daily')">Daily</button>
-                    <button class="btn btn-success btn-small" onclick="runBrandReport('${brand.slug}', 'weekly')">Weekly</button>
-                    <button class="btn btn-warning btn-small" onclick="runBrandReport('${brand.slug}', 'monthly')">Monthly</button>
-                    <button class="btn btn-info btn-small" onclick="runBrandReport('${brand.slug}', 'full')">Full</button>
-                    <button class="btn btn-outline btn-small" onclick="editBrand('${brand.slug}')">Edit</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteBrand('${brand.slug}')">Delete</button>
+                    <div class="brand-actions-run">
+                        <button class="btn" onclick="runBrandReport('${brand.slug}', 'daily', this)" title="Run daily report">Daily</button>
+                        <button class="btn" onclick="runBrandReport('${brand.slug}', 'weekly', this)" title="Run weekly report">Weekly</button>
+                        <button class="btn" onclick="runBrandReport('${brand.slug}', 'monthly', this)" title="Run monthly report">Monthly</button>
+                        <button class="btn" onclick="runBrandReport('${brand.slug}', 'full', this)" title="Run full report">Full</button>
+                    </div>
+                    <div class="brand-actions-manage">
+                        <button class="btn btn-edit" onclick="editBrand('${brand.slug}')" title="Edit brand">✎ Edit</button>
+                        <button class="btn btn-delete" onclick="deleteBrand('${brand.slug}')" title="Delete brand">✕</button>
+                    </div>
                 </div>
             </div>
         `}).join('');
@@ -4268,8 +4326,9 @@
         }
     }
 
-    async function runBrandReport(slug, reportType) {
+    async function runBrandReport(slug, reportType, btnEl) {
         if (!confirm('Run ' + reportType + ' report for "' + slug + '"?')) return;
+        if (btnEl) { btnEl.classList.add('loading'); btnEl.disabled = true; }
         try {
             const res = await fetch('/api/run', {
                 method: 'POST',
@@ -4278,7 +4337,7 @@
             });
 
             if (res.ok) {
-                showToast(`Running ${reportType} report for ${slug}...`, 'info');
+                showToast(`Running ${reportType} report for ${slug}...`, 'success');
                 fetchStatus();
             } else {
                 const err = await res.json();
@@ -4287,6 +4346,8 @@
         } catch (e) {
             console.error(e);
             showToast('Error starting report', 'error');
+        } finally {
+            if (btnEl) { btnEl.classList.remove('loading'); btnEl.disabled = false; }
         }
     }
 
@@ -6494,6 +6555,24 @@
         if (overlay) overlay.classList.remove('active');
     }
 
+    // ── Log Stats Updater ──
+    function updateLogStats() {
+        let info = 0, warn = 0, err = 0;
+        allLogs.forEach(l => {
+            if (l.level === 'error') err++;
+            else if (l.level === 'warning') warn++;
+            else info++;
+        });
+        const totalEl = document.getElementById('logStatTotalVal');
+        const infoEl = document.getElementById('logStatInfoVal');
+        const warnEl = document.getElementById('logStatWarnVal');
+        const errEl = document.getElementById('logStatErrVal');
+        if (totalEl) totalEl.textContent = allLogs.length;
+        if (infoEl) infoEl.textContent = info;
+        if (warnEl) warnEl.textContent = warn;
+        if (errEl) errEl.textContent = err;
+    }
+
     // ── Log Filtering ──
     let logFilter = 'all';
     let allLogs = [];
@@ -6513,6 +6592,7 @@
     }
 
     function renderLogs() {
+        updateLogStats();
         const panel = document.getElementById('logPanel');
         let filtered = logFilter === 'all' ? allLogs : allLogs.filter(l => l.level === logFilter);
 
