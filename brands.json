@@ -3,6 +3,7 @@
         "hbc-soap": {
             "name": "HBC Soap",
             "active": true,
+            "currency": "INR",
             "meta": {
                 "ad_account_id": "act_YOUR_ACCOUNT_ID",
                 "campaign_filter": "Soap",
@@ -72,6 +73,7 @@
         "hbc-shampoo": {
             "name": "HBC Shampoo",
             "active": true,
+            "currency": "INR",
             "meta": {
                 "ad_account_id": "act_YOUR_ACCOUNT_ID",
                 "campaign_filter": "Shampoo",
@@ -141,6 +143,7 @@
         "hbc-facewash": {
             "name": "HBC Facewash",
             "active": true,
+            "currency": "INR",
             "meta": {
                 "ad_account_id": "act_",
                 "campaign_filter": "Facewash",
@@ -194,11 +197,133 @@
                 "weekly": "tuesday 10:00",
                 "monthly": "1st 10:00"
             }
+        },
+        "mgd": {
+            "name": "Malabar Gold & Diamonds",
+            "active": true,
+            "currency": "AED",
+            "meta": {
+                "ad_account_id": "act_MGD_META",
+                "campaign_filter": "MGD",
+                "start_date": "2026-02-01",
+                "end_date": "2026-02-28",
+                "budget": 350000,
+                "regions": {
+                    "UAE": {
+                        "budget": 80000
+                    },
+                    "KSA": {
+                        "budget": 40000
+                    },
+                    "Singapore": {
+                        "budget": 40000
+                    },
+                    "Australia": {
+                        "budget": 35000
+                    },
+                    "Malaysia": {
+                        "budget": 30000
+                    },
+                    "Bahrain": {
+                        "budget": 25000
+                    },
+                    "USA": {
+                        "budget": 50000
+                    },
+                    "Kuwait": {
+                        "budget": 15000
+                    },
+                    "Qatar": {
+                        "budget": 15000
+                    },
+                    "Oman": {
+                        "budget": 10000
+                    },
+                    "New-Zealand": {
+                        "budget": 10000
+                    }
+                },
+                "targets": {
+                    "reach": 20000000,
+                    "impressions": 50000000,
+                    "engagement": 500000,
+                    "thruplay": 3000000,
+                    "cpm": 7,
+                    "cpr": 17.5,
+                    "cpe": 0.7,
+                    "cpv": 0.12,
+                    "er": 0.01,
+                    "vtr": 0.06
+                }
+            },
+            "youtube": {
+                "customer_id": "MGD_GOOGLE",
+                "campaign_filter": "MGD",
+                "start_date": "2026-02-01",
+                "end_date": "2026-02-28",
+                "budget": 400000,
+                "regions": {
+                    "UAE": {
+                        "budget": 80000
+                    },
+                    "KSA": {
+                        "budget": 40000
+                    },
+                    "Singapore": {
+                        "budget": 40000
+                    },
+                    "Australia": {
+                        "budget": 30000
+                    },
+                    "Malaysia": {
+                        "budget": 40000
+                    },
+                    "Bahrain": {
+                        "budget": 30000
+                    },
+                    "Canada": {
+                        "budget": 20000
+                    },
+                    "Kuwait": {
+                        "budget": 20000
+                    },
+                    "Qatar": {
+                        "budget": 20000
+                    },
+                    "Oman": {
+                        "budget": 20000
+                    },
+                    "New-Zealand": {
+                        "budget": 20000
+                    },
+                    "Auckland": {
+                        "budget": 10000
+                    },
+                    "Austin": {
+                        "budget": 15000
+                    },
+                    "Ajax": {
+                        "budget": 15000
+                    }
+                },
+                "targets": {
+                    "impressions": 30000000,
+                    "views": 18000000,
+                    "cpv": 0.02,
+                    "vtr": 0.55
+                }
+            },
+            "schedule": {
+                "daily": "10:00",
+                "weekly": "monday 10:00",
+                "monthly": "1st 10:00"
+            }
         }
     },
     "_template": {
         "name": "Brand Name",
         "active": false,
+        "currency": "INR",
         "meta": {
             "ad_account_id": "act_",
             "campaign_filter": "",

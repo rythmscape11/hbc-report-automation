@@ -19,7 +19,19 @@ def generate_meta_sample():
         "SP - Engagement - Soap - Karnataka  - 27th Feb'26",
         "SP - Engagement - Soap - Tamil Nadu - 27th Feb'26",
         "SP - Engagement - Soap - Telangana - 27th Feb'26",
-        "SP - Video Views - Soap - Maharashtra - 27th Feb'26"
+        "SP - Video Views - Soap - Maharashtra - 27th Feb'26",
+        "SP - Engagement - Shampoo - Delhi NCR - 1st Mar'26",
+        "SP - Engagement - Shampoo - Mumbai - 1st Mar'26",
+        "SP - Engagement - Shampoo - Bangalore - 1st Mar'26",
+        "SP - Video Views - Shampoo - Kolkata - 1st Mar'26",
+        "SP - Engagement - Facewash - Delhi NCR - 1st Apr'26",
+        "SP - Engagement - Facewash - Pune - 1st Apr'26",
+        "MGD - Engagement - UAE - 1st Feb'26",
+        "MGD - Engagement - KSA - 1st Feb'26",
+        "MGD - Video Views - Singapore - 1st Feb'26",
+        "MGD - Video Views - USA - 1st Feb'26",
+        "MGD - Engagement - Malaysia - 1st Feb'26",
+        "MGD - Video Views - Australia - 1st Feb'26",
     ]
     ad_sets = ["Parents + Product + Competitors - Urban", "Parents + Product + Competitors - Rural"]
     ad_names = ["Ad - Hindi", "Ad - Kannada", "Ad - Tamil", "Ad - English"]
@@ -77,7 +89,19 @@ def generate_yt_sample():
         "SP - Video Views - Soap - Tamil Nadu - Urban - 6th Feb'26",
         "SP - Video Views - Soap - Karnataka - Urban - 6th Feb'26",
         "SP - Video Views - Soap - Telangana - Rural - 6th Feb'26",
-        "SP - Video Views - Soap - Maharashtra - Rural - 6th Feb'26"
+        "SP - Video Views - Soap - Maharashtra - Rural - 6th Feb'26",
+        "SP - Video Views - Shampoo - Delhi NCR - Urban - 1st Mar'26",
+        "SP - Video Views - Shampoo - Mumbai - Urban - 1st Mar'26",
+        "SP - Video Views - Shampoo - Bangalore - Rural - 1st Mar'26",
+        "SP - Video Views - Shampoo - Kolkata - Rural - 1st Mar'26",
+        "SP - Video Views - Facewash - Delhi NCR - Urban - 1st Apr'26",
+        "SP - Video Views - Facewash - Pune - Rural - 1st Apr'26",
+        "MGD - Video Views - UAE - Urban - 1st Feb'26",
+        "MGD - Video Views - KSA - Urban - 1st Feb'26",
+        "MGD - Video Views - Singapore - Urban - 1st Feb'26",
+        "MGD - Video Views - USA - Urban - 1st Feb'26",
+        "MGD - Video Views - Australia - Rural - 1st Feb'26",
+        "MGD - Video Views - Malaysia - Rural - 1st Feb'26",
     ]
 
     rows = []
@@ -91,8 +115,8 @@ def generate_yt_sample():
             rows.append({
                 "Day": date.strftime("%Y-%m-%d"),
                 "Campaign": campaign,
-                "Ad group": campaign.split(" - ")[5].split(" - ")[0].strip() if " - " in campaign else "Default",
-                "Ad name": f"Soap_{campaign.split(' - ')[5].split(' ')[0] if len(campaign.split(' - ')) > 5 else 'Default'}",
+                "Ad group": campaign.split(" - ")[4].strip() if len(campaign.split(" - ")) > 4 else "Default",
+                "Ad name": f"{campaign.split(' - ')[2].strip()}_{campaign.split(' - ')[3].strip().split(' ')[0] if len(campaign.split(' - ')) > 3 else 'Default'}",
                 "Cost": cost,
                 "Impr.": impr,
                 "Avg. CPM": round(cost / impr * 1000, 2) if impr else 0,
