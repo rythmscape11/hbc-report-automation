@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="description" content="AdFlow Studio — Multi-Channel Campaign Intelligence Platform by SocialPanga">
     <title>AdFlow Studio — Campaign Intelligence</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231B7DB5'/%3E%3Cstop offset='100%25' stop-color='%23145E8A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='28' fill='url(%23g)'/%3E%3Cpath d='M14 34Q36 42 50 52' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M14 58Q32 56 50 56' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M14 82Q36 74 50 64' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='13' cy='34' r='3.5' fill='%234DA8DA'/%3E%3Ccircle cx='13' cy='58' r='3.5' fill='%235ED4FF'/%3E%3Ccircle cx='13' cy='82' r='3.5' fill='%234DA8DA' opacity='0.7'/%3E%3Cpath d='M56 36L72 56L56 80L44 56Z' fill='rgba(255,255,255,0.9)'/%3E%3Cpath d='M72 50Q84 44 106 36' fill='none' stroke='%235ED4FF' stroke-width='3.5' stroke-linecap='round' opacity='0.9'/%3E%3Cpath d='M72 56Q88 56 106 56' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M72 62Q84 68 106 78' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='107' cy='36' r='4' fill='%235ED4FF' opacity='0.8'/%3E%3Ccircle cx='56' cy='36' r='2' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23238BC3'/%3E%3Cstop offset='100%25' stop-color='%231D74A3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M50 16L68 50L50 84L32 50Z' fill='rgba(255,255,255,0.9)'/%3E%3Cpath d='M8 28C22 34 34 42 42 48' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M8 72C22 66 34 58 42 52' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M58 48C66 42 78 34 92 28' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M58 52C66 58 78 66 92 72' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='92' cy='28' r='4' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='92' cy='72' r='4' fill='rgba(255,255,255,0.8)'/%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -108,7 +108,8 @@
         .header { background:var(--bg-card); border-bottom:1px solid var(--border); padding:0 32px; position:sticky; top:0; z-index:100; box-shadow:0 1px 2px rgba(0,0,0,0.04); backdrop-filter:blur(12px); background:rgba(var(--bg-card-rgb,255,255,255),0.95); }
         .header-inner { max-width:1440px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
         .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
-        .logo-mark { width:36px; height:36px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .logo-mark { width:38px; height:38px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .3s ease; }
+        .logo:hover .logo-mark { transform:scale(1.05); }
         .logo-text { font-size:21px; font-weight:800; color:var(--primary); letter-spacing:-0.03em; }
         .logo-text span { font-weight:500; color:var(--text-secondary); }
         .header-right { display:flex; align-items:center; gap:20px; }
@@ -429,6 +430,122 @@
             .kpi-grid { grid-template-columns:repeat(2,1fr); }
         }
 
+        /* ── New Responsive Grid Classes ── */
+        .kpi-grid-6 { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:24px; }
+        .filter-controls-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; padding:16px; background:var(--bg); border-radius:var(--radius); border:1px solid var(--border); }
+        .platform-cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:24px; }
+
+        /* ── Enhanced Mobile Responsive ── */
+        @media(max-width:1200px) {
+            .kpi-grid-6 { grid-template-columns:repeat(3,1fr); }
+        }
+        @media(max-width:992px) {
+            .kpi-grid-6 { grid-template-columns:repeat(3,1fr); gap:10px; }
+            .platform-cards-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:768px) {
+            /* Header */
+            .header { padding:0 16px; }
+            .header-inner { height:56px; }
+            .logo-mark { width:32px; height:32px; }
+            .logo-mark svg { width:32px; height:32px; }
+            .logo-text { font-size:18px; }
+            .header-right > button[onclick="openGlobalSearch()"] { display:none; }
+            [id="dataFreshness"] { display:none !important; }
+
+            /* Analytics KPIs */
+            .kpi-grid-6 { grid-template-columns:repeat(2,1fr); gap:10px; }
+            .kpi-grid-6 .stat-card { padding:14px 10px; }
+            .kpi-grid-6 .stat-card .value { font-size:18px; }
+            .kpi-grid-6 .stat-card .label { font-size:9px; }
+
+            /* Chart cards */
+            .chart-card { padding:14px; }
+            .chart-card-canvas { min-height:180px; }
+            .chart-card-header { flex-direction:column; gap:8px; }
+            .chart-card-controls { align-self:flex-end; }
+            .chart-download-btn { padding:4px 8px; font-size:10px; }
+
+            /* Chart insight panels */
+            .chart-insight { padding:10px; font-size:11px; }
+            .insight-row { flex-direction:column; gap:2px; }
+            .insight-label { min-width:unset; }
+
+            /* Analytics section dividers */
+            .analytics-section-divider { padding:10px 14px; margin:24px 0 14px; }
+            .analytics-section-divider h3 { font-size:13px; }
+
+            /* Filter controls */
+            .filter-controls-grid { padding:12px; gap:10px; grid-template-columns:1fr 1fr; }
+            .filter-controls-grid select { font-size:13px; }
+            .platform-cards-grid { grid-template-columns:1fr; }
+
+            /* Schedule page */
+            .card.full-width [style*="display:flex;justify-content:space-between"] { flex-direction:column; gap:12px; }
+
+            /* Brands page */
+            .brand-card { padding:16px; }
+            .brand-name { font-size:16px; }
+            .brand-actions { flex-direction:column; gap:8px; }
+            .brand-actions-run { flex-wrap:wrap; }
+            .brand-actions-manage { margin-left:0; }
+
+            /* Log stats */
+            .grid-4 { grid-template-columns:repeat(2,1fr); gap:10px; }
+
+            /* Tables */
+            table { font-size:12px; }
+            th, td { padding:8px 10px; }
+            th { font-size:9px; }
+
+            /* Fullscreen overlay */
+            .chart-fullscreen-overlay { padding:12px; }
+            .fs-header h3 { font-size:16px; }
+
+            /* Global search modal */
+            .search-modal-content { width:95%; margin:60px auto; }
+
+            /* Proof strip */
+            .proof-strip { padding:14px 16px; }
+            .proof-inner { gap:14px; flex-direction:column; }
+            .proof-item { font-size:11px; }
+        }
+        @media(max-width:480px) {
+            /* Smallest screens */
+            .kpi-grid-6 { grid-template-columns:1fr 1fr; gap:8px; }
+            .kpi-grid-6 .stat-card .value { font-size:16px; }
+            .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+            .filter-controls-grid { grid-template-columns:1fr; }
+
+            /* Header compact */
+            .header { padding:0 12px; }
+            .logo-text { font-size:16px; }
+            .logo-text span { display:none; }
+            .tabs-inner { padding:8px 12px; gap:2px; }
+            .tab { padding:7px 12px; font-size:12px; }
+
+            /* Cards even tighter */
+            .card { padding:12px; }
+            .brand-info { gap:6px; }
+            .brand-actions-run .btn { padding:5px 10px; font-size:10px; }
+
+            /* Hero section */
+            .hero { padding:24px 12px 20px; }
+            .hero h1 { font-size:22px; line-height:1.15; }
+            .hero-sub { font-size:13px; }
+            .hero-right { gap:8px; }
+            .hero-metric { padding:12px; }
+            .hero-metric .val { font-size:20px; }
+
+            /* Log panel */
+            .log-panel { font-size:10px; padding:10px; max-height:350px; }
+        }
+        @media(max-width:360px) {
+            .hero-right { grid-template-columns:1fr; }
+            .kpi-grid-6 { grid-template-columns:1fr; }
+            .grid-4 { grid-template-columns:1fr; }
+        }
+
         /* ── Print ── */
         @media print {
             body { background:var(--bg-card); color:black; }
@@ -548,59 +665,60 @@
 <div class="header">
     <div class="header-inner">
         <a class="logo" href="/" aria-label="AdFlow Studio Home">
-            <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="36" height="36">
+            <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="38" height="38" class="logo-svg">
               <defs>
-                <linearGradient id="lgBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#1B7DB5"/>
-                  <stop offset="100%" stop-color="#145E8A"/>
+                <linearGradient id="lgPrismFace1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="var(--primary)"/>
+                  <stop offset="100%" stop-color="var(--primary-dark)"/>
                 </linearGradient>
-                <linearGradient id="lgPrism" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
-                  <stop offset="100%" stop-color="rgba(255,255,255,0.75)"/>
+                <linearGradient id="lgPrismFace2" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.7"/>
+                  <stop offset="100%" stop-color="var(--primary-dark)" stop-opacity="0.4"/>
                 </linearGradient>
-                <linearGradient id="lgStream1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
-                  <stop offset="100%" stop-color="rgba(255,255,255,0.7)"/>
+                <linearGradient id="lgStreamIn" x1="0%" y1="50%" x2="100%" y2="50%">
+                  <stop offset="0%" stop-color="var(--primary)" stop-opacity="0"/>
+                  <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.8"/>
                 </linearGradient>
-                <linearGradient id="lgStream2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
-                  <stop offset="100%" stop-color="rgba(255,255,255,0.55)"/>
+                <linearGradient id="lgStreamOut" x1="0%" y1="50%" x2="100%" y2="50%">
+                  <stop offset="0%" stop-color="var(--primary)"/>
+                  <stop offset="60%" stop-color="var(--primary)" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
                 </linearGradient>
-                <linearGradient id="lgOut" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#5ED4FF"/>
-                  <stop offset="100%" stop-color="#FFFFFF"/>
-                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
               </defs>
-              <!-- Background -->
-              <rect x="0" y="0" width="120" height="120" rx="28" fill="url(#lgBg)"/>
-              <rect x="0" y="0" width="120" height="120" rx="28" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-              <!-- 4 inbound data streams converging to center prism (Meta/YT/GAds/DV360) -->
-              <path d="M14 34 Q36 42 50 52" fill="none" stroke="url(#lgStream1)" stroke-width="3" stroke-linecap="round"/>
-              <path d="M14 58 Q32 56 50 56" fill="none" stroke="url(#lgStream2)" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M14 82 Q36 74 50 64" fill="none" stroke="url(#lgStream1)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M22 18 Q40 32 50 48" fill="none" stroke="url(#lgStream2)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-              <!-- Source dots (4 channels) -->
-              <circle cx="13" cy="34" r="3.5" fill="#4DA8DA" opacity="0.9"/>
-              <circle cx="13" cy="58" r="3.5" fill="#5ED4FF" opacity="0.9"/>
-              <circle cx="13" cy="82" r="3.5" fill="#4DA8DA" opacity="0.7"/>
-              <circle cx="20" cy="17" r="3" fill="#5ED4FF" opacity="0.6"/>
-              <!-- Central prism / diamond — the intelligence engine -->
-              <path d="M56 36 L72 56 L56 80 L44 56 Z" fill="url(#lgPrism)" opacity="0.92"/>
-              <path d="M56 36 L72 56 L56 80 L44 56 Z" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-              <!-- Inner facet lines on prism -->
-              <line x1="56" y1="36" x2="56" y2="80" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
-              <line x1="44" y1="56" x2="72" y2="56" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-              <!-- Outbound intelligence beam — processed data output -->
-              <path d="M72 50 Q84 44 106 36" fill="none" stroke="url(#lgOut)" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/>
-              <path d="M72 56 Q88 56 106 56" fill="none" stroke="url(#lgOut)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-              <path d="M72 62 Q84 68 106 78" fill="none" stroke="url(#lgOut)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-              <!-- Output glow dot -->
-              <circle cx="107" cy="36" r="4" fill="#5ED4FF" opacity="0.8"/>
-              <circle cx="107" cy="36" r="7" fill="#5ED4FF" opacity="0.15"/>
-              <circle cx="107" cy="56" r="3" fill="rgba(255,255,255,0.6)"/>
-              <circle cx="107" cy="78" r="2.5" fill="rgba(255,255,255,0.4)"/>
-              <!-- Subtle sparkle on prism top -->
-              <circle cx="56" cy="36" r="2" fill="#fff" opacity="0.7"/>
+              <!-- Inbound data streams — 4 channels converging -->
+              <path d="M6 24 C20 28, 30 36, 40 44" fill="none" stroke="url(#lgStreamIn)" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M2 44 C16 44, 28 46, 40 48" fill="none" stroke="url(#lgStreamIn)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M2 58 C16 58, 28 54, 40 52" fill="none" stroke="url(#lgStreamIn)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M6 76 C20 72, 30 64, 40 56" fill="none" stroke="url(#lgStreamIn)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Source dots — channel indicators -->
+              <circle cx="5" cy="24" r="2.8" fill="var(--primary)" opacity="0.5"/>
+              <circle cx="2" cy="44" r="2.5" fill="var(--primary)" opacity="0.4"/>
+              <circle cx="2" cy="58" r="2.5" fill="var(--primary)" opacity="0.4"/>
+              <circle cx="5" cy="76" r="2.8" fill="var(--primary)" opacity="0.5"/>
+              <!-- Central prism — 3D diamond with faceted faces -->
+              <path d="M50 18 L66 50 L50 82 L34 50 Z" fill="url(#lgPrismFace1)" opacity="0.15"/>
+              <path d="M50 18 L66 50 L50 50 Z" fill="var(--primary)" opacity="0.85"/>
+              <path d="M50 18 L34 50 L50 50 Z" fill="var(--primary)" opacity="0.6"/>
+              <path d="M50 82 L66 50 L50 50 Z" fill="var(--primary-dark)" opacity="0.7"/>
+              <path d="M50 82 L34 50 L50 50 Z" fill="var(--primary-dark)" opacity="0.5"/>
+              <!-- Prism edges -->
+              <path d="M50 18 L66 50 L50 82 L34 50 Z" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.4"/>
+              <line x1="50" y1="18" x2="50" y2="82" stroke="var(--primary)" stroke-width="0.6" opacity="0.3"/>
+              <line x1="34" y1="50" x2="66" y2="50" stroke="var(--primary)" stroke-width="0.6" opacity="0.3"/>
+              <!-- Highlight on prism top -->
+              <circle cx="50" cy="22" r="2.5" fill="var(--primary)" opacity="0.3" filter="url(#glow)"/>
+              <!-- Outbound intelligence beams — refined output -->
+              <path d="M60 44 C72 36, 82 30, 96 24" fill="none" stroke="url(#lgStreamOut)" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M62 50 C74 50, 84 50, 98 50" fill="none" stroke="url(#lgStreamOut)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M60 56 C72 64, 82 70, 96 76" fill="none" stroke="url(#lgStreamOut)" stroke-width="2.4" stroke-linecap="round"/>
+              <!-- Output pulse dots -->
+              <circle cx="96" cy="24" r="3" fill="var(--primary)" opacity="0.6" filter="url(#glow)"/>
+              <circle cx="98" cy="50" r="2.5" fill="var(--primary)" opacity="0.45"/>
+              <circle cx="96" cy="76" r="3" fill="var(--primary)" opacity="0.6" filter="url(#glow)"/>
             </svg></div>
             <div class="logo-text">AdFlow <span>Studio</span></div>
         </a>
@@ -614,7 +732,7 @@
                 <span id="statusText">System Online</span>
             </div>
             <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">☰</button>
-            <button onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span style="font-size:13px;">🔍</span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
+            <button class="search-btn" onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span style="font-size:13px;">🔍</span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
         </div>
     </div>
@@ -793,7 +911,7 @@
         </div>
 
         <!-- Feature 1: Date Range Picker -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;padding:16px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+        <div class="filter-controls-grid">
             <div class="form-group" style="margin-bottom:0;">
                 <label style="font-size:11px;">Preset Range</label>
                 <select id="dateRangePreset" onchange="applyDateRangePreset()" style="padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;width:100%;">
@@ -860,7 +978,7 @@
         </div>
 
         <!-- KPI Cards Row -->
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px;" id="analyticsKPIs">
+        <div class="kpi-grid-6" id="analyticsKPIs">
             <div class="stat-card" style="border-top:3px solid var(--primary);">
                 <div class="label">Total Spend</div>
                 <div class="value" id="kpiSpend" style="font-size:20px;">--</div>
@@ -888,7 +1006,7 @@
         </div>
 
         <!-- Secondary KPIs -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+        <div class="kpi-grid">
             <div class="stat-card">
                 <div class="label">Engagements</div>
                 <div class="value" id="kpiEngagements" style="font-size:18px;">--</div>
@@ -1029,7 +1147,7 @@
         </div>
 
         <!-- Platform-wise Detailed Cards (3f) -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:24px;" id="platformCardsContainer">
+        <div class="platform-cards-grid" id="platformCardsContainer">
         </div>
 
         <div class="analytics-section-divider" style="background:linear-gradient(90deg,rgba(46,204,113,0.1),transparent);">
