@@ -123,7 +123,7 @@
         .tab.active { color:#FFFFFF; background:var(--primary); font-weight:700; }
 
         /* ── Hero Section ── */
-        .hero { position:relative; overflow:hidden; padding:80px 32px 60px; background:linear-gradient(135deg,var(--bg-card-hover) 0%,var(--bg) 40%,var(--bg-card) 100%); border-bottom:1px solid var(--border); }
+        .hero { position:relative; overflow:hidden; padding:60px 32px 48px; background:linear-gradient(135deg,var(--bg-card-hover) 0%,var(--bg) 40%,var(--bg-card) 100%); border:1px solid var(--border); border-radius:var(--radius-lg); }
         .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 50% at 20% 40%,rgba(35,139,195,0.06),transparent),radial-gradient(ellipse 60% 40% at 80% 60%,rgba(99,175,54,0.04),transparent); pointer-events:none; }
         .hero-grid { max-width:1440px; margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr; gap:60px; align-items:center; position:relative; z-index:2; }
         .hero-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; background:var(--primary-light); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:700; color:var(--primary); margin-bottom:24px; }
@@ -150,7 +150,7 @@
         .hero-metric .lbl { font-size:12px; color:var(--text-secondary); margin-top:8px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
 
         /* ── Social Proof Strip ── */
-        .proof-strip { background:var(--bg-card); border-bottom:1px solid var(--border); padding:20px 32px; text-align:center; }
+        .proof-strip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 32px; text-align:center; }
         .proof-inner { max-width:1440px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:wrap; }
         .proof-item { display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:13px; font-weight:600; }
         .proof-item .num { color:var(--primary); font-weight:800; font-size:16px; }
@@ -540,7 +540,7 @@
     <div id="tab-dashboard" class="tab-content active">
 
         <!-- Hero Section -->
-        <div class="hero" style="margin:-32px -32px 32px; border-radius:0;">
+        <div class="hero" style="margin:0 0 32px; border-radius:var(--radius-lg);">
             <div class="hero-grid">
                 <div class="hero-left">
                     <div class="hero-badge">Powered by SocialPanga</div>
@@ -567,7 +567,7 @@
         </div>
 
         <!-- Social Proof -->
-        <div class="proof-strip" style="margin:-32px -32px 32px; border-radius:0;">
+        <div class="proof-strip" style="margin:0 0 28px; border-radius:var(--radius-lg);">
             <div class="proof-inner">
                 <div class="proof-item"><span class="num">8+</span> Advanced Chart Types</div>
                 <div class="proof-item"><span class="num">5</span> Platform Integrations</div>
