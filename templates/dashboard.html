@@ -3015,7 +3015,7 @@
         if (container) {
             container.style.display = 'flex';
             container.innerHTML = `
-                <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;" onclick="toggleUserMenu()" title="${currentUser.name || currentUser.email}">${initials}</div>
+                <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;" onclick="toggleUserMenu(event)" title="${currentUser.name || currentUser.email}">${initials}</div>
                 <div class="user-dropdown" id="userDropdown" style="display:none;position:absolute;top:44px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);min-width:220px;z-index:200;">
                     <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
                         <div style="font-weight:600;font-size:13px;color:var(--text);">${currentUser.name || 'User'}</div>
@@ -3031,7 +3031,8 @@
         if (usersTab) usersTab.style.display = currentUser.role === 'admin' ? '' : 'none';
     }
 
-    function toggleUserMenu() {
+    function toggleUserMenu(e) {
+        if (e) e.stopPropagation();
         const dd = document.getElementById('userDropdown');
         if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
     }
