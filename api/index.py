@@ -401,6 +401,24 @@ def run_all_brands(report_type="daily", dry_run=False):
 
 # ── Routes: Pages ────────────────────────────────────────────────────
 
+@app.route("/api/version")
+def api_version():
+    """Debug: check deployed version and module availability."""
+    info = {"version": "v2-debug", "pptx_available": False, "pptx_module": None}
+    try:
+        from pptx import Presentation
+        info["pptx_available"] = True
+        info["pptx_module"] = "python-pptx"
+    except ImportError as e:
+        info["pptx_error"] = str(e)
+    try:
+        from src.pptx_report_generator_py import generate_pptx_report as gp
+        info["generator"] = "pptx_report_generator_py"
+    except ImportError as e:
+        info["generator_error"] = str(e)
+    return jsonify(info)
+
+
 @app.route("/")
 def index():
     return render_template("dashboard.html")
