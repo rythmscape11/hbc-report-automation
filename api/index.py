@@ -358,6 +358,17 @@ def run_brand_pipeline(brand_slug, report_type="full", dry_run=False):
             add_log(f"  ⚠ PDF report failed: {e}", "warn")
             logger.warning(f"PDF report generation error: {e}")
 
+        # Generate PPTX report
+        try:
+            from src.pptx_report_bridge import generate_pptx_report
+            pptx_filename = filename.replace('.xlsx', '.pptx')
+            pptx_path = os.path.join(REPORTS_DIR, pptx_filename)
+            generate_pptx_report(meta_data, google_data, brand, report_type, pptx_path)
+            add_log(f"  ✓ PPTX Report: {pptx_filename}", "success")
+        except Exception as e:
+            add_log(f"  ⚠ PPTX report failed: {e}", "warn")
+            logger.warning(f"PPTX report generation error: {e}")
+
         return report_path
 
     except Exception as e:

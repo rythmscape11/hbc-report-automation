@@ -4529,6 +4529,7 @@
                             <option value="xlsx">Excel (.xlsx)</option>
                             <option value="html">HTML Report</option>
                             <option value="pdf">PDF Report</option>
+                            <option value="pptx">PowerPoint (.pptx)</option>
                             <option value="all">All Formats</option>
                         </select>
                     </div>
@@ -7166,7 +7167,7 @@
         document.getElementById('analyticsAudience').value = '';
         document.getElementById('analyticsObjective').value = '';
         document.getElementById('currencySelect').value = 'INR';
-        updateCurrency();
+        updateCurrencySelector();
         document.getElementById('dateRangePreset').value = 'last7';
         document.getElementById('comparisonPeriod').value = 'previous_period';
         loadAnalytics();
