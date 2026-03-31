@@ -4438,12 +4438,15 @@
 
         // Reports
         if (data.reports && data.reports.length) {
-            document.getElementById('recentReports').innerHTML = data.reports.slice(0, 5).map(r =>
-                `<div class="report-item">
-                    <span class="name">📊 ${r}</span>
-                    <button class="download-btn" onclick="window.open('/api/download/${r}')">Download</button>
-                </div>`
-            ).join('');
+            document.getElementById('recentReports').innerHTML = data.reports.slice(0, 5).map(r => {
+                const name = typeof r === 'string' ? r : r.filename;
+                const size = r.size_kb ? ` (${r.size_kb} KB)` : '';
+                const fmt = r.format ? `<span style="font-size:11px;padding:2px 6px;background:var(--accent-glow);color:var(--accent);border-radius:4px;margin-left:8px;">${r.format}</span>` : '';
+                return `<div class="report-item">
+                    <span class="name">📊 ${name}${fmt}${size}</span>
+                    <button class="download-btn" onclick="window.open('/api/download/${encodeURIComponent(name)}')">Download</button>
+                </div>`;
+            }).join('');
         } else {
             document.getElementById('recentReports').innerHTML = '<div class="empty-state" style="min-height:120px;"><div class="empty-state-icon">📄</div><p class="title">No Reports Generated Yet</p><p>Use Quick Actions above to run your first campaign report.</p><div class="empty-state-action"><button class="btn btn-primary btn-small" onclick="document.querySelector(\'.btn-group\').scrollIntoView({behavior:\'smooth\'})">Go to Quick Actions</button></div></div>';
         }

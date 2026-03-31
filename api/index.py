@@ -421,7 +421,7 @@ def api_status():
     reports_list = []
     if os.path.exists(REPORTS_DIR):
         for f in sorted(os.listdir(REPORTS_DIR), reverse=True):
-            if f.endswith((".xlsx", ".html", ".pdf")):
+            if f.endswith((".xlsx", ".html", ".pdf", ".pptx")):
                 fpath = os.path.join(REPORTS_DIR, f)
                 ext = f.split('.')[-1].upper()
                 reports_list.append({
@@ -851,7 +851,7 @@ def api_list_reports():
     reports_list = []
     if os.path.exists(REPORTS_DIR):
         for f in sorted(os.listdir(REPORTS_DIR), reverse=True):
-            if f.endswith((".xlsx", ".html", ".pdf")):
+            if f.endswith((".xlsx", ".html", ".pdf", ".pptx")):
                 fpath = os.path.join(REPORTS_DIR, f)
                 ext = f.split('.')[-1].upper()
                 reports_list.append({
