@@ -334,8 +334,30 @@ def run_brand_pipeline(brand_slug, report_type="full", dry_run=False):
 
         add_log(f"  Generating Excel report...")
         report_path = generate(meta_data, google_data, output_path, template=brand_tmpl)
-
         add_log(f"  ✓ Report: {filename}", "success")
+
+        # Generate HTML report
+        try:
+            from src.html_report_generator import generate_html_report
+            html_filename = filename.replace('.xlsx', '.html')
+            html_path = os.path.join(REPORTS_DIR, html_filename)
+            generate_html_report(meta_data, google_data, brand, report_type, html_path)
+            add_log(f"  ✓ HTML Report: {html_filename}", "success")
+        except Exception as e:
+            add_log(f"  ⚠ HTML report failed: {e}", "warn")
+            logger.warning(f"HTML report generation error: {e}")
+
+        # Generate PDF report
+        try:
+            from src.pdf_report_generator import generate_pdf_report
+            pdf_filename = filename.replace('.xlsx', '.pdf')
+            pdf_path = os.path.join(REPORTS_DIR, pdf_filename)
+            generate_pdf_report(meta_data, google_data, brand, report_type, pdf_path)
+            add_log(f"  ✓ PDF Report: {pdf_filename}", "success")
+        except Exception as e:
+            add_log(f"  ⚠ PDF report failed: {e}", "warn")
+            logger.warning(f"PDF report generation error: {e}")
+
         return report_path
 
     except Exception as e:
@@ -388,11 +410,13 @@ def api_status():
     reports_list = []
     if os.path.exists(REPORTS_DIR):
         for f in sorted(os.listdir(REPORTS_DIR), reverse=True):
-            if f.endswith(".xlsx"):
+            if f.endswith((".xlsx", ".html", ".pdf")):
                 fpath = os.path.join(REPORTS_DIR, f)
+                ext = f.split('.')[-1].upper()
                 reports_list.append({
                     "filename": f,
-                    "size_kb": round(os.path.getsize(fpath) / 1024, 1)
+                    "size_kb": round(os.path.getsize(fpath) / 1024, 1),
+                    "format": ext
                 })
 
     return jsonify({
@@ -808,6 +832,24 @@ def api_download(filename):
         })
         return send_file(path, as_attachment=True, download_name=filename)
     return jsonify({"error": "File not found. Reports on Vercel are stored in /tmp and may be cleared between requests."}), 404
+
+
+@app.route("/api/reports", methods=["GET"])
+def api_list_reports():
+    """List all available reports."""
+    reports_list = []
+    if os.path.exists(REPORTS_DIR):
+        for f in sorted(os.listdir(REPORTS_DIR), reverse=True):
+            if f.endswith((".xlsx", ".html", ".pdf")):
+                fpath = os.path.join(REPORTS_DIR, f)
+                ext = f.split('.')[-1].upper()
+                reports_list.append({
+                    "filename": f,
+                    "size_kb": round(os.path.getsize(fpath) / 1024, 1),
+                    "format": ext,
+                    "created": datetime.fromtimestamp(os.path.getctime(fpath)).isoformat()
+                })
+    return jsonify({"reports": reports_list[:50]})
 
 
 @app.route("/api/logs")

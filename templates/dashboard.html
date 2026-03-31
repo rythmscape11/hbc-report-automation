@@ -4523,7 +4523,16 @@
                         <button class="btn" onclick="runBrandReport('${brand.slug}', 'monthly', this)" title="Run monthly report">Monthly</button>
                         <button class="btn" onclick="runBrandReport('${brand.slug}', 'full', this)" title="Run full report">Full</button>
                     </div>
-                    <div class="brand-actions-manage">
+                    <div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+                        <span style="font-size:10px;color:var(--text-secondary);font-weight:500;">Format:</span>
+                        <select id="reportFormat_${brand.slug}" style="font-size:10px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;">
+                            <option value="xlsx">Excel (.xlsx)</option>
+                            <option value="html">HTML Report</option>
+                            <option value="pdf">PDF Report</option>
+                            <option value="all">All Formats</option>
+                        </select>
+                    </div>
+                    <div class="brand-actions-manage" style="margin-top:8px;">
                         <button class="btn btn-edit" onclick="editBrand('${brand.slug}')" title="Edit brand">✎ Edit</button>
                         <button class="btn" onclick="duplicateBrand('${brand.slug}')" title="Duplicate brand" style="font-size:11px;padding:6px 10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);border-radius:6px;cursor:pointer;">⧉ Copy</button>
                         <button class="btn btn-delete" onclick="deleteBrand('${brand.slug}')" title="Delete brand">✕</button>
@@ -4859,17 +4868,22 @@
     }
 
     async function runBrandReport(slug, reportType, btnEl) {
-        if (!confirm('Run ' + reportType + ' report for "' + slug + '"?')) return;
+        const formatEl = document.getElementById(`reportFormat_${slug}`);
+        const format = formatEl ? formatEl.value : 'xlsx';
+
+        if (!confirm('Run ' + reportType + ' report for "' + slug + '" (format: ' + format + ')?')) return;
         if (btnEl) { btnEl.classList.add('loading'); btnEl.disabled = true; }
         try {
             const res = await fetch('/api/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ brand: slug, report_type: reportType, dry_run: false })
+                body: JSON.stringify({ brand: slug, report_type: reportType, report_format: format, dry_run: false })
             });
 
             if (res.ok) {
-                showToast(`Running ${reportType} report for ${slug}...`, 'success');
+                const data = await res.json();
+                const msg = format === 'all' ? 'all formats' : format;
+                showToast(`Generating ${reportType} report (${msg}) for ${slug}...`, 'success');
                 fetchStatus();
             } else {
                 const err = await res.json();
