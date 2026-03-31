@@ -2073,7 +2073,7 @@ def api_ai_insights():
             worst = min(campaign_perf, key=lambda c: c.get("cpm", float('inf')))
             insights.append({
                 "type": "top_performer",
-                "icon": "🏆",
+                "icon": "◆",
                 "title": "Top Performing Campaign",
                 "text": f"{best['campaign']} leads with {best['impressions']:,} impressions at {currency_symbol}{best['spend']:,.0f} spend.",
                 "priority": "high"
@@ -2084,7 +2084,7 @@ def api_ai_insights():
             avg_cpm = total_spend / total_impressions * 1000
             insights.append({
                 "type": "efficiency",
-                "icon": "💰",
+                "icon": "◈",
                 "title": "Budget Efficiency",
                 "text": f"Average CPM across all campaigns is {currency_symbol}{avg_cpm:.2f}. " +
                         ("This is efficient for the market." if avg_cpm < 200 else "Consider optimizing high-CPM campaigns."),
@@ -2100,7 +2100,7 @@ def api_ai_insights():
                 best_day = dow_spend.idxmax()
                 insights.append({
                     "type": "day_of_week",
-                    "icon": "📅",
+                    "icon": "◉",
                     "title": "Best Performing Day",
                     "text": f"{best_day} shows the highest spend and performance. Consider allocating more budget on this day.",
                     "priority": "medium"
