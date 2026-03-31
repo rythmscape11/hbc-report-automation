@@ -701,32 +701,53 @@ def api_run():
     elif brand_slug:
         report_path = run_brand_pipeline(brand_slug, report_type, dry_run)
         if report_path:
-            import base64
             base_name = os.path.basename(report_path)
             stem = base_name.rsplit('.', 1)[0]
-            # Collect all generated formats with their data
             generated = []
-            files_data = {}
             for ext in ['.xlsx', '.html', '.pdf', '.pptx']:
                 fname = stem + ext
-                fpath = os.path.join(REPORTS_DIR, fname)
-                if os.path.exists(fpath):
+                if os.path.exists(os.path.join(REPORTS_DIR, fname)):
                     generated.append(fname)
-                    try:
-                        with open(fpath, 'rb') as f:
-                            files_data[fname] = base64.b64encode(f.read()).decode('ascii')
-                    except Exception:
-                        pass
             return jsonify({
                 "ok": True,
                 "message": f"Report generated: {base_name}",
                 "filename": base_name,
-                "all_formats": generated,
-                "files": files_data
+                "all_formats": generated
             })
         return jsonify({"ok": False, "message": "Pipeline failed — check logs"}), 500
     else:
         return jsonify({"error": "Specify 'brand' slug or set 'run_all': true"}), 400
+
+
+@app.route("/api/generate-download/<brand_slug>/<report_type>/<fmt>")
+@require_api_key
+def api_generate_download(brand_slug, report_type, fmt):
+    """Generate a single-format report and return it as a file download.
+
+    This avoids Vercel's ephemeral /tmp issue by generating and serving
+    in the same request.
+    """
+    report_path = run_brand_pipeline(brand_slug, report_type, False)
+    if not report_path:
+        return jsonify({"error": "Pipeline failed"}), 500
+
+    stem = os.path.basename(report_path).rsplit('.', 1)[0]
+    ext_map = {'xlsx': '.xlsx', 'html': '.html', 'pdf': '.pdf', 'pptx': '.pptx'}
+    ext = ext_map.get(fmt, '.xlsx')
+    fname = stem + ext
+    fpath = os.path.join(REPORTS_DIR, fname)
+
+    if not os.path.exists(fpath):
+        return jsonify({"error": f"Format {fmt} not generated"}), 404
+
+    mime_map = {
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.html': 'text/html',
+        '.pdf': 'application/pdf',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    }
+    return send_file(fpath, as_attachment=True, download_name=fname,
+                     mimetype=mime_map.get(ext, 'application/octet-stream'))
 
 
 # ── Routes: Report Templates ─────────────────────────────────────────
