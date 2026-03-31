@@ -233,6 +233,35 @@
         .skeleton-text { height:16px; margin-bottom:8px; width:80%; }
         .skeleton-kpi { height:80px; border-radius:var(--radius); }
 
+        /* ── Page Loading Screen with Logo Animation ── */
+        .page-loader { position:fixed; inset:0; background:var(--bg); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity .4s ease, visibility .4s ease; }
+        .page-loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+        .page-loader-logo { width:64px; height:64px; }
+        .page-loader-logo svg { width:100%; height:100%; }
+        /* Top layer animation — slides down and fades in */
+        .page-loader-logo .layer-top { opacity:0; transform:translateY(-8px); animation:loaderLayerTop 1.2s cubic-bezier(0.16,1,0.3,1) 0.1s forwards; }
+        .page-loader-logo .layer-top-l { opacity:0; transform:translateX(-4px); animation:loaderLayerSide 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+        .page-loader-logo .layer-top-r { opacity:0; transform:translateX(4px); animation:loaderLayerSide 1.2s cubic-bezier(0.16,1,0.3,1) 0.35s forwards; }
+        /* Bottom layer animation — slides up and fades in with delay */
+        .page-loader-logo .layer-bot { opacity:0; transform:translateY(8px); animation:loaderLayerBot 1.2s cubic-bezier(0.16,1,0.3,1) 0.25s forwards; }
+        .page-loader-logo .layer-bot-l { opacity:0; transform:translateX(-4px); animation:loaderLayerSide 1.2s cubic-bezier(0.16,1,0.3,1) 0.45s forwards; }
+        .page-loader-logo .layer-bot-r { opacity:0; transform:translateX(4px); animation:loaderLayerSide 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
+        @keyframes loaderLayerTop { to { opacity:1; transform:translateY(0); } }
+        @keyframes loaderLayerBot { to { opacity:1; transform:translateY(0); } }
+        @keyframes loaderLayerSide { to { opacity:1; transform:translateX(0); } }
+        /* Pulsing glow after assembly */
+        .page-loader-logo.assembled { animation:loaderPulse 1.5s ease-in-out infinite; }
+        @keyframes loaderPulse { 0%,100%{opacity:1;filter:drop-shadow(0 0 0 transparent)} 50%{opacity:0.85;filter:drop-shadow(0 0 12px rgba(44,62,107,0.25))} }
+        .page-loader-text { font-family:var(--font-display); font-size:14px; font-weight:600; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; opacity:0; animation:fadeIn .5s ease .6s forwards; }
+        .page-loader-bar { width:120px; height:3px; background:var(--border); border-radius:2px; overflow:hidden; opacity:0; animation:fadeIn .4s ease .8s forwards; }
+        .page-loader-bar-fill { height:100%; background:var(--primary); border-radius:2px; width:0; animation:loaderBarFill 1.8s cubic-bezier(0.4,0,0.2,1) .9s forwards; }
+        @keyframes loaderBarFill { 0%{width:0} 40%{width:60%} 80%{width:90%} 100%{width:100%} }
+        /* Tab transition loader (mini) */
+        .tab-loader { position:absolute; inset:0; background:var(--bg); z-index:50; display:flex; align-items:center; justify-content:center; gap:12px; opacity:0; pointer-events:none; transition:opacity .2s; }
+        .tab-loader.active { opacity:1; pointer-events:auto; }
+        .tab-loader-icon { width:32px; height:32px; animation:loaderPulse 1s ease-in-out infinite; }
+        .tab-loader-icon svg { width:100%; height:100%; color:var(--primary); }
+
         /* ── Toast ── */
         .toast { position:fixed; top:72px; right:24px; padding:12px 18px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:10px; min-width:300px; max-width:calc(100vw - 48px); z-index:2000; transform:translateX(400px); transition:transform .3s cubic-bezier(.22,1,.36,1); border:1px solid; font-size:12px; font-weight:500; box-shadow:var(--shadow-md); }
         .toast.show { transform:translateX(0); }
@@ -638,7 +667,7 @@
         .chart-card-canvas { position:relative; width:100%; min-height:220px; }
         .chart-card canvas { transition:opacity .3s ease; }
         .chart-card:hover canvas { opacity:0.95; }
-        .chart-download-btn { position:absolute; top:16px; right:16px; background:var(--primary-light); border:1px solid var(--border); border-radius:4px; padding:5px 12px; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; transition:all .2s; z-index:5; font-family:inherit; }
+        .chart-download-btn { position:relative; top:auto; right:auto; background:var(--primary-light); border:1px solid var(--border); border-radius:4px; padding:4px 10px; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; transition:all .2s; z-index:5; font-family:inherit; white-space:nowrap; line-height:1.2; }
         .chart-download-btn:hover { background:var(--primary); color:#FFFFFF; }
 
         /* ── Download Button (Reports) ── */
@@ -784,6 +813,22 @@
     </style>
 </head>
 <body>
+
+<!-- ═══ Page Loading Screen ═══ -->
+<div class="page-loader" id="pageLoader">
+    <div class="page-loader-logo" id="pageLoaderLogo">
+        <svg viewBox="0 0 36 36" width="64" height="64">
+            <path class="layer-top" d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
+            <path class="layer-top-l" d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
+            <path class="layer-top-r" d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
+            <path class="layer-bot" d="M18 11.5 L33 20.5 L18 29.5 L3 20.5 Z" fill="currentColor" opacity="0.48"/>
+            <path class="layer-bot-l" d="M3 20.5 L3 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.18"/>
+            <path class="layer-bot-r" d="M33 20.5 L33 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.34"/>
+        </svg>
+    </div>
+    <div class="page-loader-text">AdFlow Studio</div>
+    <div class="page-loader-bar"><div class="page-loader-bar-fill"></div></div>
+</div>
 
 <!-- ═══ Skip to Content ═══ -->
 <a href="#main-content" class="skip-to-content">Skip to main content</a>
@@ -2526,21 +2571,34 @@
         ).join('');
     }
 
-    // ── Tab Switching ──
+    // ── Page Loader Dismissal ──
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('pageLoader');
+        const logoEl = document.getElementById('pageLoaderLogo');
+        if (logoEl) logoEl.classList.add('assembled');
+        setTimeout(() => {
+            if (loader) loader.classList.add('hidden');
+            setTimeout(() => { if (loader) loader.remove(); }, 500);
+        }, 2200);
+    });
+
+    // ── Tab Switching with mini-loader ──
     function switchTab(tab) {
+        const targetContent = document.getElementById('tab-' + tab);
+        if (!targetContent) return;
+
         document.querySelectorAll('.tab').forEach(t => {
             t.classList.remove('active');
             t.setAttribute('aria-selected', 'false');
         });
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        // Find the correct tab button by matching its onclick attribute
         document.querySelectorAll('.tab').forEach(t => {
             if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + tab + "'")) {
                 t.classList.add('active');
                 t.setAttribute('aria-selected', 'true');
             }
         });
-        document.getElementById('tab-' + tab).classList.add('active');
+        targetContent.classList.add('active');
 
         if (tab === 'brands') loadBrands();
         if (tab === 'analytics') loadAnalytics();
@@ -3436,12 +3494,16 @@
 
             return `
                 <div class="chart-card">
-                    <button class="chart-download-btn" onclick="downloadChartPNG('${chart.id}')">⬇ PNG</button>
-                    <h3>${chart.title}</h3>
+                    <div class="chart-card-header">
+                        <h3 class="chart-card-title">${chart.title}</h3>
+                        <div class="chart-card-controls">
+                            <button class="chart-download-btn" onclick="downloadChartPNG('${chart.id}')">PNG</button>
+                            <button class="btn btn-danger btn-small" onclick="removeChartFromGallery(${i})" style="padding:4px 10px;font-size:11px;">Remove</button>
+                        </div>
+                    </div>
                     <div class="chart-card-canvas">
                         <canvas id="${chart.id}"></canvas>
                     </div>
-                    <button class="btn btn-danger btn-small" onclick="removeChartFromGallery(${i})">Remove</button>
                 </div>
             `;
         }).join('');
@@ -4013,17 +4075,29 @@
 
     // ======================== FEATURE 3: PNG EXPORT ========================
     function addDownloadButtonToCharts() {
-        document.querySelectorAll('[id^="chartTrend"], [id^="chartPlatformSplit"], [id^="chartCampaigns"], [id^="chartBrandComparison"]').forEach(canvas => {
+        // Add PNG download buttons into chart header controls (not absolute positioned)
+        const analyticsTab = document.getElementById('tab-analytics');
+        if (!analyticsTab) return;
+        analyticsTab.querySelectorAll('canvas').forEach(canvas => {
             const card = canvas.closest('.card');
-            if (card && !card.querySelector('.chart-download-btn')) {
-                const btn = document.createElement('button');
-                btn.className = 'chart-download-btn';
-                btn.textContent = '⬇ PNG';
-                btn.onclick = () => downloadAnalyticsChartPNG(canvas.id);
-                // Position absolutely on the card, not inside h2
-                card.style.position = 'relative';
-                card.appendChild(btn);
+            if (!card || card.querySelector('.chart-download-btn')) return;
+            const h2 = card.querySelector('h2');
+            if (!h2) return;
+            // Find or create controls container next to expand-btn
+            let controlsDiv = h2.querySelector('div[style*="flex"]') || h2.querySelector('div');
+            if (!controlsDiv || controlsDiv === h2) {
+                controlsDiv = document.createElement('div');
+                controlsDiv.style.cssText = 'display:flex;gap:6px;align-items:center;';
+                // Move existing expand-btn into this container
+                const existingExpand = h2.querySelector('.expand-btn');
+                if (existingExpand) controlsDiv.appendChild(existingExpand);
+                h2.appendChild(controlsDiv);
             }
+            const btn = document.createElement('button');
+            btn.className = 'chart-download-btn';
+            btn.textContent = 'PNG';
+            btn.onclick = () => downloadAnalyticsChartPNG(canvas.id);
+            controlsDiv.insertBefore(btn, controlsDiv.firstChild);
         });
     }
 
