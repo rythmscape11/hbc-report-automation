@@ -197,32 +197,23 @@ YT_COLS = [
 ]
 
 
+# ── Storage Layer ────────────────────────────────────────────────────
+from src.storage import (
+    UserStore, SessionStore, BrandStore, ReportStore,
+    init_postgres, get_storage_status,
+    USE_POSTGRES, USE_REDIS, USE_BLOB
+)
+
+# Initialize Postgres tables if configured
+try:
+    init_postgres()
+except Exception as e:
+    logger.warning(f"Postgres init skipped: {e}")
+
 # ── Authentication System ────────────────────────────────────────────
 
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
-
-USERS_FILE = "/tmp/users.json"
-_auth_tokens = {}  # In-memory token storage: {token: {user_id, email, created_at}}
-
-def load_users():
-    """Load users from JSON file."""
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Error loading users: {e}")
-            return {}
-    return {}
-
-def save_users(users):
-    """Save users to JSON file."""
-    try:
-        with open(USERS_FILE, 'w') as f:
-            json.dump(users, f, indent=2)
-    except Exception as e:
-        logger.error(f"Error saving users: {e}")
 
 def generate_auth_token():
     """Generate a unique auth token."""
@@ -230,15 +221,13 @@ def generate_auth_token():
 
 def create_user(email, name, password, role="viewer", assigned_brands=None):
     """Create a new user."""
-    users = load_users()
-
     # Check if email already exists
-    for user_id, user in users.items():
-        if user.get("email") == email:
-            return None, "Email already registered"
+    existing = UserStore.get_by_email(email)
+    if existing:
+        return None, "Email already registered"
 
     user_id = str(uuid.uuid4())
-    users[user_id] = {
+    user_data = {
         "id": user_id,
         "email": email,
         "name": name,
@@ -247,21 +236,16 @@ def create_user(email, name, password, role="viewer", assigned_brands=None):
         "assigned_brands": assigned_brands or [],
         "created_at": datetime.now().isoformat()
     }
-    save_users(users)
+    UserStore.save(user_id, user_data)
     return user_id, None
 
 def get_user_by_email(email):
     """Get user by email."""
-    users = load_users()
-    for user_id, user in users.items():
-        if user.get("email") == email:
-            return user
-    return None
+    return UserStore.get_by_email(email)
 
 def get_user_by_id(user_id):
     """Get user by ID."""
-    users = load_users()
-    return users.get(user_id)
+    return UserStore.get_by_id(user_id)
 
 def verify_password(user, password):
     """Verify password for a user."""
@@ -270,21 +254,20 @@ def verify_password(user, password):
 def create_auth_session(user_id, email):
     """Create an auth token for a user."""
     token = generate_auth_token()
-    _auth_tokens[token] = {
+    SessionStore.set(token, {
         "user_id": user_id,
         "email": email,
         "created_at": datetime.now().isoformat()
-    }
+    })
     return token
 
 def get_auth_session(token):
     """Get auth session from token."""
-    return _auth_tokens.get(token)
+    return SessionStore.get(token)
 
 def invalidate_auth_session(token):
     """Invalidate an auth token."""
-    if token in _auth_tokens:
-        del _auth_tokens[token]
+    SessionStore.delete(token)
 
 def get_current_user():
     """Get the current authenticated user from request."""
@@ -343,7 +326,7 @@ def require_admin(f):
 
 def seed_default_admin():
     """Seed a default admin user if no users exist."""
-    users = load_users()
+    users = UserStore.load_all()
     if len(users) == 0:
         user_id, error = create_user(
             email="admin@adflow.studio",
@@ -639,7 +622,12 @@ def api_get_config():
         "GOOGLE_ADS_DEVELOPER_TOKEN": "••••" if cfg.google.developer_token else "",
         "GOOGLE_ADS_CLIENT_ID": cfg.google.client_id or "",
         "GOOGLE_ADS_CUSTOMER_ID": cfg.google.customer_id or "",
-        "_note": "On Vercel, update API credentials via Vercel Dashboard → Settings → Environment Variables"
+        "_note": "On Vercel, update API credentials via Vercel Dashboard → Settings → Environment Variables",
+        "_storage": {
+            "postgres": "connected" if USE_POSTGRES else "not configured",
+            "redis": "connected" if USE_REDIS else "not configured",
+            "blob": "connected" if USE_BLOB else "not configured",
+        }
     })
 
 
@@ -651,6 +639,29 @@ def api_save_config():
         "ok": False,
         "message": "On Vercel, update API credentials via Vercel Dashboard → Settings → Environment Variables, then redeploy."
     }), 400
+
+
+@app.route("/api/storage-status", methods=["GET"])
+def api_storage_status():
+    """Return status of persistent storage backends (Postgres, Redis, Blob)."""
+    return jsonify({
+        "storage": get_storage_status(),
+        "backends": {
+            "users": "postgres" if USE_POSTGRES else "file (/tmp)",
+            "sessions": "redis" if USE_REDIS else "memory",
+            "brands": "postgres" if USE_POSTGRES else "file (/tmp)",
+            "reports": "blob" if USE_BLOB else "file (/tmp)"
+        }
+    })
+
+
+@app.route("/api/reports/history", methods=["GET"])
+def api_reports_history():
+    """List recent generated reports."""
+    brand = request.args.get("brand")
+    limit = int(request.args.get("limit", 50))
+    reports = ReportStore.list_recent(brand_slug=brand, limit=limit)
+    return jsonify({"reports": reports})
 
 
 # ── Routes: Multi-API Account Management ──────────────────────────────
@@ -890,8 +901,17 @@ def api_generate_download(brand_slug, report_type, fmt):
         '.pdf': 'application/pdf',
         '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     }
+    mimetype = mime_map.get(ext, 'application/octet-stream')
+
+    # Also upload to Blob storage if configured (persistent copy)
+    if USE_BLOB:
+        try:
+            ReportStore.upload(fname, fpath, content_type=mimetype)
+        except Exception as e:
+            logger.warning(f"Blob upload failed (non-fatal): {e}")
+
     return send_file(fpath, as_attachment=True, download_name=fname,
-                     mimetype=mime_map.get(ext, 'application/octet-stream'))
+                     mimetype=mimetype)
 
 
 # ── Routes: Report Templates ─────────────────────────────────────────

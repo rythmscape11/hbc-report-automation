@@ -3681,16 +3681,24 @@
                 const hasGoogle = cfg.GOOGLE_ADS_DEVELOPER_TOKEN || cfg.GOOGLE_ADS_CUSTOMER_ID;
                 const hasDV360 = cfg.DV360_ADVERTISER_ID;
                 const hasEmail = cfg.EMAIL_ENABLED === 'true' || cfg.EMAIL_ENABLED === true;
+                const st = cfg._storage || {};
+                const pgOk = st.postgres === 'connected';
+                const rdOk = st.redis === 'connected';
+                const blOk = st.blob === 'connected';
                 healthEl.innerHTML =
-                    '<div style="margin-bottom:6px;color:' + (hasMeta ? 'var(--success)' : 'var(--warning)') + ';font-weight:600;">' + (hasMeta ? '✓ Meta API configured' : '○ Meta API — not configured') + ' ' + (!hasMeta ? '<a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a>' : '') + '</div>' +
-                    '<div style="margin-bottom:6px;color:' + (hasGoogle ? 'var(--success)' : 'var(--warning)') + ';font-weight:600;">' + (hasGoogle ? '✓ Google Ads configured' : '○ Google Ads — not configured') + ' ' + (!hasGoogle ? '<a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a>' : '') + '</div>' +
-                    '<div style="margin-bottom:6px;color:' + (hasDV360 ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;">' + (hasDV360 ? '✓ DV360 configured' : '○ DV360 — optional') + '</div>' +
-                    '<div style="color:' + (hasEmail ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;">' + (hasEmail ? '✓ Email enabled' : '○ Email — not configured') + '</div>';
+                    '<div style="margin-bottom:6px;color:' + (hasMeta ? 'var(--success)' : 'var(--warning)') + ';font-weight:600;">' + (hasMeta ? '✓ Meta API' : '○ Meta API') + ' ' + (!hasMeta ? '<a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a>' : '') + '</div>' +
+                    '<div style="margin-bottom:6px;color:' + (hasGoogle ? 'var(--success)' : 'var(--warning)') + ';font-weight:600;">' + (hasGoogle ? '✓ Google Ads' : '○ Google Ads') + ' ' + (!hasGoogle ? '<a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a>' : '') + '</div>' +
+                    '<div style="margin-bottom:8px;color:' + (hasEmail ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;">' + (hasEmail ? '✓ Email' : '○ Email — optional') + '</div>' +
+                    '<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:2px;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">STORAGE</div>' +
+                    '<div style="margin-bottom:4px;color:' + (pgOk ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;font-size:12px;">' + (pgOk ? '✓ Postgres (Neon)' : '○ Postgres — using /tmp') + '</div>' +
+                    '<div style="margin-bottom:4px;color:' + (rdOk ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;font-size:12px;">' + (rdOk ? '✓ Redis (Upstash)' : '○ Redis — using memory') + '</div>' +
+                    '<div style="color:' + (blOk ? 'var(--success)' : 'var(--text-secondary)') + ';font-weight:600;font-size:12px;">' + (blOk ? '✓ Blob Storage' : '○ Blob — using /tmp') + '</div>';
             }).catch(() => {
-                healthEl.innerHTML = '<div style="color:var(--warning);font-weight:600;">○ Meta API — not configured <a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a></div>' +
-                    '<div style="margin-top:6px;color:var(--warning);font-weight:600;">○ Google Ads — not configured <a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a></div>' +
-                    '<div style="margin-top:6px;color:var(--text-secondary);font-weight:600;">○ DV360 — optional</div>' +
-                    '<div style="margin-top:6px;color:var(--text-secondary);font-weight:600;">○ Email — not configured</div>';
+                healthEl.innerHTML = '<div style="color:var(--warning);font-weight:600;">○ Meta API <a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a></div>' +
+                    '<div style="margin-top:6px;color:var(--warning);font-weight:600;">○ Google Ads <a href="#" onclick="switchTab(\'api\');return false" style="font-size:10px;color:var(--primary);">Configure →</a></div>' +
+                    '<div style="margin-top:6px;color:var(--text-secondary);font-weight:600;">○ Email — optional</div>' +
+                    '<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">STORAGE</div>' +
+                    '<div style="color:var(--text-secondary);font-weight:600;font-size:12px;">○ Using ephemeral /tmp</div>';
             });
         }
 

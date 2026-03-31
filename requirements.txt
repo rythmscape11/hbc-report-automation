@@ -6,3 +6,7 @@ python-dotenv==1.0.1
 reportlab==4.1.0
 numpy==1.26.4
 python-pptx==1.0.2
+# Vercel Storage integrations (optional — app falls back to /tmp if not configured)
+psycopg2-binary>=2.9.9
+upstash-redis>=1.1.0
+vercel-blob>=0.4.0
