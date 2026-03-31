@@ -122,8 +122,8 @@
         [data-theme="dark"] .header { background:rgba(13,17,23,0.92); }
         .header-inner { max-width:1440px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:56px; }
         .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
-        .logo-mark { width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .3s ease; }
-        .logo:hover .logo-mark { transform:scale(1.06) rotate(-2deg); }
+        .logo-mark { width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .4s cubic-bezier(0.16,1,0.3,1); }
+        .logo:hover .logo-mark { transform:translateY(-2px) scale(1.06); }
         .logo-text { font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--text); letter-spacing:-0.02em; }
         .logo-text span { font-family:var(--font-body); font-weight:400; color:var(--text-muted); font-size:14px; margin-left:3px; letter-spacing:0.02em; }
         .header-right { display:flex; align-items:center; gap:20px; }
@@ -792,60 +792,15 @@
 <div class="header">
     <div class="header-inner">
         <a class="logo" href="/" aria-label="AdFlow Studio Home">
-            <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="38" height="38" class="logo-svg">
-              <defs>
-                <linearGradient id="lgPrismFace1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--primary)"/>
-                  <stop offset="100%" stop-color="var(--primary-dark)"/>
-                </linearGradient>
-                <linearGradient id="lgPrismFace2" x1="100%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.7"/>
-                  <stop offset="100%" stop-color="var(--primary-dark)" stop-opacity="0.4"/>
-                </linearGradient>
-                <linearGradient id="lgStreamIn" x1="0%" y1="50%" x2="100%" y2="50%">
-                  <stop offset="0%" stop-color="var(--primary)" stop-opacity="0"/>
-                  <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.8"/>
-                </linearGradient>
-                <linearGradient id="lgStreamOut" x1="0%" y1="50%" x2="100%" y2="50%">
-                  <stop offset="0%" stop-color="var(--primary)"/>
-                  <stop offset="60%" stop-color="var(--primary)" stop-opacity="0.5"/>
-                  <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
-                </linearGradient>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="2" result="blur"/>
-                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-              </defs>
-              <!-- Inbound data streams — 4 channels converging -->
-              <path d="M6 24 C20 28, 30 36, 40 44" fill="none" stroke="url(#lgStreamIn)" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M2 44 C16 44, 28 46, 40 48" fill="none" stroke="url(#lgStreamIn)" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M2 58 C16 58, 28 54, 40 52" fill="none" stroke="url(#lgStreamIn)" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M6 76 C20 72, 30 64, 40 56" fill="none" stroke="url(#lgStreamIn)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Source dots — channel indicators -->
-              <circle cx="5" cy="24" r="2.8" fill="var(--primary)" opacity="0.5"/>
-              <circle cx="2" cy="44" r="2.5" fill="var(--primary)" opacity="0.4"/>
-              <circle cx="2" cy="58" r="2.5" fill="var(--primary)" opacity="0.4"/>
-              <circle cx="5" cy="76" r="2.8" fill="var(--primary)" opacity="0.5"/>
-              <!-- Central prism — 3D diamond with faceted faces -->
-              <path d="M50 18 L66 50 L50 82 L34 50 Z" fill="url(#lgPrismFace1)" opacity="0.15"/>
-              <path d="M50 18 L66 50 L50 50 Z" fill="var(--primary)" opacity="0.85"/>
-              <path d="M50 18 L34 50 L50 50 Z" fill="var(--primary)" opacity="0.6"/>
-              <path d="M50 82 L66 50 L50 50 Z" fill="var(--primary-dark)" opacity="0.7"/>
-              <path d="M50 82 L34 50 L50 50 Z" fill="var(--primary-dark)" opacity="0.5"/>
-              <!-- Prism edges -->
-              <path d="M50 18 L66 50 L50 82 L34 50 Z" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.4"/>
-              <line x1="50" y1="18" x2="50" y2="82" stroke="var(--primary)" stroke-width="0.6" opacity="0.3"/>
-              <line x1="34" y1="50" x2="66" y2="50" stroke="var(--primary)" stroke-width="0.6" opacity="0.3"/>
-              <!-- Highlight on prism top -->
-              <circle cx="50" cy="22" r="2.5" fill="var(--primary)" opacity="0.3" filter="url(#glow)"/>
-              <!-- Outbound intelligence beams — refined output -->
-              <path d="M60 44 C72 36, 82 30, 96 24" fill="none" stroke="url(#lgStreamOut)" stroke-width="2.4" stroke-linecap="round"/>
-              <path d="M62 50 C74 50, 84 50, 98 50" fill="none" stroke="url(#lgStreamOut)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M60 56 C72 64, 82 70, 96 76" fill="none" stroke="url(#lgStreamOut)" stroke-width="2.4" stroke-linecap="round"/>
-              <!-- Output pulse dots -->
-              <circle cx="96" cy="24" r="3" fill="var(--primary)" opacity="0.6" filter="url(#glow)"/>
-              <circle cx="98" cy="50" r="2.5" fill="var(--primary)" opacity="0.45"/>
-              <circle cx="96" cy="76" r="3" fill="var(--primary)" opacity="0.6" filter="url(#glow)"/>
+            <div class="logo-mark"><svg viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
+              <!-- Top isometric layer — primary data surface -->
+              <path d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
+              <path d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
+              <path d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
+              <!-- Bottom isometric layer — stacked data depth -->
+              <path d="M18 11.5 L33 20.5 L18 29.5 L3 20.5 Z" fill="currentColor" opacity="0.48"/>
+              <path d="M3 20.5 L3 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.18"/>
+              <path d="M33 20.5 L33 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.34"/>
             </svg></div>
             <div class="logo-text">AdFlow <span>Studio</span></div>
         </a>
