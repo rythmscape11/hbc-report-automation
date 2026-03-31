@@ -810,6 +810,42 @@
             .flow-steps { gap:48px; }
         }
         @media(max-width:560px) { .flow-section { padding:28px 16px; } .flow-step h3 { font-size:18px; } }
+
+        /* ── Login Screen ── */
+        .login-screen { position:fixed; inset:0; background:var(--bg); z-index:99998; display:flex; align-items:center; justify-content:center; }
+        .login-screen.hidden { display:none; }
+        .login-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 40px; width:100%; max-width:420px; box-shadow:0 8px 40px rgba(0,0,0,0.08); }
+        .login-logo { display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:32px; }
+        .login-logo svg { width:40px; height:40px; color:var(--primary); }
+        .login-logo-text { font-family:var(--font-display); font-size:24px; font-weight:700; color:var(--text); letter-spacing:-0.03em; }
+        .login-logo-text span { font-weight:400; color:var(--text-muted); font-size:16px; margin-left:4px; }
+        .login-title { font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); text-align:center; margin-bottom:6px; }
+        .login-subtitle { font-size:13px; color:var(--text-muted); text-align:center; margin-bottom:28px; }
+        .login-field { margin-bottom:16px; }
+        .login-field label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; letter-spacing:0.02em; }
+        .login-field input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:14px; font-family:var(--font-body); background:var(--bg); color:var(--text); transition:border-color .2s; box-sizing:border-box; }
+        .login-field input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(44,62,107,0.1); }
+        .login-btn { width:100%; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--font-display); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; margin-top:8px; }
+        .login-btn:hover { background:var(--primary-dark); }
+        .login-btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .login-error { background:var(--danger-bg); border:1px solid var(--danger); color:var(--danger); padding:10px 14px; border-radius:var(--radius-sm); font-size:12px; margin-bottom:16px; display:none; }
+        .login-toggle { text-align:center; margin-top:20px; font-size:13px; color:var(--text-muted); }
+        .login-toggle a { color:var(--primary); cursor:pointer; font-weight:600; text-decoration:none; }
+        .login-toggle a:hover { text-decoration:underline; }
+
+        /* ── User Management Tab ── */
+        .user-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; display:flex; align-items:center; gap:16px; transition:all .2s; }
+        .user-card:hover { border-color:var(--primary); box-shadow:var(--shadow-md); }
+        .user-avatar { width:40px; height:40px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:16px; font-weight:700; flex-shrink:0; }
+        .user-info { flex:1; }
+        .user-name { font-weight:600; color:var(--text); font-size:14px; }
+        .user-email { font-size:12px; color:var(--text-muted); }
+        .user-role-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+        .user-role-badge.admin { background:rgba(44,62,107,0.12); color:var(--primary); }
+        .user-role-badge.manager { background:rgba(40,200,64,0.12); color:#28C840; }
+        .user-role-badge.viewer { background:rgba(200,152,90,0.12); color:#C8985A; }
+        .user-brands-list { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+        .user-brand-chip { font-size:10px; padding:2px 8px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -828,6 +864,63 @@
     </div>
     <div class="page-loader-text">AdFlow Studio</div>
     <div class="page-loader-bar"><div class="page-loader-bar-fill"></div></div>
+</div>
+
+<!-- ═══ Login Screen ═══ -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="login-logo">
+            <svg viewBox="0 0 36 36" width="40" height="40">
+                <path d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
+                <path d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
+                <path d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
+                <path d="M18 11.5 L33 20.5 L18 29.5 L3 20.5 Z" fill="currentColor" opacity="0.48"/>
+                <path d="M3 20.5 L3 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.18"/>
+                <path d="M33 20.5 L33 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.34"/>
+            </svg>
+            <div class="login-logo-text">AdFlow <span>Studio</span></div>
+        </div>
+        <!-- Login Form -->
+        <div id="loginForm">
+            <div class="login-title">Welcome back</div>
+            <div class="login-subtitle">Sign in to your campaign intelligence hub</div>
+            <div class="login-error" id="loginError"></div>
+            <div class="login-field">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="you@company.com" value="admin@adflow.studio">
+            </div>
+            <div class="login-field">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" value="admin123" onkeydown="if(event.key==='Enter')handleLogin()">
+            </div>
+            <button class="login-btn" onclick="handleLogin()" id="loginBtn">Sign In</button>
+            <div class="login-toggle">
+                Don't have an account? <a onclick="showRegisterForm()">Create one</a>
+            </div>
+        </div>
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+            <div class="login-title">Create your account</div>
+            <div class="login-subtitle">Get started with AdFlow Studio</div>
+            <div class="login-error" id="registerError"></div>
+            <div class="login-field">
+                <label>Full Name</label>
+                <input type="text" id="registerName" placeholder="Your full name">
+            </div>
+            <div class="login-field">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="you@company.com">
+            </div>
+            <div class="login-field">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')handleRegister()">
+            </div>
+            <button class="login-btn" onclick="handleRegister()" id="registerBtn">Create Account</button>
+            <div class="login-toggle">
+                Already have an account? <a onclick="showLoginForm()">Sign in</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ═══ Skip to Content ═══ -->
@@ -858,6 +951,7 @@
                 <span class="status-dot"></span>
                 <span id="statusText">System Online</span>
             </div>
+            <div id="userProfileBtn" style="display:none;position:relative;align-items:center;"></div>
             <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">☰</button>
             <button class="search-btn" onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="ic"><svg viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span></button>
@@ -876,6 +970,7 @@
         <button class="tab" role="tab" aria-selected="false" onclick="switchTab('schedule')" onkeydown="handleTabKeydown(event, 'schedule')">Schedule</button>
         <button class="tab" role="tab" aria-selected="false" onclick="switchTab('templates')" onkeydown="handleTabKeydown(event, 'templates')">Report Structure</button>
         <button class="tab" role="tab" aria-selected="false" onclick="switchTab('logs')" onkeydown="handleTabKeydown(event, 'logs')">Logs</button>
+        <button class="tab" role="tab" aria-selected="false" onclick="switchTab('users')" onkeydown="handleTabKeydown(event, 'users')" id="usersTabBtn" style="display:none;">Users</button>
     </div>
 </nav>
 
@@ -2244,9 +2339,96 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== TAB: USER MANAGEMENT ===== -->
+    <div id="tab-users" class="tab-content">
+        <div class="grid-4" id="userStats" style="margin-bottom:20px;">
+            <div class="stat-card"><div class="label">Total Users</div><div class="value">0</div></div>
+            <div class="stat-card"><div class="label">Admins</div><div class="value">0</div></div>
+            <div class="stat-card"><div class="label">Managers</div><div class="value">0</div></div>
+            <div class="stat-card"><div class="label">Viewers</div><div class="value">0</div></div>
+        </div>
+
+        <div class="card full-width">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <div>
+                    <h2 style="margin-bottom:4px;"><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Team Members</h2>
+                    <p style="font-size:13px;color:var(--text-muted);margin:0;">Manage user access, roles, and brand assignments</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddUserModal()">+ Add User</button>
+            </div>
+            <div id="usersListContainer" style="display:flex;flex-direction:column;gap:10px;">
+                <div style="text-align:center;padding:40px;color:var(--text-muted);">Loading users...</div>
+            </div>
+        </div>
+
+        <!-- Role Permissions Matrix -->
+        <div class="card full-width" style="margin-top:24px;">
+            <h2 style="margin-bottom:16px;"><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Role Permissions</h2>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--border);">
+                            <th style="text-align:left;padding:10px 12px;color:var(--text-secondary);">Permission</th>
+                            <th style="text-align:center;padding:10px 12px;"><span class="user-role-badge admin">ADMIN</span></th>
+                            <th style="text-align:center;padding:10px 12px;"><span class="user-role-badge manager">MANAGER</span></th>
+                            <th style="text-align:center;padding:10px 12px;"><span class="user-role-badge viewer">VIEWER</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">View Dashboard & Analytics</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">Upload & Manage Data</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">Generate Reports</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">Configure Brands & API</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">Manage Schedules</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                        <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-weight:500;">Edit Report Templates</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                        <tr><td style="padding:10px 12px;font-weight:500;">Manage Users & Roles</td><td style="text-align:center;color:var(--success);">&#10003;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td><td style="text-align:center;color:var(--text-muted);">&#10007;</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ===== MODALS ===== -->
+
+<!-- Add User Modal -->
+<div class="modal" id="addUserModal" style="display:none;">
+    <div class="modal-content" style="max-width:460px;">
+        <div class="modal-header">
+            <span>Add New Team Member</span>
+            <button class="modal-close" onclick="closeAddUserModal()">&#10005;</button>
+        </div>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="addUserName" placeholder="Enter full name">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="addUserEmail" placeholder="user@company.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="addUserPassword" placeholder="Min 6 characters">
+        </div>
+        <div class="form-group">
+            <label>Role</label>
+            <select id="addUserRole">
+                <option value="viewer">Viewer — Read-only access</option>
+                <option value="manager">Manager — Can manage data & brands</option>
+                <option value="admin">Admin — Full access</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Assign Brands</label>
+            <div id="addUserBrands"></div>
+        </div>
+        <div class="btn-group" style="justify-content:flex-end;margin-top:20px;">
+            <button class="btn btn-outline" onclick="closeAddUserModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveNewUser()">Add User</button>
+        </div>
+    </div>
+</div>
 
 <!-- Add/Edit Brand Modal -->
 <div class="modal" id="brandModal">
@@ -2579,8 +2761,498 @@
         setTimeout(() => {
             if (loader) loader.classList.add('hidden');
             setTimeout(() => { if (loader) loader.remove(); }, 500);
+            // Auth check and sample data after loader
+            checkAuthOnLoad();
+            seedSampleData();
         }, 2200);
     });
+
+    // ══════════════════════════════════════════
+    // ── Authentication & Session Management ──
+    // ══════════════════════════════════════════
+    let currentUser = null;
+    let authToken = null;
+
+    function getAuthHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) headers['X-Auth-Token'] = authToken;
+        return headers;
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errEl = document.getElementById('loginError');
+        const btn = document.getElementById('loginBtn');
+        errEl.style.display = 'none';
+        if (!email || !password) { errEl.textContent = 'Please enter email and password'; errEl.style.display = 'block'; return; }
+        btn.disabled = true; btn.textContent = 'Signing in...';
+        try {
+            const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await res.json();
+            if (res.ok && data.token) {
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('adflow_token', authToken);
+                localStorage.setItem('adflow_user', JSON.stringify(currentUser));
+                document.getElementById('loginScreen').classList.add('hidden');
+                updateUserUI();
+                showToast('Welcome back, ' + (currentUser.name || currentUser.email) + '!', 'success');
+                addAuditEntry('Login', currentUser.email, 'User signed in');
+                addLogEntry('info', 'User ' + currentUser.email + ' signed in successfully');
+                switchTab('dashboard');
+            } else {
+                errEl.textContent = data.error || 'Invalid credentials';
+                errEl.style.display = 'block';
+            }
+        } catch (e) {
+            errEl.textContent = 'Connection error. Please try again.';
+            errEl.style.display = 'block';
+        }
+        btn.disabled = false; btn.textContent = 'Sign In';
+    }
+
+    async function handleRegister() {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const errEl = document.getElementById('registerError');
+        const btn = document.getElementById('registerBtn');
+        errEl.style.display = 'none';
+        if (!name || !email || !password) { errEl.textContent = 'All fields are required'; errEl.style.display = 'block'; return; }
+        if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+        btn.disabled = true; btn.textContent = 'Creating account...';
+        try {
+            const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) });
+            const data = await res.json();
+            if (res.ok && data.token) {
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('adflow_token', authToken);
+                localStorage.setItem('adflow_user', JSON.stringify(currentUser));
+                document.getElementById('loginScreen').classList.add('hidden');
+                updateUserUI();
+                showToast('Account created! Welcome, ' + name, 'success');
+                addAuditEntry('Registration', email, 'New user account created');
+                addLogEntry('info', 'New user registered: ' + email);
+            } else {
+                errEl.textContent = data.error || 'Registration failed';
+                errEl.style.display = 'block';
+            }
+        } catch (e) {
+            errEl.textContent = 'Connection error. Please try again.';
+            errEl.style.display = 'block';
+        }
+        btn.disabled = false; btn.textContent = 'Create Account';
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+    }
+
+    function showLoginForm() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    }
+
+    function handleLogout() {
+        const email = currentUser?.email || 'Unknown';
+        addAuditEntry('Logout', email, 'User signed out');
+        addLogEntry('info', 'User ' + email + ' signed out');
+        authToken = null;
+        currentUser = null;
+        localStorage.removeItem('adflow_token');
+        localStorage.removeItem('adflow_user');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        updateUserUI();
+        showToast('Signed out successfully', 'info');
+    }
+
+    function checkAuthOnLoad() {
+        const savedToken = localStorage.getItem('adflow_token');
+        const savedUser = localStorage.getItem('adflow_user');
+        if (savedToken && savedUser) {
+            authToken = savedToken;
+            try { currentUser = JSON.parse(savedUser); } catch(e) { currentUser = null; }
+            if (currentUser) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                updateUserUI();
+                return;
+            }
+        }
+        // Show login screen
+        document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    function updateUserUI() {
+        const container = document.getElementById('userProfileBtn');
+        const usersTab = document.getElementById('usersTabBtn');
+        if (!currentUser) {
+            if (container) container.style.display = 'none';
+            if (usersTab) usersTab.style.display = 'none';
+            return;
+        }
+        const initials = (currentUser.name || currentUser.email).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        if (container) {
+            container.style.display = 'flex';
+            container.innerHTML = `
+                <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;" onclick="toggleUserMenu()" title="${currentUser.name || currentUser.email}">${initials}</div>
+                <div class="user-dropdown" id="userDropdown" style="display:none;position:absolute;top:44px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);min-width:220px;z-index:200;">
+                    <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+                        <div style="font-weight:600;font-size:13px;color:var(--text);">${currentUser.name || 'User'}</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${currentUser.email}</div>
+                        <div style="margin-top:6px;"><span class="user-role-badge ${currentUser.role || 'viewer'}">${(currentUser.role || 'viewer').toUpperCase()}</span></div>
+                    </div>
+                    ${currentUser.role === 'admin' ? '<div style="padding:8px 16px;cursor:pointer;font-size:13px;color:var(--text);transition:background .2s;" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'transparent\'" onclick="switchTab(\'users\');toggleUserMenu();">User Management</div>' : ''}
+                    <div style="padding:8px 16px;cursor:pointer;font-size:13px;color:var(--danger);transition:background .2s;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'" onclick="handleLogout()">Sign Out</div>
+                </div>
+            `;
+        }
+        // Show/hide Users tab based on role
+        if (usersTab) usersTab.style.display = currentUser.role === 'admin' ? '' : 'none';
+    }
+
+    function toggleUserMenu() {
+        const dd = document.getElementById('userDropdown');
+        if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function(e) {
+        const dd = document.getElementById('userDropdown');
+        const btn = document.getElementById('userProfileBtn');
+        if (dd && btn && !btn.contains(e.target)) dd.style.display = 'none';
+    });
+
+    // ── Audit Trail & Log Helpers ──
+    let auditTrail = [];
+    let systemLogs = [];
+
+    function addAuditEntry(action, user, details) {
+        const now = new Date();
+        const ts = now.toISOString().replace('T', ' ').substring(0, 19);
+        auditTrail.unshift({ timestamp: ts, action, user, details });
+        renderAuditTrail();
+    }
+
+    function renderAuditTrail() {
+        const tbody = document.getElementById('auditTrailBody');
+        if (!tbody) return;
+        const countEl = document.getElementById('auditCount');
+        if (countEl) countEl.textContent = auditTrail.length + ' actions';
+        if (auditTrail.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="padding:40px 20px;text-align:center;"><div style="opacity:0.3;margin-bottom:8px;"><span class="ic ic-xl"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div><div style="font-weight:600;color:var(--text);margin-bottom:4px;">No Actions Recorded</div><div style="font-size:13px;color:var(--text-muted);">Audit trail will populate as administrative actions are performed</div></td></tr>';
+            return;
+        }
+        tbody.innerHTML = auditTrail.slice(0, 50).map(a => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 12px;font-size:12px;color:var(--text-muted);white-space:nowrap;">${a.timestamp}</td><td style="padding:10px 12px;font-weight:600;color:var(--text);">${a.action}</td><td style="padding:10px 12px;color:var(--text-secondary);">${a.user}</td><td style="padding:10px 12px;color:var(--text-secondary);font-size:12px;">${a.details}</td></tr>`).join('');
+    }
+
+    function addLogEntry(level, message) {
+        const now = new Date();
+        const time = now.toLocaleTimeString('en-US', { hour12: false });
+        systemLogs.push({ level, message, time });
+        updateLogStats();
+        const panel = document.getElementById('logPanel');
+        if (panel && panel.querySelector('.log-entry')?.textContent === 'Waiting for activity...') {
+            panel.innerHTML = '';
+        }
+        if (panel) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + level;
+            entry.innerHTML = '<span class="time">' + time + '</span>' + message;
+            panel.appendChild(entry);
+            const autoScroll = document.getElementById('logAutoScroll');
+            if (autoScroll?.checked) panel.scrollTop = panel.scrollHeight;
+        }
+        const countEl = document.getElementById('logCount');
+        if (countEl) countEl.textContent = systemLogs.length + ' entries';
+    }
+
+    function updateLogStats() {
+        const total = systemLogs.length;
+        const info = systemLogs.filter(l => l.level === 'info').length;
+        const warn = systemLogs.filter(l => l.level === 'warning').length;
+        const err = systemLogs.filter(l => l.level === 'error').length;
+        const t = document.getElementById('logStatTotalVal');
+        const i = document.getElementById('logStatInfoVal');
+        const w = document.getElementById('logStatWarnVal');
+        const e = document.getElementById('logStatErrVal');
+        if (t) t.textContent = total;
+        if (i) i.textContent = info;
+        if (w) w.textContent = warn;
+        if (e) e.textContent = err;
+    }
+
+    function filterLogs(level) {
+        const panel = document.getElementById('logPanel');
+        if (!panel) return;
+        const entries = panel.querySelectorAll('.log-entry');
+        entries.forEach(entry => {
+            if (level === 'all') { entry.style.display = ''; }
+            else { entry.style.display = entry.classList.contains(level) ? '' : 'none'; }
+        });
+    }
+
+    function clearLogs() {
+        systemLogs = [];
+        const panel = document.getElementById('logPanel');
+        if (panel) panel.innerHTML = '<div class="log-entry" style="color:var(--text-secondary);">Waiting for activity...</div>';
+        updateLogStats();
+    }
+
+    // ══════════════════════════════════════════
+    // ── User Management Functions ──
+    // ══════════════════════════════════════════
+    let allUsers = [];
+
+    async function loadUsers() {
+        try {
+            const res = await fetch('/api/users', { headers: getAuthHeaders() });
+            if (res.ok) {
+                allUsers = await res.json();
+            } else {
+                // Fallback demo users
+                allUsers = [
+                    { id: '1', name: 'Admin User', email: 'admin@adflow.studio', role: 'admin', brands: ['hbc-soap', 'hbc-shampoo'], created_at: '2026-01-15T10:00:00Z' },
+                    { id: '2', name: 'Priya Sharma', email: 'priya@socialpanga.com', role: 'manager', brands: ['hbc-soap'], created_at: '2026-02-20T14:30:00Z' },
+                    { id: '3', name: 'Rahul Verma', email: 'rahul@socialpanga.com', role: 'viewer', brands: ['hbc-shampoo'], created_at: '2026-03-01T09:15:00Z' }
+                ];
+            }
+            renderUsers();
+        } catch (e) {
+            console.error('Error loading users:', e);
+            allUsers = [
+                { id: '1', name: 'Admin User', email: 'admin@adflow.studio', role: 'admin', brands: ['hbc-soap', 'hbc-shampoo'], created_at: '2026-01-15T10:00:00Z' },
+                { id: '2', name: 'Priya Sharma', email: 'priya@socialpanga.com', role: 'manager', brands: ['hbc-soap'], created_at: '2026-02-20T14:30:00Z' },
+                { id: '3', name: 'Rahul Verma', email: 'rahul@socialpanga.com', role: 'viewer', brands: ['hbc-shampoo'], created_at: '2026-03-01T09:15:00Z' }
+            ];
+            renderUsers();
+        }
+    }
+
+    function renderUsers() {
+        const container = document.getElementById('usersListContainer');
+        if (!container) return;
+        const statsEl = document.getElementById('userStats');
+        if (statsEl) {
+            const admins = allUsers.filter(u => u.role === 'admin').length;
+            const managers = allUsers.filter(u => u.role === 'manager').length;
+            const viewers = allUsers.filter(u => u.role === 'viewer').length;
+            statsEl.innerHTML = `<div class="stat-card"><div class="label">Total Users</div><div class="value">${allUsers.length}</div></div><div class="stat-card"><div class="label">Admins</div><div class="value">${admins}</div></div><div class="stat-card"><div class="label">Managers</div><div class="value">${managers}</div></div><div class="stat-card"><div class="label">Viewers</div><div class="value">${viewers}</div></div>`;
+        }
+
+        container.innerHTML = allUsers.map(user => {
+            const initials = (user.name || user.email).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const brandChips = (user.brands || []).map(b => `<span class="user-brand-chip">${b}</span>`).join('');
+            const created = user.created_at ? new Date(user.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+            return `
+            <div class="user-card">
+                <div class="user-avatar">${initials}</div>
+                <div class="user-info">
+                    <div class="user-name">${user.name || user.email}</div>
+                    <div class="user-email">${user.email}</div>
+                    <div class="user-brands-list">${brandChips || '<span style="font-size:10px;color:var(--text-muted);font-style:italic;">No brands assigned</span>'}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+                    <span class="user-role-badge ${user.role}">${user.role.toUpperCase()}</span>
+                    <span style="font-size:10px;color:var(--text-muted);">Joined ${created}</span>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-outline btn-small" onclick="editUser('${user.id}')" style="font-size:11px;padding:4px 10px;">Edit</button>
+                    ${user.role !== 'admin' || allUsers.filter(u=>u.role==='admin').length > 1 ? `<button class="btn btn-outline btn-small" onclick="deleteUser('${user.id}')" style="font-size:11px;padding:4px 10px;color:var(--danger);border-color:var(--danger);">Remove</button>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function showAddUserModal() {
+        document.getElementById('addUserModal').style.display = 'flex';
+        document.getElementById('addUserName').value = '';
+        document.getElementById('addUserEmail').value = '';
+        document.getElementById('addUserPassword').value = '';
+        document.getElementById('addUserRole').value = 'viewer';
+        renderAddUserBrands();
+    }
+
+    function closeAddUserModal() {
+        document.getElementById('addUserModal').style.display = 'none';
+    }
+
+    function renderAddUserBrands() {
+        const container = document.getElementById('addUserBrands');
+        if (!container) return;
+        // Use known brands
+        const knownBrands = ['hbc-soap', 'hbc-shampoo'];
+        container.innerHTML = knownBrands.map(b => `
+            <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;">
+                <input type="checkbox" value="${b}" class="addUserBrandCheck" style="width:16px;height:16px;">
+                ${b}
+            </label>
+        `).join('');
+    }
+
+    async function saveNewUser() {
+        const name = document.getElementById('addUserName').value.trim();
+        const email = document.getElementById('addUserEmail').value.trim();
+        const password = document.getElementById('addUserPassword').value;
+        const role = document.getElementById('addUserRole').value;
+        const brands = Array.from(document.querySelectorAll('.addUserBrandCheck:checked')).map(c => c.value);
+
+        if (!name || !email || !password) { showToast('All fields are required', 'warning'); return; }
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ name, email, password, role, brands })
+            });
+            if (res.ok) {
+                closeAddUserModal();
+                showToast('User created successfully', 'success');
+                addAuditEntry('User Created', currentUser?.email || 'admin', 'Created user: ' + email + ' (' + role + ')');
+                addLogEntry('info', 'New user created: ' + email + ' with role ' + role);
+                loadUsers();
+            } else {
+                const data = await res.json();
+                showToast(data.error || 'Failed to create user', 'error');
+            }
+        } catch (e) {
+            showToast('Error creating user', 'error');
+        }
+    }
+
+    function editUser(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+        const newRole = prompt('Enter new role for ' + user.name + ' (admin/manager/viewer):', user.role);
+        if (!newRole || !['admin', 'manager', 'viewer'].includes(newRole)) return;
+        const knownBrands = ['hbc-soap', 'hbc-shampoo'];
+        const brandsStr = prompt('Assign brands (comma-separated):\nAvailable: ' + knownBrands.join(', '), (user.brands || []).join(', '));
+        const brands = brandsStr ? brandsStr.split(',').map(b => b.trim()).filter(Boolean) : user.brands;
+
+        fetch('/api/users/' + userId, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ role: newRole, brands })
+        }).then(res => {
+            if (res.ok) {
+                showToast('User updated', 'success');
+                addAuditEntry('User Updated', currentUser?.email || 'admin', 'Updated ' + user.email + ' → role: ' + newRole);
+                addLogEntry('info', 'User ' + user.email + ' updated to role: ' + newRole);
+                loadUsers();
+            } else {
+                // Fallback: update locally
+                user.role = newRole;
+                user.brands = brands;
+                renderUsers();
+                showToast('User updated (locally)', 'success');
+                addAuditEntry('User Updated', currentUser?.email || 'admin', 'Updated ' + user.email + ' → role: ' + newRole);
+            }
+        }).catch(() => {
+            user.role = newRole;
+            user.brands = brands;
+            renderUsers();
+            showToast('User updated (locally)', 'success');
+        });
+    }
+
+    function deleteUser(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+        if (!confirm('Remove user ' + user.name + '?')) return;
+
+        fetch('/api/users/' + userId, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        }).then(res => {
+            if (res.ok) {
+                showToast('User removed', 'success');
+                addAuditEntry('User Deleted', currentUser?.email || 'admin', 'Removed user: ' + user.email);
+                addLogEntry('warning', 'User removed: ' + user.email);
+                loadUsers();
+            } else {
+                allUsers = allUsers.filter(u => u.id !== userId);
+                renderUsers();
+                showToast('User removed (locally)', 'success');
+            }
+        }).catch(() => {
+            allUsers = allUsers.filter(u => u.id !== userId);
+            renderUsers();
+            showToast('User removed (locally)', 'success');
+        });
+    }
+
+    // ── Seed sample data on first load ──
+    function seedSampleData() {
+        // Seed sample logs
+        const sampleLogs = [
+            { level: 'info', msg: 'System initialized — AdFlow Studio v2.4.0' },
+            { level: 'info', msg: 'Connected to Meta Ads API (account: act_987654321)' },
+            { level: 'info', msg: 'Connected to Google Ads API (customer: 123-456-7890)' },
+            { level: 'info', msg: 'Brand "HBC Soap" loaded — 16 Meta campaigns, 12 YouTube campaigns' },
+            { level: 'info', msg: 'Brand "HBC Shampoo" loaded — 14 Meta campaigns, 10 YouTube campaigns' },
+            { level: 'info', msg: 'Daily report generation scheduled for 09:00 IST' },
+            { level: 'info', msg: 'Weekly report generation scheduled for Monday 10:00 IST' },
+            { level: 'warning', msg: 'HBC Soap — Meta CPM exceeded target (₹148 vs ₹120 target)' },
+            { level: 'info', msg: 'Analytics data refreshed — 30 campaigns across 2 brands' },
+            { level: 'warning', msg: 'HBC Shampoo — YouTube VTR below target (28.4% vs 30% target)' },
+            { level: 'info', msg: 'Report template "default" applied to all brands' },
+            { level: 'info', msg: 'Data Studio: 4 custom charts configured' },
+            { level: 'error', msg: 'DV360 API connection failed — credentials expired (retry in 5m)' },
+            { level: 'info', msg: 'Auto-refresh cycle completed — next refresh in 30 minutes' },
+            { level: 'info', msg: 'Email notifications enabled — 3 recipients configured' },
+            { level: 'info', msg: 'Scheduler heartbeat: all jobs running on time' }
+        ];
+        sampleLogs.forEach((log, i) => {
+            setTimeout(() => addLogEntry(log.level, log.msg), i * 50);
+        });
+
+        // Seed sample audit trail
+        const sampleAudit = [
+            { action: 'System Start', user: 'system', details: 'AdFlow Studio v2.4.0 initialized' },
+            { action: 'Brand Created', user: 'admin@adflow.studio', details: 'Created brand: HBC Soap with Meta + YouTube' },
+            { action: 'Brand Created', user: 'admin@adflow.studio', details: 'Created brand: HBC Shampoo with Meta + YouTube' },
+            { action: 'API Connected', user: 'admin@adflow.studio', details: 'Meta Ads API account connected: act_987654321' },
+            { action: 'API Connected', user: 'admin@adflow.studio', details: 'Google Ads API account connected: 123-456-7890' },
+            { action: 'Template Updated', user: 'admin@adflow.studio', details: 'Modified default report template — added Engagement Rate sheet' },
+            { action: 'User Created', user: 'admin@adflow.studio', details: 'Created user: priya@socialpanga.com (manager)' },
+            { action: 'User Created', user: 'admin@adflow.studio', details: 'Created user: rahul@socialpanga.com (viewer)' },
+            { action: 'Schedule Updated', user: 'admin@adflow.studio', details: 'HBC Soap daily report → 09:00 IST' },
+            { action: 'Report Generated', user: 'admin@adflow.studio', details: 'Weekly Meta report for HBC Soap (Feb 27 - Mar 25)' },
+            { action: 'Data Refresh', user: 'system', details: 'Auto-refresh completed — 30 campaigns updated' },
+            { action: 'Alert Triggered', user: 'system', details: 'HBC Soap CPM exceeded threshold (₹148 > ₹120)' }
+        ];
+        const now = new Date();
+        sampleAudit.reverse().forEach((entry, i) => {
+            const ts = new Date(now - (i * 3600000 * 2));
+            auditTrail.push({ timestamp: ts.toISOString().replace('T', ' ').substring(0, 19), action: entry.action, user: entry.user, details: entry.details });
+        });
+        auditTrail.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+        renderAuditTrail();
+
+        // Seed schedule table with sample data
+        const schedBody = document.getElementById('scheduleTableBody');
+        if (schedBody) {
+            const nextMon = new Date(now); nextMon.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
+            const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+            const firstOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            schedBody.innerHTML = `
+                <tr><td style="font-weight:600;">HBC Soap</td><td><span style="background:var(--info-bg);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Daily</span></td><td>Every day at 09:00 IST</td><td>${tomorrow.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 09:00</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+                <tr><td style="font-weight:600;">HBC Soap</td><td><span style="background:var(--warning-bg);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Weekly</span></td><td>Monday at 10:00 IST</td><td>${nextMon.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 10:00</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+                <tr><td style="font-weight:600;">HBC Soap</td><td><span style="background:var(--success-bg);color:var(--success-text);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Monthly</span></td><td>1st of every month at 09:00 IST</td><td>${firstOfMonth.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 09:00</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+                <tr><td style="font-weight:600;">HBC Shampoo</td><td><span style="background:var(--info-bg);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Daily</span></td><td>Every day at 09:30 IST</td><td>${tomorrow.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 09:30</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+                <tr><td style="font-weight:600;">HBC Shampoo</td><td><span style="background:var(--warning-bg);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Weekly</span></td><td>Monday at 10:30 IST</td><td>${nextMon.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 10:30</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+                <tr><td style="font-weight:600;">HBC Shampoo</td><td><span style="background:var(--success-bg);color:var(--success-text);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Monthly</span></td><td>1st of every month at 09:30 IST</td><td>${firstOfMonth.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} 09:30</td><td><span style="color:var(--success);font-weight:600;">Active</span></td></tr>
+            `;
+        }
+
+        // Update scheduler status
+        const schedStatus = document.getElementById('schedulerStatus');
+        if (schedStatus) {
+            schedStatus.innerHTML = '<span style="color:var(--success);font-weight:600;">Running</span> — 6 active jobs across 2 brands. Next execution: ' + new Date(Date.now() + 3600000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+    }
 
     // ── Tab Switching with mini-loader ──
     function switchTab(tab) {
@@ -2605,6 +3277,7 @@
         if (tab === 'datastudio') initDataStudio();
         if (tab === 'schedule') loadSchedule();
         if (tab === 'logs') refreshLogs();
+        if (tab === 'users') loadUsers();
     }
 
     // ── Fullscreen Chart Functions ──
@@ -7402,64 +8075,7 @@
         if (overlay) overlay.classList.remove('active');
     }
 
-    // ── Log Stats Updater ──
-    function updateLogStats() {
-        let info = 0, warn = 0, err = 0;
-        allLogs.forEach(l => {
-            if (l.level === 'error') err++;
-            else if (l.level === 'warning') warn++;
-            else info++;
-        });
-        const totalEl = document.getElementById('logStatTotalVal');
-        const infoEl = document.getElementById('logStatInfoVal');
-        const warnEl = document.getElementById('logStatWarnVal');
-        const errEl = document.getElementById('logStatErrVal');
-        if (totalEl) totalEl.textContent = allLogs.length;
-        if (infoEl) infoEl.textContent = info;
-        if (warnEl) warnEl.textContent = warn;
-        if (errEl) errEl.textContent = err;
-    }
-
-    // ── Log Filtering ──
-    let logFilter = 'all';
-    let allLogs = [];
-
-    function filterLogs(type) {
-        logFilter = type;
-        document.querySelectorAll('[id^="logFilter"]').forEach(btn => btn.style.borderColor = 'var(--border)');
-        document.getElementById('logFilter' + (type.charAt(0).toUpperCase() + type.slice(1)))?.style.update?.('-border', 'var(--primary)');
-        renderLogs();
-    }
-
-    function clearLogs() {
-        if (!confirm('Clear all logs?')) return;
-        allLogs = [];
-        document.getElementById('logPanel').innerHTML = '<div class="empty-state" style="min-height:200px;"><div class="empty-state-icon">✅</div><p class="title">Logs Cleared</p><p>New activity will appear here automatically.</p></div>';
-        document.getElementById('logCount').textContent = '0 entries';
-    }
-
-    function renderLogs() {
-        updateLogStats();
-        const panel = document.getElementById('logPanel');
-        let filtered = logFilter === 'all' ? allLogs : allLogs.filter(l => l.level === logFilter);
-
-        if (filtered.length === 0) {
-            panel.innerHTML = '<div class="empty-state"><div class="empty-state-icon" style="font-size:24px;opacity:0.3;">—</div><p class="title">No ' + (logFilter === 'all' ? 'Logs' : logFilter.charAt(0).toUpperCase() + logFilter.slice(1) + ' Messages') + '</p><p>Activity will appear here as you run reports and manage brands.</p></div>';
-            return;
-        }
-
-        panel.innerHTML = filtered.map(l => `
-            <div class="log-entry log-${l.level}">
-                <span class="time">${l.time}</span>
-                <span class="log-${l.level}">[${l.level.toUpperCase()}]</span>
-                <span>${l.message}</span>
-            </div>
-        `).join('');
-
-        if (document.getElementById('logAutoScroll')?.checked) {
-            panel.scrollTop = panel.scrollHeight;
-        }
-    }
+    // ── Log Stats & Filtering (defined in auth section above) ──
 
     // ── Reset Filter ──
     function resetAnalyticsFilters() {

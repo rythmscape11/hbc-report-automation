@@ -197,6 +197,170 @@ YT_COLS = [
 ]
 
 
+# ── Authentication System ────────────────────────────────────────────
+
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+
+USERS_FILE = "/tmp/users.json"
+_auth_tokens = {}  # In-memory token storage: {token: {user_id, email, created_at}}
+
+def load_users():
+    """Load users from JSON file."""
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading users: {e}")
+            return {}
+    return {}
+
+def save_users(users):
+    """Save users to JSON file."""
+    try:
+        with open(USERS_FILE, 'w') as f:
+            json.dump(users, f, indent=2)
+    except Exception as e:
+        logger.error(f"Error saving users: {e}")
+
+def generate_auth_token():
+    """Generate a unique auth token."""
+    return secrets.token_urlsafe(32)
+
+def create_user(email, name, password, role="viewer", assigned_brands=None):
+    """Create a new user."""
+    users = load_users()
+
+    # Check if email already exists
+    for user_id, user in users.items():
+        if user.get("email") == email:
+            return None, "Email already registered"
+
+    user_id = str(uuid.uuid4())
+    users[user_id] = {
+        "id": user_id,
+        "email": email,
+        "name": name,
+        "password_hash": generate_password_hash(password),
+        "role": role,
+        "assigned_brands": assigned_brands or [],
+        "created_at": datetime.now().isoformat()
+    }
+    save_users(users)
+    return user_id, None
+
+def get_user_by_email(email):
+    """Get user by email."""
+    users = load_users()
+    for user_id, user in users.items():
+        if user.get("email") == email:
+            return user
+    return None
+
+def get_user_by_id(user_id):
+    """Get user by ID."""
+    users = load_users()
+    return users.get(user_id)
+
+def verify_password(user, password):
+    """Verify password for a user."""
+    return check_password_hash(user.get("password_hash", ""), password)
+
+def create_auth_session(user_id, email):
+    """Create an auth token for a user."""
+    token = generate_auth_token()
+    _auth_tokens[token] = {
+        "user_id": user_id,
+        "email": email,
+        "created_at": datetime.now().isoformat()
+    }
+    return token
+
+def get_auth_session(token):
+    """Get auth session from token."""
+    return _auth_tokens.get(token)
+
+def invalidate_auth_session(token):
+    """Invalidate an auth token."""
+    if token in _auth_tokens:
+        del _auth_tokens[token]
+
+def get_current_user():
+    """Get the current authenticated user from request."""
+    # Check for X-Auth-Token header
+    token = request.headers.get("X-Auth-Token")
+
+    # Check for auth cookie
+    if not token:
+        token = request.cookies.get("auth_token")
+
+    if not token:
+        return None
+
+    session = get_auth_session(token)
+    if not session:
+        return None
+
+    user = get_user_by_id(session["user_id"])
+    return user
+
+def require_auth(f):
+    """Decorator to require authentication."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def require_role(required_role):
+    """Decorator to require a specific role."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user = get_current_user()
+            if not user:
+                return jsonify({"error": "Unauthorized"}), 401
+            if user.get("role") != required_role:
+                return jsonify({"error": "Forbidden"}), 403
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def require_admin(f):
+    """Decorator to require admin role."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+        if user.get("role") != "admin":
+            return jsonify({"error": "Forbidden"}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+def seed_default_admin():
+    """Seed a default admin user if no users exist."""
+    users = load_users()
+    if len(users) == 0:
+        user_id, error = create_user(
+            email="admin@adflow.studio",
+            name="Admin",
+            password="admin123",
+            role="admin",
+            assigned_brands=[]
+        )
+        if user_id:
+            add_log(f"Seeded default admin user: admin@adflow.studio", "info")
+        else:
+            add_log(f"Failed to seed admin: {error}", "error")
+
+# Seed admin user on startup
+seed_default_admin()
+
+
 def empty_meta():
     e = pd.DataFrame(columns=META_COLS)
     return {"raw_data": e, "campaign_data": e.copy(), "adset_data": e.copy(), "ad_data": e.copy()}
@@ -2130,6 +2294,231 @@ def api_platform_stats():
         })
     except Exception as e:
         logger.error(f"Platform stats error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ── Routes: Authentication ──────────────────────────────────────────
+
+@app.route("/api/auth/register", methods=["POST"])
+@verify_csrf
+def api_auth_register():
+    """Register a new user."""
+    try:
+        data = request.json or {}
+        email = data.get("email", "").strip()
+        name = data.get("name", "").strip()
+        password = data.get("password", "")
+
+        if not email or not name or not password:
+            return jsonify({"error": "Missing email, name, or password"}), 400
+
+        # Check if user already exists
+        if get_user_by_email(email):
+            return jsonify({"error": "Email already registered"}), 400
+
+        # First user becomes admin
+        users = load_users()
+        role = "admin" if len(users) == 0 else "viewer"
+
+        user_id, error = create_user(email, name, password, role)
+        if error:
+            return jsonify({"error": error}), 400
+
+        add_log(f"User registered: {email} (role: {role})", "info", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
+
+        # Auto-login after registration
+        token = create_auth_session(user_id, email)
+        return jsonify({
+            "ok": True,
+            "user_id": user_id,
+            "email": email,
+            "role": role,
+            "token": token
+        }), 201
+
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/auth/login", methods=["POST"])
+@verify_csrf
+def api_auth_login():
+    """Login with email and password."""
+    try:
+        data = request.json or {}
+        email = data.get("email", "").strip()
+        password = data.get("password", "")
+
+        if not email or not password:
+            return jsonify({"error": "Missing email or password"}), 400
+
+        user = get_user_by_email(email)
+        if not user or not verify_password(user, password):
+            return jsonify({"error": "Invalid email or password"}), 401
+
+        token = create_auth_session(user["id"], user["email"])
+
+        add_log(f"User logged in: {email}", "info", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
+
+        return jsonify({
+            "ok": True,
+            "user_id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "role": user["role"],
+            "assigned_brands": user.get("assigned_brands", []),
+            "token": token
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+@require_auth
+def api_auth_logout():
+    """Logout user by invalidating token."""
+    try:
+        token = request.headers.get("X-Auth-Token") or request.cookies.get("auth_token")
+        if token:
+            invalidate_auth_session(token)
+
+        user = get_current_user()
+        if user:
+            add_log(f"User logged out: {user.get('email')}", "info", {
+                "ip": request.remote_addr,
+                "method": request.method,
+                "path": request.path
+            })
+
+        return jsonify({"ok": True}), 200
+
+    except Exception as e:
+        logger.error(f"Logout error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/auth/me", methods=["GET"])
+@require_auth
+def api_auth_me():
+    """Get current user info."""
+    try:
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify({
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "role": user["role"],
+            "assigned_brands": user.get("assigned_brands", []),
+            "created_at": user.get("created_at")
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Get user error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/users", methods=["GET"])
+@require_admin
+def api_list_users():
+    """List all users (admin only)."""
+    try:
+        users = load_users()
+        user_list = []
+        for user_id, user in users.items():
+            user_list.append({
+                "id": user["id"],
+                "email": user["email"],
+                "name": user["name"],
+                "role": user["role"],
+                "assigned_brands": user.get("assigned_brands", []),
+                "created_at": user.get("created_at")
+            })
+
+        return jsonify({"users": user_list, "total": len(user_list)}), 200
+
+    except Exception as e:
+        logger.error(f"List users error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/users/<user_id>", methods=["PUT"])
+@require_admin
+def api_update_user(user_id):
+    """Update user (admin only)."""
+    try:
+        users = load_users()
+        if user_id not in users:
+            return jsonify({"error": "User not found"}), 404
+
+        data = request.json or {}
+        user = users[user_id]
+
+        # Update fields
+        if "name" in data:
+            user["name"] = data["name"]
+        if "role" in data and data["role"] in ["admin", "manager", "viewer"]:
+            user["role"] = data["role"]
+        if "assigned_brands" in data and isinstance(data["assigned_brands"], list):
+            user["assigned_brands"] = data["assigned_brands"]
+
+        save_users(users)
+
+        add_log(f"User updated: {user.get('email')}", "info", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
+
+        return jsonify({
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "role": user["role"],
+            "assigned_brands": user.get("assigned_brands", [])
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Update user error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/users/<user_id>", methods=["DELETE"])
+@require_admin
+def api_delete_user(user_id):
+    """Delete user (admin only)."""
+    try:
+        users = load_users()
+        if user_id not in users:
+            return jsonify({"error": "User not found"}), 404
+
+        deleted_email = users[user_id].get("email")
+        del users[user_id]
+        save_users(users)
+
+        add_log(f"User deleted: {deleted_email}", "info", {
+            "ip": request.remote_addr,
+            "method": request.method,
+            "path": request.path
+        })
+
+        return jsonify({"ok": True}), 200
+
+    except Exception as e:
+        logger.error(f"Delete user error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
