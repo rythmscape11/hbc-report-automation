@@ -363,11 +363,13 @@ def run_brand_pipeline(brand_slug, report_type="full", dry_run=False):
             from src.pptx_report_generator_py import generate_pptx_report
             pptx_filename = filename.replace('.xlsx', '.pptx')
             pptx_path = os.path.join(REPORTS_DIR, pptx_filename)
+            add_log(f"  PPTX: using python-pptx generator (v2)")
             result = generate_pptx_report(meta_data, google_data, brand, report_type, pptx_path)
             if result and os.path.exists(pptx_path):
-                add_log(f"  ✓ PPTX Report: {pptx_filename}", "success")
+                pptx_size = os.path.getsize(pptx_path)
+                add_log(f"  ✓ PPTX Report: {pptx_filename} ({pptx_size} bytes)", "success")
             else:
-                add_log(f"  ⚠ PPTX report: file not created", "warn")
+                add_log(f"  ⚠ PPTX: result={result}, exists={os.path.exists(pptx_path)}", "warn")
         except Exception as e:
             add_log(f"  ⚠ PPTX report failed: {e}", "warn")
             logger.warning(f"PPTX report generation error: {e}")
