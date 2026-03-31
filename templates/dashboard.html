@@ -655,11 +655,22 @@
         .api-account-item { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; transition:all .2s; }
         .api-account-item:hover { border-color:var(--border-hover); }
 
+        /* ── API Account Card (Enhanced) ── */
+        .api-account-card { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; background:var(--bg-card); transition:all 0.2s; }
+        .api-account-card:hover { border-color:var(--border-hover); box-shadow:0 2px 8px rgba(35,139,195,0.08); }
+
+        /* ── API Status Dot ── */
+        .api-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+        /* ── Data Source Badge ── */
+        .data-source-badge { display:inline-block; font-size:11px; font-weight:600; padding:4px 10px; border-radius:12px; background:var(--primary-light); color:var(--primary); margin-right:6px; }
+
         /* ── Responsive overrides for new classes ── */
         @media(max-width:768px) {
             .brand-info { grid-template-columns:1fr; }
             .form-row, .form-row-3, .form-row-4 { grid-template-columns:1fr; }
             .api-account-item { flex-direction:column; align-items:flex-start; }
+            .api-account-card { flex-direction:column; align-items:flex-start; }
         }
     </style>
 </head>
@@ -2122,6 +2133,11 @@
             <input type="time" id="formScheduleMonthly" placeholder="09:00">
         </div>
 
+        <!-- API Account Mapping Section -->
+        <div class="section-title" style="margin-top:28px;">Data Sources</div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Select which API accounts this brand pulls data from. If none selected, global credentials are used.</p>
+        <div id="formBrandApiAccounts" style="margin-bottom:12px;"></div>
+
         <!-- Modal Actions -->
         <div class="btn-group" style="justify-content:flex-end;margin-top:28px;">
             <button class="btn btn-outline" onclick="closeBrandModal()">Cancel</button>
@@ -2261,6 +2277,8 @@
             colorPicker.addEventListener('input', () => colorHex.value = colorPicker.value);
             colorHex.addEventListener('input', () => { if (/^#[0-9A-Fa-f]{6}$/.test(colorHex.value)) colorPicker.value = colorHex.value; });
         }
+        // Seed demo API accounts if empty
+        seedDemoApiAccounts();
     });
 
     // ── Data Freshness Tracking ──
@@ -3665,26 +3683,132 @@
     function renderAPIAccountsList() {
         const list = document.getElementById('apiAccountsList');
         if (apiAccounts.length === 0) {
-            list.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No API accounts configured yet.</p>';
+            list.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No API accounts configured yet. Click "Add API Account" below to get started.</p>';
             return;
         }
 
-        list.innerHTML = apiAccounts.map(account => `
-            <div class="api-account-item">
-                <div>
-                    <div class="name">${account.name}</div>
-                    <div class="platform">${account.displayPlatform || (account.platform === 'meta' ? 'Meta Ads' : 'Google Ads')} • ${account.accountId}</div>
+        list.innerHTML = apiAccounts.map(account => {
+            const platformColors = {
+                'meta': '#1877F2',
+                'google': '#34A853',
+                'dv360': '#7B1FA2',
+                'linkedin': '#0A66C2',
+                'twitter': '#1DA1F2',
+                'snapchat': '#FFFC00',
+                'programmatic': '#9C27B0',
+                'custom': '#757575'
+            };
+            const platformColor = platformColors[account.platform] || '#999';
+            const platforms = { meta: 'Meta', google: 'Google', dv360: 'DV360', linkedin: 'LinkedIn', twitter: 'Twitter/X', snapchat: 'Snapchat', programmatic: 'Programmatic' };
+            const platformShort = platforms[account.platform] || account.customPlatformName?.substring(0, 10) || 'Custom';
+
+            return `
+                <div class="api-account-card" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg-card);transition:all 0.2s;">
+                    <div style="display:flex;align-items:center;gap:14px;flex:1;">
+                        <div style="width:8px;height:8px;border-radius:50%;background:${platformColor};flex-shrink:0;" title="API Status: Connected"></div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600;color:var(--text);">${account.name}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${account.displayPlatform || platformShort} • ${account.accountId}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span style="font-size:11px;color:var(--success);font-weight:600;background:var(--success-bg);padding:4px 10px;border-radius:12px;">Connected</span>
+                        <button class="btn btn-danger btn-small" onclick="removeAPIAccount('${account.id}')" style="padding:6px 12px;font-size:12px;">Remove</button>
+                    </div>
                 </div>
-                <div style="font-size:12px;color:var(--text-secondary);">Active</div>
-                <button class="btn btn-danger btn-small" onclick="removeAPIAccount('${account.id}')" style="width:80px;justify-content:center;">Remove</button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    function seedDemoApiAccounts() {
+        if (apiAccounts.length > 0) return; // Only seed if empty
+
+        const demoAccounts = [
+            {
+                id: 'api_demo_meta_primary',
+                name: 'Primary Meta Account',
+                platform: 'meta',
+                displayPlatform: 'Meta Ads',
+                accountId: 'act_987654321',
+                credentials: '***demo***',
+                appId: '',
+                appSecret: ''
+            },
+            {
+                id: 'api_demo_google_primary',
+                name: 'Primary Google Account',
+                platform: 'google',
+                displayPlatform: 'Google Ads',
+                accountId: '1234567890',
+                credentials: '***demo***',
+                clientId: '',
+                refreshToken: ''
+            },
+            {
+                id: 'api_demo_meta_secondary',
+                name: 'Secondary Meta Account',
+                platform: 'meta',
+                displayPlatform: 'Meta Ads',
+                accountId: 'act_456789012',
+                credentials: '***demo***',
+                appId: '',
+                appSecret: ''
+            },
+            {
+                id: 'api_demo_dv360',
+                name: 'DV360 Display Account',
+                platform: 'dv360',
+                displayPlatform: 'DV360 (Display & Video)',
+                accountId: '123456-789',
+                credentials: '***demo***',
+                partnerId: '123456',
+                advertiserId: '789'
+            },
+            {
+                id: 'api_demo_linkedin',
+                name: 'LinkedIn Ads Account',
+                platform: 'linkedin',
+                displayPlatform: 'LinkedIn Ads',
+                accountId: '123456789',
+                credentials: '***demo***',
+                orgId: '123456'
+            }
+        ];
+
+        apiAccounts = demoAccounts;
+        renderAPIAccountsList();
     }
 
     function removeAPIAccount(accountId) {
         apiAccounts = apiAccounts.filter(a => a.id !== accountId);
         renderAPIAccountsList();
         showToast('API account removed', 'info');
+    }
+
+    function renderBrandApiAccountSelector(selectedIds = []) {
+        const container = document.getElementById('formBrandApiAccounts');
+        if (!container) return;
+
+        if (apiAccounts.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-secondary);font-size:12px;font-style:italic;">No API accounts configured. Add accounts in the API Settings tab first.</p>';
+            return;
+        }
+
+        let html = '';
+        apiAccounts.forEach(account => {
+            const isChecked = selectedIds.includes(account.id);
+            html += `
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;background:${isChecked ? 'var(--primary-light)' : 'var(--bg-card)'};">
+                    <input type="checkbox" id="apiAccount_${account.id}" value="${account.id}" ${isChecked ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;">
+                    <label for="apiAccount_${account.id}" style="flex:1;cursor:pointer;margin:0;">
+                        <div style="font-weight:500;color:var(--text);">${account.name}</div>
+                        <div style="font-size:11px;color:var(--text-secondary);">${account.displayPlatform || account.platform} • ${account.accountId}</div>
+                    </label>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
     }
 
     // ======================== FEATURE 3: PNG EXPORT ========================
@@ -4387,6 +4511,10 @@
                         <div class="label">Regions</div>
                         <div class="value">${(brand.meta?.regions?.length || 0) + (brand.youtube?.regions?.length || 0)}</div>
                     </div>
+                    <div class="brand-info-item">
+                        <div class="label">Data Sources</div>
+                        <div class="value">${brand.api_accounts?.length || 0} connected</div>
+                    </div>
                 </div>
                 <div class="brand-actions">
                     <div class="brand-actions-run">
@@ -4445,6 +4573,9 @@
         document.getElementById('formScheduleMonthly').value = '';
 
         document.getElementById('modalTitle').textContent = 'Add New Brand';
+
+        // Render API account selector
+        renderBrandApiAccountSelector([]);
 
         if (brandSlug) {
             document.getElementById('modalTitle').textContent = 'Edit Brand';
@@ -4514,6 +4645,9 @@
             document.getElementById('formScheduleWeeklyDay').value = brand.schedule?.weekly_day || 'monday';
             document.getElementById('formScheduleWeeklyTime').value = brand.schedule?.weekly_time || '';
             document.getElementById('formScheduleMonthly').value = brand.schedule?.monthly || '';
+
+            // API Accounts
+            renderBrandApiAccountSelector(brand.api_accounts || []);
         } catch (e) {
             console.error(e);
             showToast('Failed to load brand', 'error');
@@ -4588,10 +4722,14 @@
             if (name && budget) youtubeRegions.push({ name, budget: parseFloat(budget) });
         });
 
+        // Collect selected API accounts
+        const apiAccountIds = Array.from(document.querySelectorAll('#formBrandApiAccounts input[type="checkbox"]:checked')).map(cb => cb.value);
+
         const brand = {
             slug,
             name,
             active: true,
+            api_accounts: apiAccountIds,
             meta: {
                 campaign_filter: document.getElementById('formMetaCampaignFilter').value,
                 start_date: document.getElementById('formMetaStartDate').value,
