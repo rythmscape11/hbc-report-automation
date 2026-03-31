@@ -6154,15 +6154,27 @@
     async function refreshLogs() {
         try {
             const res = await fetch('/api/logs');
-            const logs = await res.json();
-            const panel = document.getElementById('logPanel');
-            if (logs.length) {
-                panel.innerHTML = logs.map(l =>
-                    `<div class="log-entry ${l.level}"><span class="time">${l.time}</span>${l.message}</div>`
-                ).join('');
-                panel.scrollTop = panel.scrollHeight;
+            const serverLogs = await res.json();
+            // Merge server logs into systemLogs (avoid duplicates)
+            if (serverLogs.length) {
+                serverLogs.forEach(sl => {
+                    if (!systemLogs.some(cl => cl.message === sl.message && cl.time === sl.time)) {
+                        systemLogs.push({ level: sl.level, message: sl.message, time: sl.time });
+                    }
+                });
+                updateLogStats();
             }
         } catch (e) { console.error(e); }
+        // Re-render all logs from systemLogs
+        const panel = document.getElementById('logPanel');
+        if (panel && systemLogs.length) {
+            panel.innerHTML = systemLogs.map(l =>
+                `<div class="log-entry ${l.level}"><span class="time">${l.time}</span>${l.message}</div>`
+            ).join('');
+            panel.scrollTop = panel.scrollHeight;
+            const countEl = document.getElementById('logCount');
+            if (countEl) countEl.textContent = systemLogs.length + ' entries';
+        }
     }
 
     // ── Template Management ──
@@ -6233,13 +6245,13 @@
         sheets.forEach((sheet, idx) => {
             const typeIcon = {'summary': '●', 'overview': '◆', 'raw': '■', 'creative': '▲', 'placeholder': '○', 'custom': '◇'}[sheet.type] || '●';
             html += `
-                <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:${sheet.enabled ? '#F8FCFF' : '#FAFBFC'};color:var(--text);">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg-card-hover);color:var(--text);">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-width:32px;">
                         <input type="checkbox" ${sheet.enabled ? 'checked' : ''} onchange="toggleSheet(${idx}, this.checked)">
                     </label>
                     <span style="min-width:24px;">${typeIcon}</span>
                     <div style="flex:1;cursor:pointer;" onclick="editSheet(${idx})">
-                        <strong style="${sheet.enabled ? '' : 'opacity:0.5;'}">${sheet.name}</strong>
+                        <strong style="color:var(--text);${sheet.enabled ? '' : 'opacity:0.5;'}">${sheet.name}</strong>
                         <div style="font-size:11px;color:var(--text-secondary);">${sheet.type} · ${sheet.platform || 'both'} · ${Array.isArray(sheet.metrics) ? sheet.metrics.length + ' metrics' : sheet.type === 'raw' ? (sheet.columns?.length || 0) + ' columns' : ''}</div>
                     </div>
                     <div style="display:flex;gap:6px;">
