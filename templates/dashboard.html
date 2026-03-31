@@ -2910,7 +2910,7 @@
             const data = await res.json();
             if (res.ok && data.token) {
                 authToken = data.token;
-                currentUser = data.user;
+                currentUser = data.user || { id: data.user_id, name: data.name, email: data.email, role: data.role, brands: data.assigned_brands || [] };
                 localStorage.setItem('adflow_token', authToken);
                 localStorage.setItem('adflow_user', JSON.stringify(currentUser));
                 document.getElementById('loginScreen').classList.add('hidden');
@@ -2945,7 +2945,7 @@
             const data = await res.json();
             if (res.ok && data.token) {
                 authToken = data.token;
-                currentUser = data.user;
+                currentUser = data.user || { id: data.user_id, name: data.name || name, email: data.email || email, role: data.role || 'viewer', brands: data.assigned_brands || [] };
                 localStorage.setItem('adflow_token', authToken);
                 localStorage.setItem('adflow_user', JSON.stringify(currentUser));
                 document.getElementById('loginScreen').classList.add('hidden');
