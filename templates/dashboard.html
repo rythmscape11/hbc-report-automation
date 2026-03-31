@@ -693,6 +693,32 @@
             .api-account-item { flex-direction:column; align-items:flex-start; }
             .api-account-card { flex-direction:column; align-items:flex-start; }
         }
+
+        /* ── SVG Icon System ── */
+        .ic { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; flex-shrink:0; }
+        .ic svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        .ic-sm { width:14px; height:14px; }
+        .ic-lg { width:22px; height:22px; }
+        .ic-xl { width:28px; height:28px; }
+
+        /* ── How It Works Section ── */
+        .flow-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 44px; margin-bottom:24px; }
+        .flow-section-header { text-align:center; margin-bottom:40px; }
+        .flow-section-header h2 { font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--text); letter-spacing:-0.025em; margin-bottom:8px; }
+        .flow-section-header p { font-size:14px; color:var(--text-secondary); max-width:520px; margin:0 auto; }
+        .flow-steps { display:grid; grid-template-columns:repeat(4, 1fr); gap:0; position:relative; }
+        .flow-step { text-align:center; padding:0 20px; position:relative; }
+        .flow-step-num { width:40px; height:40px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:16px; font-weight:700; margin-bottom:16px; position:relative; z-index:2; }
+        .flow-step:not(:last-child)::after { content:''; position:absolute; top:20px; left:calc(50% + 28px); right:calc(-50% + 28px); height:2px; background:var(--border); z-index:1; }
+        .flow-step h3 { font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--text); margin-bottom:6px; letter-spacing:-0.01em; }
+        .flow-step p { font-size:12px; color:var(--text-muted); line-height:1.6; }
+        .flow-step .flow-icon { width:48px; height:48px; border-radius:12px; background:var(--primary-light); display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px; color:var(--primary); }
+        .flow-step .flow-icon svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        @media(max-width:900px) {
+            .flow-steps { grid-template-columns:1fr 1fr; gap:32px; }
+            .flow-step:not(:last-child)::after { display:none; }
+        }
+        @media(max-width:560px) { .flow-steps { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
@@ -771,8 +797,8 @@
                 <span id="statusText">System Online</span>
             </div>
             <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="document.querySelector('.tabs-bar').classList.toggle('mobile-open'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true')">☰</button>
-            <button class="search-btn" onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span style="font-size:13px;">🔍</span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+            <button class="search-btn" onclick="openGlobalSearch()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> <span>Search</span> <kbd style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:inherit;">⌘K</kbd></button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="ic"><svg viewBox="0 0 24 24" id="themeIcon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span></button>
         </div>
     </div>
 </div>
@@ -835,6 +861,40 @@
             </div>
         </div>
 
+        <!-- How It Works -->
+        <div class="flow-section">
+            <div class="flow-section-header">
+                <h2>How It Works</h2>
+                <p>Four steps from raw ad data to client-ready reports. Set up once, automate forever.</p>
+            </div>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><circle cx="12" cy="12" r="10"/></svg></div>
+                    <div class="flow-step-num">1</div>
+                    <h3>Connect Platforms</h3>
+                    <p>Add your Meta, Google Ads, YouTube, and DV360 API credentials in <a href="#" onclick="switchTab('api');return false" style="color:var(--primary);text-decoration:underline;">API Settings</a>. Or upload CSV/Excel exports directly.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                    <div class="flow-step-num">2</div>
+                    <h3>Upload & Map Data</h3>
+                    <p>Drop your campaign exports into <a href="#" onclick="switchTab('datastudio');return false" style="color:var(--primary);text-decoration:underline;">Data Studio</a>. Smart detection auto-maps columns to the right metrics.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+                    <div class="flow-step-num">3</div>
+                    <h3>Analyze & Visualize</h3>
+                    <p>Open <a href="#" onclick="switchTab('analytics');return false" style="color:var(--primary);text-decoration:underline;">Analytics</a> for auto-generated charts, KPIs, AI insights, and cross-platform comparisons.</p>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                    <div class="flow-step-num">4</div>
+                    <h3>Generate Reports</h3>
+                    <p>Hit "Run All" below to export PDF, Excel, HTML, or PPTX reports. <a href="#" onclick="switchTab('schedule');return false" style="color:var(--primary);text-decoration:underline;">Schedule</a> them to run daily or weekly.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Overview Stats -->
         <div class="grid-4">
             <div class="stat-card" tabindex="0" role="region" aria-label="Total Brands stat">
@@ -858,7 +918,7 @@
         <!-- AI Insights Panel -->
         <div class="ai-insights" id="aiInsightsPanel" style="display:none;">
             <div class="ai-insights-header">
-                <h3>🧠 AI-Powered Insights</h3>
+                <h3><span class="ic" style="color:var(--primary);margin-right:6px;"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M10 21h4"/></svg></span> AI-Powered Insights</h3>
                 <span class="ai-badge">Auto-Generated</span>
             </div>
             <div id="aiInsightsContent">
@@ -870,7 +930,7 @@
 
         <!-- Quick Actions -->
         <div class="card full-width">
-            <h2><span class="icon">⚡</span> Quick Actions</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Quick Actions</h2>
             <div class="btn-group">
                 <button class="btn btn-primary" aria-label="Run all brands daily report" onclick="runAllBrands('daily')">Run All (Daily)</button>
                 <button class="btn btn-outline" aria-label="Run all brands weekly report" onclick="runAllBrands('weekly')">Run All (Weekly)</button>
@@ -882,7 +942,7 @@
 
         <!-- Recent Reports -->
         <div class="card full-width">
-            <h2><span class="icon">📊</span> Recent Reports</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></span> Recent Reports</h2>
             <div id="recentReports" style="font-size:14px;color:var(--text-secondary);">
                 <div class="skeleton skeleton-line" style="width:100%"></div>
                 <div class="skeleton skeleton-line" style="width:75%"></div>
@@ -893,13 +953,13 @@
         <!-- Scheduler / Health (compact row) -->
         <div class="grid" style="gap:16px;">
             <div class="card" style="padding:18px 20px;">
-                <h2 style="font-size:13px;margin-bottom:10px;"><span class="icon">⚙️</span> Scheduler Status</h2>
+                <h2 style="font-size:13px;margin-bottom:10px;"><span class="ic ic-sm" style="color:var(--primary);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Scheduler Status</h2>
                 <div id="schedulerInfo" style="font-size:13px;color:var(--text-secondary);">
                     <div class="skeleton skeleton-line"></div>
                 </div>
             </div>
             <div class="card" style="padding:18px 20px;">
-                <h2 style="font-size:13px;margin-bottom:10px;"><span class="icon">📈</span> System Health</h2>
+                <h2 style="font-size:13px;margin-bottom:10px;"><span class="ic ic-sm" style="color:var(--primary);"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> System Health</h2>
                 <div id="systemHealth" style="font-size:13px;color:var(--text-secondary);">
                     <div class="skeleton skeleton-line"></div>
                 </div>
@@ -1265,7 +1325,7 @@
                 <span>CPM vs CTR — Efficiency Frontier</span>
                 <div style="display:flex;gap:8px;">
                     <button class="expand-btn" onclick="openChartFullscreen('chartEfficiency', 'CPM vs CTR — Efficiency Frontier')" title="Fullscreen">⛶</button>
-                    <button class="btn btn-success btn-small" onclick="downloadChart('chartEfficiency')" style="padding:5px 12px;font-size:11px;">📥 PNG</button>
+                    <button class="btn btn-success btn-small" onclick="downloadChart('chartEfficiency')" style="padding:5px 12px;font-size:11px;">Export</button>
                 </div>
             </h2>
             <div style="height:350px;position:relative;">
@@ -1280,7 +1340,7 @@
                 <span>Day-of-Week Performance</span>
                 <div style="display:flex;gap:8px;">
                     <button class="expand-btn" onclick="openChartFullscreen('chartDayOfWeek', 'Day-of-Week Performance')" title="Fullscreen">⛶</button>
-                    <button class="btn btn-success btn-small" onclick="downloadChart('chartDayOfWeek')" style="padding:5px 12px;font-size:11px;">📥 PNG</button>
+                    <button class="btn btn-success btn-small" onclick="downloadChart('chartDayOfWeek')" style="padding:5px 12px;font-size:11px;">Export</button>
                 </div>
             </h2>
             <div style="height:300px;position:relative;">
@@ -1302,7 +1362,7 @@
         <!-- ═══════════════════════════════════════════════════════════════ -->
 
         <div style="margin:32px 0 20px;padding:16px 20px;background:linear-gradient(90deg,var(--bg-card-hover),var(--bg-card));border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:12px;">
-            <span style="font-size:22px;">🔬</span>
+            <span class="ic ic-lg" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M6 18l6-6 4 4 6-6"/><path d="M20 12V6h-6"/></svg></span>
             <div>
                 <h2 style="font-size:16px;font-weight:700;color:var(--primary);margin:0;">Advanced Analytics Suite</h2>
                 <p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">Consulting-grade analysis tools used by senior data analysts at top firms</p>
@@ -1313,7 +1373,7 @@
         <div class="card full-width" style="margin-bottom:24px;">
             <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="color:#C32126;">⚡</span> Anomaly Detection Timeline
+                    <span class="ic ic-sm" style="color:var(--danger);"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Anomaly Detection Timeline
                 </div>
                 <button class="expand-btn" onclick="openChartFullscreen('anomalyContainer', 'Anomaly Detection Timeline')" title="Fullscreen">⛶</button>
             </h2>
@@ -1327,7 +1387,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>📊</span> Pareto Analysis (80/20 Rule)
+                        Pareto Analysis (80/20 Rule)
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('chartPareto', 'Pareto Analysis')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1340,7 +1400,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>📈</span> Cumulative Spend Curve
+                        Cumulative Spend Curve
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('chartCumulativeSpend', 'Cumulative Spend Curve')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1357,7 +1417,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>🏗️</span> Spend Contribution Waterfall
+                        Spend Contribution Waterfall
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('chartWaterfall', 'Spend Contribution Waterfall')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1370,7 +1430,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>📉</span> Diminishing Returns Analysis
+                        Diminishing Returns Analysis
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('chartDiminishing', 'Diminishing Returns Analysis')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1387,7 +1447,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>🔗</span> Metric Correlation Matrix
+                        Metric Correlation Matrix
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('correlationContainer', 'Metric Correlation Matrix')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1398,7 +1458,7 @@
             <div class="card">
                 <h2 style="font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span>🎯</span> Spend Concentration (HHI)
+                        Spend Concentration (HHI)
                     </div>
                     <button class="expand-btn" onclick="openChartFullscreen('concentrationContainer', 'Spend Concentration')" title="Fullscreen">⛶</button>
                 </h2>
@@ -1410,7 +1470,7 @@
 
         <!-- Alert Rules Configuration -->
         <div class="card full-width" style="margin-top:24px;">
-            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Alert Rules</h2>
+            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:4px;">Alert Rules</h2>
             <p style="color:var(--text-secondary);margin-bottom:16px;">Get notified when metrics exceed thresholds</p>
             <div id="alertRules" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;">
@@ -1439,13 +1499,13 @@
     <!-- Share Report Modal -->
     <div id="shareReportModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:3000;align-items:center;justify-content:center;">
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;">🔗 Share Report with Client</h2>
+            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;">Share Report with Client</h2>
             <p style="font-size:12px;color:var(--text-secondary);margin-bottom:20px;">Generate a shareable link or send the report directly</p>
             <div style="margin-bottom:16px;">
                 <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px;">Report Link</label>
                 <div style="display:flex;gap:8px;">
                     <input type="text" id="shareReportUrl" readonly style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);">
-                    <button onclick="copyShareLink()" class="btn btn-primary btn-small" style="padding:10px 16px;white-space:nowrap;">📋 Copy</button>
+                    <button onclick="copyShareLink()" class="btn btn-primary btn-small" style="padding:10px 16px;white-space:nowrap;">Copy Link</button>
                 </div>
             </div>
             <div style="margin-bottom:16px;">
@@ -1497,33 +1557,33 @@
 
         <!-- Sample Templates Download Section -->
         <div class="card full-width" style="margin-bottom:24px;background:linear-gradient(90deg,var(--bg-card-hover),transparent);">
-            <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon">📋</span> Download Sample Templates
+            <h2 style="display:flex;align-items:center;gap:8px;"><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Download Sample Templates
                 <span style="font-size:11px;font-weight:400;color:var(--text-secondary);margin-left:auto;">Fill these with your platform data for best results</span>
             </h2>
             <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Each template matches the exact export format of the respective ad platform. Download, fill with your data, and upload.</p>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
                 <a href="/api/sample-template/meta" download class="btn btn-outline" onclick="showToast('Downloading Meta Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <span style="font-size:24px;">📘</span>
+                    <span style="width:32px;height:32px;border-radius:8px;background:#1877F2;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></span>
                     <span style="font-size:12px;font-weight:700;">Meta Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Facebook & Instagram</span>
                 </a>
                 <a href="/api/sample-template/youtube" download class="btn btn-outline" onclick="showToast('Downloading YouTube Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <span style="font-size:24px;">📕</span>
+                    <span style="width:32px;height:32px;border-radius:8px;background:#E53935;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
                     <span style="font-size:12px;font-weight:700;">YouTube Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Google Ads Video</span>
                 </a>
                 <a href="/api/sample-template/google-ads" download class="btn btn-outline" onclick="showToast('Downloading Google Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <span style="font-size:24px;">📗</span>
+                    <span style="width:32px;height:32px;border-radius:8px;background:#2E7D4F;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
                     <span style="font-size:12px;font-weight:700;">Google Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Search & Display</span>
                 </a>
                 <a href="/api/sample-template/dv360" download class="btn btn-outline" onclick="showToast('Downloading DV360 template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <span style="font-size:24px;">📙</span>
+                    <span style="width:32px;height:32px;border-radius:8px;background:#6A3EA1;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
                     <span style="font-size:12px;font-weight:700;">DV360</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Programmatic</span>
                 </a>
                 <a href="/api/sample-template/combined" download class="btn btn-outline" onclick="showToast('Downloading Combined template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <span style="font-size:24px;">🔗</span>
+                    <span style="width:32px;height:32px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
                     <span style="font-size:12px;font-weight:700;">Combined</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Multi-platform unified</span>
                 </a>
@@ -1532,9 +1592,9 @@
 
         <!-- CSV Upload Section -->
         <div class="card full-width" style="margin-bottom:24px;">
-            <h2><span class="icon">📤</span> Upload Data File</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Upload Data File</h2>
             <div id="csvUploadZone" style="border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);">
-                <div style="font-size:32px;margin-bottom:12px;">📁</div>
+                <div style="margin-bottom:12px;"><span class="ic ic-xl" style="color:var(--text-muted);"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span></div>
                 <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Drag and drop your data file here</div>
                 <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">or click to select a file</div>
                 <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
@@ -1575,7 +1635,7 @@
         <!-- Smart Column Detection (replaces manual X/Y mapping) -->
         <div id="columnMapperSection" style="display:none;margin-bottom:24px;">
             <div class="card full-width">
-                <h2><span class="icon">🧠</span> Smart Column Detection
+                <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M10 21h4"/></svg></span> Smart Column Detection
                     <span style="font-size:11px;font-weight:400;color:var(--text-secondary);margin-left:auto;">Auto-detected from your data</span>
                 </h2>
                 <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">We detected your platform format and mapped columns automatically. Adjust if needed.</p>
@@ -1587,7 +1647,7 @@
         <!-- Chart Builder Section (auto-generates charts based on detected columns) -->
         <div id="chartBuilderSection" style="display:none;margin-bottom:24px;">
             <div class="card full-width">
-                <h2><span class="icon">📊</span> Auto-Generated Visualizations
+                <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></span> Auto-Generated Visualizations
                     <button class="btn btn-primary btn-small" onclick="autoGenerateCharts()" style="margin-left:auto;font-size:11px;padding:6px 14px;">Regenerate Charts</button>
                 </h2>
                 <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Charts are automatically created based on your data structure. Add custom charts below.</p>
@@ -1624,7 +1684,7 @@
 
         <!-- Export to Analytics Section -->
         <div id="exportToAnalyticsSection" style="display:none;margin-top:24px;" class="card full-width">
-            <h2><span class="icon">📊</span> Export to Analytics</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Export to Analytics</h2>
             <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Create a new brand from your uploaded data with audience-specific analytics views</p>
 
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
@@ -1688,7 +1748,7 @@
                 <button class="btn btn-primary" onclick="openBrandModal()">+ Add New Brand</button>
                 <div style="position:relative;">
                     <input type="text" id="brandSearchInput" placeholder="Search brands..." oninput="filterBrands(this.value)" style="padding:9px 14px 9px 36px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-card);color:var(--text);width:220px;">
-                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;">🔍</span>
+                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></span>
                 </div>
             </div>
             <div style="font-size:12px;color:var(--text-secondary);" id="brandCount"></div>
@@ -1708,7 +1768,7 @@
     <div id="tab-api" class="tab-content">
         <!-- Multi-API Support Section -->
         <div class="card full-width" style="margin-bottom:24px;">
-            <h2><span class="icon">🔗</span> Multi-API Account Management</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span> Multi-API Account Management</h2>
             <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
                 Configure multiple API accounts. Each brand can pull data from selected accounts.
             </p>
@@ -1719,14 +1779,14 @@
         <div class="grid">
             <!-- Meta Credentials -->
             <div class="card">
-                <h2><span class="icon">📘</span> Meta API Credentials</h2>
+                <h2><span class="ic" style="color:#1877F2;"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></span> Meta API Credentials</h2>
                 <div class="form-group">
                     <label>Access Token</label>
                     <div style="display:flex;gap:8px;align-items:flex-end;">
                         <div style="flex:1;">
                             <input type="password" id="META_ACCESS_TOKEN" placeholder="EAAxxxxxxx..." aria-label="Meta Access Token">
                         </div>
-                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('META_ACCESS_TOKEN')" aria-label="Toggle Access Token visibility">👁</button>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('META_ACCESS_TOKEN')" aria-label="Toggle Access Token visibility"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1744,26 +1804,26 @@
                             <div style="flex:1;">
                                 <input type="password" id="META_APP_SECRET" placeholder="Optional" aria-label="Meta App Secret">
                             </div>
-                            <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('META_APP_SECRET')" aria-label="Toggle App Secret visibility">👁</button>
+                            <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('META_APP_SECRET')" aria-label="Toggle App Secret visibility"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
                         </div>
                     </div>
                 </div>
                 <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('meta')" id="metaTestBtn" style="padding:8px 16px;">🔌 Test Meta Connection</button>
+                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('meta')" id="metaTestBtn" style="padding:8px 16px;">Test Meta Connection</button>
                     <span id="metaTestResult" style="font-size:12px;"></span>
                 </div>
             </div>
 
             <!-- Google Ads Credentials -->
             <div class="card">
-                <h2><span class="icon">📕</span> Google Ads API Credentials</h2>
+                <h2><span class="ic" style="color:#2E7D4F;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Google Ads API Credentials</h2>
                 <div class="form-group">
                     <label>Developer Token</label>
                     <div style="display:flex;gap:8px;align-items:flex-end;">
                         <div style="flex:1;">
                             <input type="password" id="GOOGLE_ADS_DEVELOPER_TOKEN" placeholder="Your developer token" aria-label="Google Ads Developer Token">
                         </div>
-                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('GOOGLE_ADS_DEVELOPER_TOKEN')" aria-label="Toggle Developer Token visibility">👁</button>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;" onclick="togglePasswordVisibility('GOOGLE_ADS_DEVELOPER_TOKEN')" aria-label="Toggle Developer Token visibility"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1776,7 +1836,7 @@
                         <div style="flex:1;">
                             <input type="password" id="GOOGLE_ADS_CLIENT_SECRET" placeholder="Your client secret" aria-label="Google Ads Client Secret">
                         </div>
-                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_CLIENT_SECRET')" aria-label="Toggle Client Secret visibility">👁</button>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_CLIENT_SECRET')" aria-label="Toggle Client Secret visibility"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1785,7 +1845,7 @@
                         <div style="flex:1;">
                             <input type="password" id="GOOGLE_ADS_REFRESH_TOKEN" placeholder="1//xxxxxxx" aria-label="Google Ads Refresh Token">
                         </div>
-                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_REFRESH_TOKEN')" aria-label="Toggle Refresh Token visibility">👁</button>
+                        <button class="btn btn-sm" style="padding:10px 14px;background:var(--primary-light);border:1px solid var(--border);color:var(--primary);font-weight:600;margin-bottom:0;" onclick="togglePasswordVisibility('GOOGLE_ADS_REFRESH_TOKEN')" aria-label="Toggle Refresh Token visibility"><span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1793,7 +1853,7 @@
                     <input type="text" id="GOOGLE_ADS_CUSTOMER_ID" placeholder="1234567890" aria-label="Google Ads Customer ID">
                 </div>
                 <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('google')" id="googleTestBtn" style="padding:8px 16px;">🔌 Test Google Connection</button>
+                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('google')" id="googleTestBtn" style="padding:8px 16px;">Test Google Connection</button>
                     <span id="googleTestResult" style="font-size:12px;"></span>
                 </div>
             </div>
@@ -1801,7 +1861,7 @@
 
         <!-- Email Notifications -->
         <div class="card full-width">
-            <h2><span class="icon">📧</span> Email Notifications</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span> Email Notifications</h2>
             <div class="form-row-4">
                 <div class="form-group">
                     <label>Enabled</label>
@@ -1835,14 +1895,14 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-outline" onclick="testEmail()">Send Test Email</button>
-                <button class="btn btn-outline" onclick="testAPIConnection('email')" style="margin-left:8px;">🔌 Test SMTP</button>
+                <button class="btn btn-outline" onclick="testAPIConnection('email')" style="margin-left:8px;">Test SMTP</button>
                 <span id="emailTestResult" style="font-size:12px;margin-left:8px;"></span>
             </div>
         </div>
 
         <!-- White-Label Settings -->
         <div class="card full-width" style="margin-top:24px;">
-            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:16px;">🏷️ White-Label Settings</h2>
+            <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:16px;">White-Label Settings</h2>
             <p style="color:var(--text-secondary);margin-bottom:16px;">Customize branding for client-facing views</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div>
@@ -1881,7 +1941,7 @@
         <div class="card full-width" style="margin-bottom:24px;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
                 <div>
-                    <h2 style="margin-bottom:8px;"><span class="icon">⚡</span> Scheduler Control</h2>
+                    <h2 style="margin-bottom:8px;"><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Scheduler Control</h2>
                     <div id="schedulerStatus" style="font-size:14px;color:var(--text-secondary);">
                         Loading...
                     </div>
@@ -1899,7 +1959,7 @@
 
         <!-- Scheduled Jobs Table -->
         <div class="card full-width">
-            <h2><span class="icon">📅</span> Scheduled Jobs</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Scheduled Jobs</h2>
             <div id="scheduleTable" style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -1924,7 +1984,7 @@
         <div class="grid">
             <!-- Template List -->
             <div class="card">
-                <h2><span class="icon">📐</span> Report Templates</h2>
+                <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Report Templates</h2>
                 <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
                     Customize which sheets appear in reports, reorder them, enable/disable individual sheets, and change metrics.
                 </p>
@@ -1934,7 +1994,7 @@
 
             <!-- Template Editor -->
             <div class="card">
-                <h2><span class="icon">✏️</span> Edit Template: <span id="editingTemplateName" style="color:var(--primary);">default</span></h2>
+                <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span> Edit Template: <span id="editingTemplateName" style="color:var(--primary);">default</span></h2>
                 <div id="templateEditor">
                     <p style="color:var(--text-secondary);font-size:13px;">Select a template to edit its sheets and metrics.</p>
                 </div>
@@ -1943,13 +2003,13 @@
 
         <!-- Sheet Details -->
         <div class="card" id="sheetEditorCard" style="display:none;">
-            <h2><span class="icon">📄</span> Sheet Configuration: <span id="editingSheetName"></span></h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Sheet Configuration: <span id="editingSheetName"></span></h2>
             <div id="sheetEditor"></div>
         </div>
 
         <!-- Assign Templates to Brands -->
         <div class="card" style="margin-top:24px;">
-            <h2><span class="icon">🔗</span> Brand → Template Assignments</h2>
+            <h2><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span> Brand-Template Assignments</h2>
             <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
                 Each brand can use a different report template. Unassigned brands use the default template.
             </p>
@@ -1968,13 +2028,13 @@
         </div>
         <div class="card full-width">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h2 style="margin:0;"><span class="icon">📋</span> Real-Time Logs</h2>
+                <h2 style="margin:0;"><span class="ic" style="color:var(--primary);"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span> Real-Time Logs</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('all')" id="logFilterAll">All</button>
                     <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('info')" id="logFilterInfo">Info</button>
                     <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('warning')" id="logFilterWarning">Warning</button>
                     <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="filterLogs('error')" id="logFilterError">Error</button>
-                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="clearLogs()" id="logClearBtn">🗑 Clear Logs</button>
+                    <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:8px 14px;" onclick="clearLogs()" id="logClearBtn">Clear Logs</button>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
@@ -1991,7 +2051,7 @@
         <div class="card full-width" style="margin-top:24px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <div>
-                    <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:4px;">📋 Audit Trail</h2>
+                    <h2 style="font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);margin-bottom:4px;">Audit Trail</h2>
                     <p style="color:var(--text-secondary);margin:0;">Track all administrative actions</p>
                 </div>
                 <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;" id="auditCount">0 actions</span>
@@ -2008,7 +2068,7 @@
                     </thead>
                     <tbody id="auditTrailBody">
                         <tr><td colspan="4" style="padding:40px 20px;text-align:center;">
-                            <div style="font-size:36px;opacity:0.3;margin-bottom:8px;">🔒</div>
+                            <div style="opacity:0.3;margin-bottom:8px;"><span class="ic ic-xl"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
                             <div style="font-weight:600;color:var(--text);margin-bottom:4px;">No Actions Recorded</div>
                             <div style="font-size:13px;color:var(--text-muted);">Audit trail will populate as administrative actions are performed</div>
                         </td></tr>
@@ -2535,7 +2595,7 @@
             const hideBtn = document.createElement('button');
             hideBtn.className = 'hide-btn';
             hideBtn.title = 'Hide this chart';
-            hideBtn.innerHTML = '👁';
+            hideBtn.innerHTML = '<span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></span>';
             hideBtn.onclick = (e) => { e.stopPropagation(); toggleChartVisibility(cardId); };
 
             // Insert hide button into the controls area (the flex div) next to expand btn
@@ -2615,7 +2675,7 @@
         bar.innerHTML = '<span style="font-weight:700;">Hidden Charts:</span> ' +
             Array.from(hiddenCharts).map(id => {
                 const card = document.getElementById(id);
-                const name = card ? (card.querySelector('h2')?.textContent || id).replace(/⛶|👁|📥 PNG|⬇ PNG/g, '').trim().substring(0, 25) : id;
+                const name = card ? (card.querySelector('h2')?.textContent || id).replace(/⛶|👁|Export|⬇ PNG/g, '').trim().substring(0, 25) : id;
                 return `<button onclick="toggleChartVisibility('${id}')" style="padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-size:11px;cursor:pointer;font-family:inherit;">${name} ✕</button>`;
             }).join(' ');
     }
@@ -3040,8 +3100,8 @@
         let msg = [];
         const audLabels = { cmo: 'CMO/C-Suite view hides granular tables and technical charts for a strategic overview.', media_planner: 'Media Planner view focuses on tactical campaign-level data and budget pacing.', analyst: 'Data Analyst view shows all charts including correlation matrices and advanced analytics.' };
         const objLabels = { awareness: 'Awareness objective emphasizes Reach, Impressions, CPM metrics.', engagement: 'Engagement objective focuses on CTR, CPC, Engagement Rate metrics.', video: 'Video objective prioritizes Views, VTR, ThruPlays metrics.', conversions: 'Conversion objective highlights Clicks, Conversions, CPA, ROAS metrics.' };
-        if (audience && audLabels[audience]) msg.push('👤 ' + audLabels[audience]);
-        if (objective && objLabels[objective]) msg.push('🎯 ' + objLabels[objective]);
+        if (audience && audLabels[audience]) msg.push('&bull; ' + audLabels[audience]);
+        if (objective && objLabels[objective]) msg.push('&bull; ' + objLabels[objective]);
         preview.innerHTML = msg.join('<br>');
     }
 
@@ -3105,11 +3165,11 @@
         detectedPlatform = detectPlatform();
         const badge = document.getElementById('detectedPlatformBadge');
         const platformLabels = {
-            'meta': ['📘', 'Meta Ads', 'Facebook & Instagram export format detected'],
-            'youtube': ['📕', 'YouTube Ads', 'Google Ads Video export format detected'],
-            'google-ads': ['📗', 'Google Ads', 'Search & Display export format detected'],
-            'dv360': ['📙', 'DV360', 'Display & Video 360 format detected'],
-            'combined': ['🔗', 'Combined', 'Multi-platform unified format detected'],
+            'meta': ['●', 'Meta Ads', 'Facebook & Instagram export format detected'],
+            'youtube': ['●', 'YouTube Ads', 'Google Ads Video export format detected'],
+            'google-ads': ['●', 'Google Ads', 'Search & Display export format detected'],
+            'dv360': ['●', 'DV360', 'Display & Video 360 format detected'],
+            'combined': ['●', 'Combined', 'Multi-platform unified format detected'],
             'unknown': ['❓', 'Unknown Format', 'Could not auto-detect platform — manual mapping recommended']
         };
         const [icon, name, desc] = platformLabels[detectedPlatform] || platformLabels['unknown'];
@@ -4461,12 +4521,12 @@
                 const size = r.size_kb ? ` (${r.size_kb} KB)` : '';
                 const fmt = r.format ? `<span style="font-size:11px;padding:2px 6px;background:var(--accent-glow);color:var(--accent);border-radius:4px;margin-left:8px;">${r.format}</span>` : '';
                 return `<div class="report-item">
-                    <span class="name">📊 ${name}${fmt}${size}</span>
+                    <span class="name">${name}${fmt}${size}</span>
                     <button class="download-btn" onclick="window.open('/api/download/${encodeURIComponent(name)}')">Download</button>
                 </div>`;
             }).join('');
         } else {
-            document.getElementById('recentReports').innerHTML = '<div class="empty-state" style="min-height:120px;"><div class="empty-state-icon">📄</div><p class="title">No Reports Generated Yet</p><p>Use Quick Actions above to run your first campaign report.</p><div class="empty-state-action"><button class="btn btn-primary btn-small" onclick="document.querySelector(\'.btn-group\').scrollIntoView({behavior:\'smooth\'})">Go to Quick Actions</button></div></div>';
+            document.getElementById('recentReports').innerHTML = '<div class="empty-state" style="min-height:120px;"><p class="title">No Reports Generated Yet</p><p>Use Quick Actions above to run your first campaign report.</p><div class="empty-state-action"><button class="btn btn-primary btn-small" onclick="document.querySelector(\'.btn-group\').scrollIntoView({behavior:\'smooth\'})">Go to Quick Actions</button></div></div>';
         }
     }
 
@@ -5162,7 +5222,7 @@
         `;
 
         sheets.forEach((sheet, idx) => {
-            const typeIcon = {'summary': '📊', 'overview': '📈', 'raw': '📋', 'creative': '🎨', 'placeholder': '📝', 'custom': '⚙️'}[sheet.type] || '📄';
+            const typeIcon = {'summary': '●', 'overview': '◆', 'raw': '■', 'creative': '▲', 'placeholder': '○', 'custom': '◇'}[sheet.type] || '●';
             html += `
                 <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:${sheet.enabled ? '#F8FCFF' : '#FAFBFC'};color:var(--text);">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-width:32px;">
@@ -5817,7 +5877,7 @@
         if (bp) {
             if (bp.meta.pct > 100) insights.push('⚠️ Meta budget is <strong>' + bp.meta.pct.toFixed(0) + '% consumed</strong> — consider reallocating or pausing low-performing campaigns.');
             if (bp.youtube.pct > 100) insights.push('⚠️ YouTube budget is <strong>' + bp.youtube.pct.toFixed(0) + '% consumed</strong> — review pacing strategy.');
-            if (bp.meta.pct < 50 && bp.youtube.pct < 50) insights.push('📊 Both platforms are under 50% budget utilization — there\'s room to scale winning campaigns.');
+            if (bp.meta.pct < 50 && bp.youtube.pct < 50) insights.push('Both platforms are under 50% budget utilization — there\'s room to scale winning campaigns.');
         }
 
         // 5. Best day
@@ -5835,7 +5895,7 @@
         // 7. Concentration warning
         const conc = analyticsData.concentration;
         if (conc && conc.hhi > 2500) {
-            insights.push('🎯 Spend is <strong>highly concentrated</strong> (HHI: ' + conc.hhi.toFixed(0) + '). Top 3 campaigns control ' + conc.top3_share + '% of budget — diversification recommended.');
+            insights.push('Spend is <strong>highly concentrated</strong> (HHI: ' + conc.hhi.toFixed(0) + '). Top 3 campaigns control ' + conc.top3_share + '% of budget — diversification recommended.');
         }
 
         // Render
@@ -5844,7 +5904,7 @@
             panel.style.display = 'block';
             panel.innerHTML = `
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                    <span style="font-size:20px;">💡</span>
+                    <span class="ic ic-lg" style="color:var(--primary);"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M10 21h4"/></svg></span>
                     <h3 style="font-size:14px;font-weight:700;margin:0;">Key Insights — ${brandLabel}</h3>
                     <span style="font-size:11px;color:var(--text-secondary);margin-left:auto;">Auto-generated ${brandCtx}</span>
                 </div>
@@ -6612,7 +6672,7 @@
             const dt = new Date(a.date);
             const dateStr = dt.getDate() + '/' + (dt.getMonth() + 1) + '/' + dt.getFullYear();
             const flagsHtml = a.flags.map(f => {
-                const icon = f.direction === 'spike' ? '🔴' : '🔵';
+                const icon = f.direction === 'spike' ? '<span style="color:var(--danger)">▲</span>' : '<span style="color:var(--primary)">▼</span>';
                 const dirLabel = f.direction === 'spike' ? 'Spike' : 'Drop';
                 const zLabel = Math.abs(f.zscore).toFixed(1) + 'σ';
                 return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:${f.direction === 'spike' ? 'rgba(195,33,38,0.1)' : 'rgba(5,115,182,0.1)'};">
@@ -6636,11 +6696,11 @@
 
     function buildInsightHTML(what, why, insight, action) {
         return `
-            <div class="insight-header">📋 Chart Intelligence</div>
+            <div class="insight-header">Chart Intelligence</div>
             <div class="insight-row"><div class="insight-label">What</div><div class="insight-text">${what}</div></div>
             <div class="insight-row"><div class="insight-label">Why</div><div class="insight-text">${why}</div></div>
             <div class="insight-row"><div class="insight-label">Insight</div><div class="insight-text"><strong>${insight}</strong></div></div>
-            <div class="insight-action">💡 <strong>Action:</strong> ${action}</div>
+            <div class="insight-action"><strong>Action:</strong> ${action}</div>
         `;
     }
 
@@ -6974,7 +7034,7 @@
                 panel.style.display = 'block';
                 content.innerHTML = data.insights.map(i => `
                     <div class="insight-card ${i.priority || ''}">
-                        <div class="insight-icon">${i.icon || '💡'}</div>
+                        <div class="insight-icon">${i.icon || '◆'}</div>
                         <div class="insight-title">${i.title}</div>
                         <div class="insight-body">${i.text}</div>
                     </div>
@@ -7000,9 +7060,15 @@
     const themeToggle = document.getElementById('themeToggle');
     let currentTheme = localStorage.getItem('theme') || 'light';
 
+    function updateThemeIcon(theme) {
+        const icon = document.getElementById('themeIcon');
+        if (icon) icon.innerHTML = theme === 'dark'
+            ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+            : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    }
     if (currentTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.textContent = '☀️';
+        updateThemeIcon('dark');
     }
 
     function applyThemeToCharts() {
@@ -7043,7 +7109,7 @@
     themeToggle?.addEventListener('click', () => {
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', newTheme);
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        updateThemeIcon(newTheme);
         currentTheme = newTheme;
         localStorage.setItem('theme', newTheme);
         // Update Chart.js colors for new theme
@@ -7059,7 +7125,7 @@
         if (!field) return;
         const isPassword = field.type === 'password';
         field.type = isPassword ? 'text' : 'password';
-        event.target.textContent = isPassword ? '🙈' : '👁';
+        event.target.innerHTML = isPassword ? '<span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>' : '<span class="ic ic-sm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" fill="none" stroke-width="1.8"/></svg></span>';
     }
 
     // ── Tab Keyboard Navigation ──
@@ -7182,7 +7248,7 @@
         let filtered = logFilter === 'all' ? allLogs : allLogs.filter(l => l.level === logFilter);
 
         if (filtered.length === 0) {
-            panel.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p class="title">No ' + (logFilter === 'all' ? 'Logs' : logFilter.charAt(0).toUpperCase() + logFilter.slice(1) + ' Messages') + '</p><p>Activity will appear here as you run reports and manage brands.</p></div>';
+            panel.innerHTML = '<div class="empty-state"><div class="empty-state-icon" style="font-size:24px;opacity:0.3;">—</div><p class="title">No ' + (logFilter === 'all' ? 'Logs' : logFilter.charAt(0).toUpperCase() + logFilter.slice(1) + ' Messages') + '</p><p>Activity will appear here as you run reports and manage brands.</p></div>';
             return;
         }
 
@@ -7260,20 +7326,20 @@
     
     // ── Global Search (Cmd+K) ──
     const searchItems = [
-        { label: 'Dashboard', desc: 'Overview, KPIs & quick actions', action: () => switchTab('dashboard'), icon: '📊' },
-        { label: 'Analytics', desc: 'Charts, trends & performance deep-dive', action: () => switchTab('analytics'), icon: '📈' },
-        { label: 'Data Studio', desc: 'Upload files & auto-detect columns', action: () => switchTab('datastudio'), icon: '📋' },
-        { label: 'Brands', desc: 'Manage brand configuration', action: () => switchTab('brands'), icon: '🏷️' },
-        { label: 'API Settings', desc: 'Configure Meta & Google API keys', action: () => switchTab('api'), icon: '🔑' },
-        { label: 'Schedule', desc: 'Scheduler control & job management', action: () => switchTab('schedule'), icon: '⏰' },
-        { label: 'Report Structure', desc: 'Customize report templates & sheets', action: () => switchTab('templates'), icon: '📑' },
-        { label: 'Logs', desc: 'Real-time logs & audit trail', action: () => switchTab('logs'), icon: '📜' },
-        { label: 'Run Daily Report', desc: 'Quick action: run all brands daily', action: () => { switchTab('dashboard'); runAllBrands('daily'); }, icon: '▶️' },
-        { label: 'Run Weekly Report', desc: 'Quick action: run all brands weekly', action: () => { switchTab('dashboard'); runAllBrands('weekly'); }, icon: '▶️' },
-        { label: 'Export PDF', desc: 'Generate PDF report for current view', action: () => { switchTab('analytics'); }, icon: '📥' },
-        { label: 'Toggle Dark Mode', desc: 'Switch between light and dark themes', action: () => document.getElementById('themeToggle').click(), icon: '🌙' },
-        { label: 'Add New Brand', desc: 'Create a new brand configuration', action: () => { switchTab('brands'); setTimeout(() => openBrandModal(), 300); }, icon: '➕' },
-        { label: 'Upload Data', desc: 'Upload CSV/Excel data files', action: () => switchTab('datastudio'), icon: '📤' },
+        { label: 'Dashboard', desc: 'Overview, KPIs & quick actions', action: () => switchTab('dashboard'), icon: '◆' },
+        { label: 'Analytics', desc: 'Charts, trends & performance deep-dive', action: () => switchTab('analytics'), icon: '◆' },
+        { label: 'Data Studio', desc: 'Upload files & auto-detect columns', action: () => switchTab('datastudio'), icon: '◆' },
+        { label: 'Brands', desc: 'Manage brand configuration', action: () => switchTab('brands'), icon: '◆' },
+        { label: 'API Settings', desc: 'Configure Meta & Google API keys', action: () => switchTab('api'), icon: '◆' },
+        { label: 'Schedule', desc: 'Scheduler control & job management', action: () => switchTab('schedule'), icon: '◆' },
+        { label: 'Report Structure', desc: 'Customize report templates & sheets', action: () => switchTab('templates'), icon: '◆' },
+        { label: 'Logs', desc: 'Real-time logs & audit trail', action: () => switchTab('logs'), icon: '◆' },
+        { label: 'Run Daily Report', desc: 'Quick action: run all brands daily', action: () => { switchTab('dashboard'); runAllBrands('daily'); }, icon: '▸' },
+        { label: 'Run Weekly Report', desc: 'Quick action: run all brands weekly', action: () => { switchTab('dashboard'); runAllBrands('weekly'); }, icon: '▸' },
+        { label: 'Export PDF', desc: 'Generate PDF report for current view', action: () => { switchTab('analytics'); }, icon: '↓' },
+        { label: 'Toggle Dark Mode', desc: 'Switch between light and dark themes', action: () => document.getElementById('themeToggle').click(), icon: '◐' },
+        { label: 'Add New Brand', desc: 'Create a new brand configuration', action: () => { switchTab('brands'); setTimeout(() => openBrandModal(), 300); }, icon: '+' },
+        { label: 'Upload Data', desc: 'Upload CSV/Excel data files', action: () => switchTab('datastudio'), icon: '↑' },
     ];
 
     function openGlobalSearch() {
@@ -7492,7 +7558,7 @@
 
         if (btn) {
             btn.disabled = false;
-            btn.textContent = '🔌 Test ' + platform.charAt(0).toUpperCase() + platform.slice(1) + ' Connection';
+            btn.textContent = 'Test ' + platform.charAt(0).toUpperCase() + platform.slice(1) + ' Connection';
         }
     }
 
@@ -7593,7 +7659,7 @@
         const ytPct = budgetUtil.youtube_pct || 0;
         const overBudget = metaPct > 100 || ytPct > 100;
         cards.push({
-            icon: '💰', title: 'Budget Pacing',
+            icon: '◈', title: 'Budget Pacing',
             status: overBudget ? 'critical' : metaPct > 85 ? 'warning' : 'healthy',
             insight: overBudget
                 ? 'Budget overspend detected. Meta at ' + metaPct.toFixed(0) + '%, YouTube at ' + ytPct.toFixed(0) + '%. <strong>Action:</strong> Pause lowest-performing campaigns immediately and reallocate to top performers.'
@@ -7605,7 +7671,7 @@
         const avgCTR = k.avg_ctr || 0;
         const industryCTR = 0.9; // Industry benchmark
         cards.push({
-            icon: '🎯', title: 'CTR Performance',
+            icon: '◉', title: 'CTR Performance',
             status: avgCTR >= industryCTR ? 'healthy' : avgCTR >= 0.5 ? 'warning' : 'critical',
             insight: avgCTR >= industryCTR
                 ? 'CTR at ' + avgCTR.toFixed(2) + '% — above industry benchmark (' + industryCTR + '%). Creative and targeting performing well.'
@@ -7616,7 +7682,7 @@
         // CPM Efficiency
         const avgCPM = k.avg_cpm || 0;
         cards.push({
-            icon: '📊', title: 'CPM Efficiency',
+            icon: '◆', title: 'CPM Efficiency',
             status: avgCPM <= 100 ? 'healthy' : avgCPM <= 200 ? 'warning' : 'critical',
             insight: 'Avg CPM: ' + currentCurrency.symbol + avgCPM.toFixed(0) + '. ' + (avgCPM > 200
                 ? '<strong>Action:</strong> CPM is high — expand audience pools, test broader targeting, and leverage lookalike audiences at 3-5% expansion.'
@@ -7631,7 +7697,7 @@
         const totalSpend = metaSpend + ytSpend || 1;
         const metaShare = ((metaSpend / totalSpend) * 100).toFixed(0);
         cards.push({
-            icon: '🔄', title: 'Platform Mix Strategy',
+            icon: '◎', title: 'Platform Mix Strategy',
             status: Math.abs(metaShare - 60) <= 15 ? 'healthy' : 'warning',
             insight: 'Current split — Meta: ' + metaShare + '%, YouTube: ' + (100 - metaShare) + '%. ' +
                 (metaShare > 75 ? '<strong>Action:</strong> Over-indexed on Meta. Diversify 15-20% budget to YouTube for video-first audiences and incremental reach.'
@@ -7647,7 +7713,7 @@
         const lateAvg = recentCTR.slice(-3).reduce((a, b) => a + b, 0) / 3 || 0;
         const ctrDeclining = lateAvg < earlyAvg * 0.85;
         cards.push({
-            icon: '👥', title: 'Audience Fatigue Analysis',
+            icon: '◇', title: 'Audience Fatigue Analysis',
             status: ctrDeclining ? 'warning' : 'healthy',
             insight: ctrDeclining
                 ? 'CTR declining over the last 7 days (down ' + ((1 - lateAvg / earlyAvg) * 100).toFixed(0) + '%). <strong>Action:</strong> Refresh creatives, rotate audience segments, or introduce new ad formats (carousel, video, stories).'
@@ -7658,7 +7724,7 @@
         // Conversion Funnel Health
         const funnelConv = k.total_clicks > 0 ? ((k.total_engagements || 0) / k.total_clicks * 100) : 0;
         cards.push({
-            icon: '🔬', title: 'Conversion Funnel Health',
+            icon: '▽', title: 'Conversion Funnel Health',
             status: funnelConv >= 150 ? 'healthy' : funnelConv >= 80 ? 'warning' : 'critical',
             insight: 'Engagement-to-Click ratio: ' + funnelConv.toFixed(0) + '%. ' +
                 (funnelConv < 80 ? '<strong>Action:</strong> Low engagement rate suggests weak landing page or creative mismatch. Audit landing pages, improve load speed, and align ad copy with landing page messaging.'
@@ -7756,7 +7822,7 @@
 <div id="globalSearchOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;backdrop-filter:blur(4px);animation:pageFadeIn .15s ease;" onclick="if(event.target===this)closeGlobalSearch()">
     <div style="max-width:560px;margin:120px auto;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;">
         <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px;">
-            <span style="font-size:18px;color:var(--text-muted);">🔍</span>
+            <span class="ic ic-lg" style="color:var(--text-muted);"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input type="text" id="globalSearchInput" placeholder="Search pages, brands, actions..." style="flex:1;border:none;outline:none;background:transparent;font-size:15px;color:var(--text);font-family:inherit;font-weight:500;" oninput="handleGlobalSearch(this.value)" autocomplete="off">
             <kbd style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;font-family:inherit;color:var(--text-muted);">ESC</kbd>
         </div>
@@ -7776,7 +7842,7 @@
 <div id="onboardingChecklist" style="display:none;position:fixed;bottom:24px;right:24px;z-index:1000;width:340px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.12);overflow:hidden;">
     <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:18px;">🚀</span>
+            <span class="ic ic-lg" style="color:var(--primary);"><svg viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg></span>
             <span style="font-size:14px;font-weight:700;color:var(--text);">Getting Started</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
