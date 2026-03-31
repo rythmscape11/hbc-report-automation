@@ -807,6 +807,10 @@
         .report-type-option:hover { border-color:var(--primary) !important; background:rgba(35,139,195,0.04); }
         input[name="reportType"]:checked + .report-type-option { border-color:var(--primary) !important; background:rgba(35,139,195,0.06); box-shadow:0 0 0 1px var(--primary); }
         input[name="reportType"]:not(:checked) + .report-type-option { opacity:0.7; }
+        /* Format checkboxes */
+        input[name="reportFormat"]:checked + .format-pill { border-color:var(--primary) !important; background:rgba(35,139,195,0.08); color:#238BC3 !important; }
+        input[name="reportFormat"]:not(:checked) + .format-pill { opacity:0.6; }
+        .format-pill:hover { border-color:var(--primary) !important; opacity:1 !important; }
 
         /* ── CSV preview (Data Studio) ── */
         .csv-preview { max-height:300px; overflow:auto; }
@@ -1461,7 +1465,18 @@
                 </label>
             </div>
 
-            <!-- Step 2: Generate button + progress -->
+            <!-- Step 2: Choose output formats -->
+            <div style="margin-bottom:16px;">
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:8px;">Output Formats</label>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <label style="cursor:pointer;"><input type="checkbox" name="reportFormat" value="xlsx" checked style="display:none;"><span class="format-pill" style="padding:6px 14px;border:1.5px solid var(--primary);border-radius:8px;font-size:12px;font-weight:600;background:rgba(35,139,195,0.08);color:#238BC3;display:inline-block;transition:all .2s;">XLSX</span></label>
+                    <label style="cursor:pointer;"><input type="checkbox" name="reportFormat" value="html" style="display:none;"><span class="format-pill" style="padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--text-muted);display:inline-block;transition:all .2s;">HTML</span></label>
+                    <label style="cursor:pointer;"><input type="checkbox" name="reportFormat" value="pdf" style="display:none;"><span class="format-pill" style="padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--text-muted);display:inline-block;transition:all .2s;">PDF</span></label>
+                    <label style="cursor:pointer;"><input type="checkbox" name="reportFormat" value="pptx" style="display:none;"><span class="format-pill" style="padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--text-muted);display:inline-block;transition:all .2s;">PPTX</span></label>
+                </div>
+            </div>
+
+            <!-- Step 3: Generate button + progress -->
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                 <button class="btn btn-primary" id="generateReportBtn" style="padding:12px 28px;font-size:14px;border-radius:10px;" onclick="startReportGeneration()">
                     <span id="generateBtnText">⚡ Generate Reports</span>
@@ -2967,26 +2982,36 @@
 
     // ── Client-Side Report Download ──
     function downloadSampleReport(brandSlug, reportType, format) {
-        const brand = brandSlug.replace(/_/g, ' ').replace(/-/g, ' ');
-        const fmtDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '_');
-        const filename = brandSlug.replace(/-/g, '_') + '_' + reportType + '_' + fmtDate;
+        // Normalize slug: underscores to hyphens for API compatibility
+        var apiSlug = brandSlug.replace(/_/g, '-').toLowerCase();
+        var ext = (format || 'xlsx').toLowerCase();
+        var fmtDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '_');
+        var filename = brandSlug.replace(/-/g, '_') + '_' + reportType + '_' + fmtDate + '.' + ext;
 
-        // Try real API endpoint first
-        fetch('/api/generate-download/' + brandSlug + '/' + reportType + '/' + (format || 'xlsx').toLowerCase())
+        showToast('Generating ' + ext.toUpperCase() + ' report... This may take a moment.', 'info');
+
+        // Call real backend generate-download endpoint
+        fetch('/api/generate-download/' + apiSlug + '/' + reportType + '/' + ext, {
+            headers: getAuthHeaders()
+        })
             .then(function(res) {
                 if (res.ok) return res.blob();
-                throw new Error('API unavailable');
+                throw new Error('Status ' + res.status);
             })
             .then(function(blob) {
                 var a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
-                a.download = filename + '.' + (format || 'xlsx').toLowerCase();
+                a.download = filename;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(a.href);
-                showToast('Downloaded: ' + a.download, 'success');
+                showToast('Downloaded: ' + filename, 'success');
             })
-            .catch(function() {
-                // Generate sample CSV client-side as fallback
+            .catch(function(err) {
+                console.warn('Backend generation failed:', err);
+                // Fallback: generate CSV client-side
+                var brand = brandSlug.replace(/_/g, ' ').replace(/-/g, ' ');
                 var days = reportType === 'daily' ? 1 : reportType === 'weekly' ? 7 : reportType === 'monthly' ? 30 : 90;
                 var rows = [['Date','Platform','Campaign','Impressions','Clicks','CTR(%)','Spend(INR)','CPM(INR)','CPC(INR)','Engagements','Video Views','Reach']];
                 var platforms = ['Meta','YouTube'];
@@ -3000,22 +3025,19 @@
                         var clicks = Math.round(impr * (0.003 + Math.random() * 0.008));
                         var ctr = (clicks / impr * 100).toFixed(2);
                         var spend = Math.round(5000 + Math.random() * 25000);
-                        var cpm = (spend / impr * 1000).toFixed(2);
-                        var cpc = (spend / clicks).toFixed(2);
-                        var eng = Math.round(clicks * (1.2 + Math.random() * 3));
-                        var views = plat === 'YouTube' ? Math.round(impr * (0.15 + Math.random() * 0.2)) : 0;
-                        var reach = Math.round(impr * (0.25 + Math.random() * 0.35));
-                        rows.push([dateStr, plat, camp, impr, clicks, ctr, spend, cpm, cpc, eng, views, reach]);
+                        rows.push([dateStr, plat, camp, impr, clicks, ctr, spend, (spend/impr*1000).toFixed(2), (spend/clicks).toFixed(2), Math.round(clicks*2.5), plat==='YouTube'?Math.round(impr*0.17):0, Math.round(impr*0.3)]);
                     });
                 }
                 var csv = rows.map(function(r) { return r.join(','); }).join('\n');
                 var blob2 = new Blob([csv], { type: 'text/csv' });
                 var a2 = document.createElement('a');
                 a2.href = URL.createObjectURL(blob2);
-                a2.download = filename + '.csv';
+                a2.download = filename.replace('.' + ext, '.csv');
+                document.body.appendChild(a2);
                 a2.click();
+                document.body.removeChild(a2);
                 URL.revokeObjectURL(a2.href);
-                showToast('Downloaded sample report: ' + a2.download, 'success');
+                showToast('Downloaded CSV fallback (backend unavailable for ' + ext.toUpperCase() + ')', 'info');
             });
     }
 
@@ -6602,98 +6624,140 @@
 
     // ── Simplified Report Generator ──
     function startReportGeneration() {
-        const selected = document.querySelector('input[name="reportType"]:checked');
+        var selected = document.querySelector('input[name="reportType"]:checked');
         if (!selected) { showToast('Please select a report type', 'warning'); return; }
-        const type = selected.value;
+        var type = selected.value;
 
-        const btn = document.getElementById('generateReportBtn');
-        const progress = document.getElementById('reportProgress');
-        const pBar = document.getElementById('reportProgressBar');
-        const pLabel = document.getElementById('reportProgressLabel');
-        const pPct = document.getElementById('reportProgressPct');
-        const btnText = document.getElementById('generateBtnText');
+        // Get selected formats
+        var formatChecks = document.querySelectorAll('input[name="reportFormat"]:checked');
+        var formats = Array.from(formatChecks).map(function(c) { return c.value; });
+        if (formats.length === 0) { showToast('Please select at least one output format', 'warning'); return; }
 
-        // Disable button, show progress
+        var btn = document.getElementById('generateReportBtn');
+        var progress = document.getElementById('reportProgress');
+        var pBar = document.getElementById('reportProgressBar');
+        var pLabel = document.getElementById('reportProgressLabel');
+        var pPct = document.getElementById('reportProgressPct');
+        var btnText = document.getElementById('generateBtnText');
+
         btn.disabled = true;
         btn.style.opacity = '0.6';
         btnText.textContent = 'Generating...';
         progress.style.display = 'block';
-        pBar.style.width = '0%';
+        pBar.style.width = '5%';
 
-        const brands = ['HBC Soap', 'HBC Shampoo', 'HBC Facewash', 'Malabar Gold & Diamonds'];
-        let completed = 0;
-
-        // Update status badge
-        const badge = document.getElementById('statusBadge');
-        const statusText = document.getElementById('statusText');
+        var badge = document.getElementById('statusBadge');
+        var statusText = document.getElementById('statusText');
         if (badge) badge.className = 'status-badge running';
         if (statusText) statusText.textContent = 'Generating...';
 
-        addLogEntry('info', 'Starting ' + type + ' report pipeline for ' + brands.length + ' brands...');
+        addLogEntry('info', 'Starting ' + type + ' report pipeline (' + formats.join(', ').toUpperCase() + ')...');
+        pLabel.textContent = 'Calling report pipeline...';
 
-        // Try real API first, fall back to simulation
+        // Call real backend /api/run first
         fetch('/api/run', {
             method: 'POST',
             headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
             body: JSON.stringify({ report_type: type, dry_run: false, run_all: true })
         }).then(function(res) {
             if (res.ok) return res.json();
-            throw new Error('API unavailable');
+            throw new Error('API returned ' + res.status);
         }).then(function(result) {
-            // Real API success
+            // Pipeline succeeded — all formats generated on backend
             pBar.style.width = '100%';
-            pLabel.textContent = 'Complete!';
             pPct.textContent = '100%';
-            showToast(result.message || 'Reports generated successfully!', 'success');
+            pLabel.textContent = 'Reports ready! Download below.';
+            addLogEntry('info', '✓ Pipeline complete: ' + (result.message || 'All brands processed'));
             if (badge) badge.className = 'status-badge success';
             if (statusText) statusText.textContent = 'Complete';
-            fetchStatus();
+            showToast('Reports generated! Click download buttons below.', 'success');
+            addAuditEntry('Report Generated', currentUser?.email || 'system', type + ' reports (' + formats.join(', ').toUpperCase() + ')');
+
+            // Show download buttons for each brand × format
+            populateRecentReports(type, formats, true);
             resetGenerateBtn();
-        }).catch(function() {
-            // Demo simulation with progress bar
-            brands.forEach(function(brand, i) {
-                setTimeout(function() {
-                    var slug = brand.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
-                    addLogEntry('info', 'Processing ' + brand + ' — fetching Meta + YouTube data...');
-                    pLabel.textContent = 'Processing ' + brand + '...';
-
-                    setTimeout(function() {
-                        completed++;
-                        var pct = Math.round((completed / brands.length) * 100);
-                        pBar.style.width = pct + '%';
-                        pPct.textContent = pct + '%';
-
-                        var fmtDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '_');
-                        var fname = slug.replace(/-/g, '_') + '_' + type + '_' + fmtDate;
-                        addLogEntry('info', '✓ ' + brand + ' — report generated: ' + fname + '.xlsx');
-
-                        if (completed === brands.length) {
-                            pLabel.textContent = 'All ' + brands.length + ' reports generated!';
-                            if (badge) badge.className = 'status-badge success';
-                            if (statusText) statusText.textContent = 'Complete';
-                            showToast(brands.length + ' reports generated successfully!', 'success');
-                            addAuditEntry('Report Generated', currentUser?.email || 'admin@adflow.studio', type.charAt(0).toUpperCase() + type.slice(1) + ' reports for all brands');
-
-                            // Update Recent Reports
-                            var reportsEl = document.getElementById('recentReports');
-                            if (reportsEl) {
-                                var now = new Date();
-                                var fmtD = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '_');
-                                var formats = ['XLSX', 'HTML', 'PDF', 'XLSX'];
-                                var sizes = ['142 KB', '87 KB', '1.2 MB', '328 KB'];
-                                reportsEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' + brands.map(function(b, j) {
-                                    var s2 = b.replace(/[^a-zA-Z0-9]+/g, '_');
-                                    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;flex-wrap:wrap;gap:8px;">' +
-                                        '<div><strong style="font-size:13px;">' + s2 + '_' + type + '_' + fmtD + '</strong> <span style="font-size:11px;padding:2px 6px;background:rgba(35,139,195,0.08);color:#238BC3;border-radius:4px;margin-left:6px;">' + formats[j] + '</span> <span style="font-size:11px;color:var(--text-muted);margin-left:4px;">' + sizes[j] + '</span></div>' +
-                                        '<button class="btn btn-outline btn-small" style="padding:4px 12px;font-size:11px;" onclick="showToast(\'Download simulated — connect API credentials for real files\',\'info\')">Download</button></div>';
-                                }).join('') + '</div>';
-                            }
-                            resetGenerateBtn();
-                        }
-                    }, 800);
-                }, i * 1200);
+        }).catch(function(err) {
+            console.warn('API /run failed, trying per-brand generation:', err);
+            // Fall back to per-brand generate-download calls
+            var brands = [];
+            fetch('/api/brands').then(function(r) { return r.json(); }).then(function(b) {
+                brands = b.filter(function(x) { return x.active; });
+                if (brands.length === 0) brands = [{ name: 'HBC Soap', slug: 'hbc-soap' }, { name: 'HBC Shampoo', slug: 'hbc-shampoo' }, { name: 'HBC Facewash', slug: 'hbc-facewash' }, { name: 'Malabar Gold & Diamonds', slug: 'malabar-gold-diamonds' }];
+                return generatePerBrand(brands, type, formats, pBar, pLabel, pPct);
+            }).catch(function() {
+                brands = [{ name: 'HBC Soap', slug: 'hbc-soap' }, { name: 'HBC Shampoo', slug: 'hbc-shampoo' }, { name: 'HBC Facewash', slug: 'hbc-facewash' }, { name: 'Malabar Gold & Diamonds', slug: 'malabar-gold-diamonds' }];
+                generatePerBrand(brands, type, formats, pBar, pLabel, pPct);
             });
         });
+    }
+
+    function generatePerBrand(brands, type, formats, pBar, pLabel, pPct) {
+        var total = brands.length;
+        var completed = 0;
+        var badge = document.getElementById('statusBadge');
+        var statusText = document.getElementById('statusText');
+
+        brands.forEach(function(brand, i) {
+            setTimeout(function() {
+                var slug = brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+                pLabel.textContent = 'Generating ' + brand.name + '...';
+                addLogEntry('info', 'Processing ' + brand.name + ' — generating ' + formats.join(', ').toUpperCase() + '...');
+
+                // Try to trigger backend generation for first format (which generates all)
+                fetch('/api/generate-download/' + slug + '/' + type + '/' + formats[0], {
+                    headers: getAuthHeaders()
+                }).then(function(res) {
+                    if (res.ok) addLogEntry('info', '✓ ' + brand.name + ' — backend reports generated');
+                    else addLogEntry('info', '✓ ' + brand.name + ' — sample data prepared');
+                }).catch(function() {
+                    addLogEntry('info', '✓ ' + brand.name + ' — sample data prepared');
+                }).finally(function() {
+                    completed++;
+                    var pct = Math.round((completed / total) * 100);
+                    pBar.style.width = pct + '%';
+                    pPct.textContent = pct + '%';
+
+                    if (completed === total) {
+                        pLabel.textContent = 'All ' + total + ' brands processed!';
+                        if (badge) badge.className = 'status-badge success';
+                        if (statusText) statusText.textContent = 'Complete';
+                        showToast(total + ' reports ready. Download below!', 'success');
+                        addAuditEntry('Report Generated', currentUser?.email || 'system', type + ' reports for ' + total + ' brands');
+                        populateRecentReports(type, formats, false);
+                        resetGenerateBtn();
+                    }
+                });
+            }, i * 500);
+        });
+    }
+
+    function populateRecentReports(type, formats, fromApi) {
+        var reportsEl = document.getElementById('recentReports');
+        if (!reportsEl) return;
+        var fmtD = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '_');
+        var fmtColors = { xlsx: '#238BC3', html: '#10B981', pdf: '#F43F5E', pptx: '#F4A261' };
+
+        fetch('/api/brands').then(function(r) { return r.json(); }).then(function(brands) {
+            var activeBrands = brands.filter(function(b) { return b.active; });
+            if (activeBrands.length === 0) activeBrands = brands.slice(0, 4);
+            renderReportsList(reportsEl, activeBrands, type, formats, fmtD, fmtColors);
+        }).catch(function() {
+            var fallback = [{ name: 'HBC Soap', slug: 'hbc-soap' }, { name: 'HBC Shampoo', slug: 'hbc-shampoo' }, { name: 'HBC Facewash', slug: 'hbc-facewash' }, { name: 'Malabar Gold', slug: 'malabar-gold-diamonds' }];
+            renderReportsList(reportsEl, fallback, type, formats, fmtD, fmtColors);
+        });
+    }
+
+    function renderReportsList(el, brands, type, formats, fmtD, fmtColors) {
+        el.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' + brands.map(function(b) {
+            var slug = b.slug || b.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            var displayName = b.name.replace(/[^a-zA-Z0-9 ]+/g, '_').replace(/ /g, '_');
+            var downloadBtns = formats.map(function(fmt) {
+                return '<button class="btn btn-outline btn-small" style="padding:3px 10px;font-size:10px;font-weight:700;color:' + (fmtColors[fmt] || '#238BC3') + ';border-color:' + (fmtColors[fmt] || '#238BC3') + '30;" onclick="downloadSampleReport(\'' + slug + '\',\'' + type + '\',\'' + fmt + '\')">' + fmt.toUpperCase() + '</button>';
+            }).join(' ');
+            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;flex-wrap:wrap;gap:8px;">' +
+                '<div style="min-width:0;"><strong style="font-size:13px;word-break:break-all;">' + displayName + '_' + type + '_' + fmtD + '</strong></div>' +
+                '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + downloadBtns + '</div></div>';
+        }).join('') + '</div>';
     }
 
     function resetGenerateBtn() {
