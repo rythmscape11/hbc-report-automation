@@ -825,6 +825,127 @@ def api_test_email():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+@app.route("/api/share-report", methods=["POST"])
+def share_report_endpoint():
+    """Share analytics report via email."""
+    try:
+        data = request.get_json() or {}
+        emails = data.get("emails", [])
+        brand = data.get("brand", "all")
+        access_level = data.get("access_level", "view")
+        expiry_days = data.get("expiry_days", 7)
+
+        if not emails:
+            return jsonify({"error": "No email recipients provided"}), 400
+
+        share_id = f"rpt_{int(time.time())}_{secrets.token_hex(4)}"
+        share_url = f"{request.host_url}shared/{share_id}?brand={brand}"
+
+        # Try to send email via notifier
+        try:
+            from src.notifier import send_share_email
+            send_share_email(emails, share_url, brand, access_level, expiry_days)
+            email_sent = True
+        except Exception as e:
+            logger.warning(f"Email send failed: {e}")
+            email_sent = False
+
+        add_log(f"Report shared: {share_id} -> {', '.join(emails)} [{access_level}]", "info")
+
+        return jsonify({
+            "success": True,
+            "share_id": share_id,
+            "share_url": share_url,
+            "sent_to": emails,
+            "email_sent": email_sent,
+            "access_level": access_level,
+            "expires_in_days": expiry_days
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/test-connection", methods=["POST"])
+def test_connection():
+    """Test API connection for a specific platform."""
+    try:
+        data = request.get_json() or {}
+        platform = data.get("platform", "")
+        credentials = data.get("credentials", {})
+
+        result = {"platform": platform, "status": "unknown", "message": ""}
+
+        if platform == "meta":
+            token = credentials.get("access_token", "")
+            account_id = credentials.get("ad_account_id", "")
+            if not token or not account_id:
+                result["status"] = "error"
+                result["message"] = "Missing access token or ad account ID"
+            else:
+                try:
+                    import requests as req
+                    api_version = "v21.0"
+                    url = f"https://graph.facebook.com/{api_version}/{account_id}"
+                    resp = req.get(url, params={"access_token": token, "fields": "name,account_status"}, timeout=10)
+                    if resp.status_code == 200:
+                        data_resp = resp.json()
+                        result["status"] = "success"
+                        result["message"] = f"Connected to: {data_resp.get('name', account_id)}"
+                        result["account_name"] = data_resp.get("name", "")
+                        result["account_status"] = data_resp.get("account_status", "")
+                    else:
+                        result["status"] = "error"
+                        result["message"] = f"API error: {resp.json().get('error', {}).get('message', 'Unknown error')}"
+                except Exception as e:
+                    result["status"] = "error"
+                    result["message"] = f"Connection failed: {str(e)}"
+
+        elif platform == "google":
+            developer_token = credentials.get("developer_token", "")
+            customer_id = credentials.get("customer_id", "")
+            if not developer_token or not customer_id:
+                result["status"] = "error"
+                result["message"] = "Missing developer token or customer ID"
+            else:
+                # Google Ads API requires OAuth, so we just validate format
+                if len(developer_token) > 10 and customer_id.replace("-", "").isdigit():
+                    result["status"] = "success"
+                    result["message"] = f"Credentials format valid for Customer ID: {customer_id}"
+                else:
+                    result["status"] = "error"
+                    result["message"] = "Invalid credential format"
+
+        elif platform == "email":
+            import smtplib
+            server_host = credentials.get("smtp_server", "smtp.gmail.com")
+            server_port = int(credentials.get("smtp_port", 587))
+            sender = credentials.get("sender", "")
+            password = credentials.get("password", "")
+            if not sender or not password:
+                result["status"] = "error"
+                result["message"] = "Missing sender email or password"
+            else:
+                try:
+                    with smtplib.SMTP(server_host, server_port, timeout=10) as server:
+                        server.starttls()
+                        server.login(sender, password)
+                        result["status"] = "success"
+                        result["message"] = f"SMTP connected and authenticated as {sender}"
+                except smtplib.SMTPAuthenticationError:
+                    result["status"] = "error"
+                    result["message"] = "Authentication failed. Check email/password (use App Password for Gmail)"
+                except Exception as e:
+                    result["status"] = "error"
+                    result["message"] = f"SMTP connection failed: {str(e)}"
+        else:
+            result["status"] = "error"
+            result["message"] = f"Unknown platform: {platform}"
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"platform": "", "status": "error", "message": str(e)}), 500
+
+
 # ── Analytics API ────────────────────────────────────────────────────
 
 def extract_region(campaign_name):
@@ -892,6 +1013,7 @@ def api_analytics():
     compare = sanitize(request.args.get("compare", ""))  # "previous_period", "previous_year", or None
     audience = sanitize(request.args.get("audience", ""))  # "cmo", "media_planner", "analyst", ""
     objective = sanitize(request.args.get("objective", ""))  # "awareness", "engagement", "video", "conversions", ""
+    currency = sanitize(request.args.get("currency", ""))  # Optional currency override: "USD", "AED", "INR"
 
     try:
         brands = list_brands()
@@ -1011,9 +1133,19 @@ def api_analytics():
         full_brands = [get_brand(b["slug"]) for b in active_brands if get_brand(b["slug"])]
         currency, currency_symbol = get_currency_for_brands(full_brands)
 
+        # Override with query parameter if provided
+        if currency:
+            if currency == "USD":
+                currency, currency_symbol = "USD", "$"
+            elif currency == "AED":
+                currency, currency_symbol = "AED", "د.إ"
+            elif currency == "INR":
+                currency, currency_symbol = "INR", "₹"
+
         result = {
             "brands": [{"name": b["name"], "slug": b["slug"]} for b in all_active_brands],
             "currency": currency,
+            "currency_code": currency,
             "currency_symbol": currency_symbol
         }
 

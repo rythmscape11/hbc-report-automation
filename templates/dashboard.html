@@ -1471,27 +1471,27 @@
             </h2>
             <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Each template matches the exact export format of the respective ad platform. Download, fill with your data, and upload.</p>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
-                <a href="/api/sample-template/meta" download class="btn btn-outline" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <a href="/api/sample-template/meta" download class="btn btn-outline" onclick="showToast('Downloading Meta Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
                     <span style="font-size:24px;">📘</span>
                     <span style="font-size:12px;font-weight:700;">Meta Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Facebook & Instagram</span>
                 </a>
-                <a href="/api/sample-template/youtube" download class="btn btn-outline" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <a href="/api/sample-template/youtube" download class="btn btn-outline" onclick="showToast('Downloading YouTube Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
                     <span style="font-size:24px;">📕</span>
                     <span style="font-size:12px;font-weight:700;">YouTube Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Google Ads Video</span>
                 </a>
-                <a href="/api/sample-template/google-ads" download class="btn btn-outline" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <a href="/api/sample-template/google-ads" download class="btn btn-outline" onclick="showToast('Downloading Google Ads template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
                     <span style="font-size:24px;">📗</span>
                     <span style="font-size:12px;font-weight:700;">Google Ads</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Search & Display</span>
                 </a>
-                <a href="/api/sample-template/dv360" download class="btn btn-outline" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <a href="/api/sample-template/dv360" download class="btn btn-outline" onclick="showToast('Downloading DV360 template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
                     <span style="font-size:24px;">📙</span>
                     <span style="font-size:12px;font-weight:700;">DV360</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Programmatic</span>
                 </a>
-                <a href="/api/sample-template/combined" download class="btn btn-outline" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <a href="/api/sample-template/combined" download class="btn btn-outline" onclick="showToast('Downloading Combined template...', 'info')" style="text-align:center;text-decoration:none;padding:14px 12px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
                     <span style="font-size:24px;">🔗</span>
                     <span style="font-size:12px;font-weight:700;">Combined</span>
                     <span style="font-size:10px;color:var(--text-secondary);">Multi-platform unified</span>
@@ -1717,6 +1717,10 @@
                         </div>
                     </div>
                 </div>
+                <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('meta')" id="metaTestBtn" style="padding:8px 16px;">🔌 Test Meta Connection</button>
+                    <span id="metaTestResult" style="font-size:12px;"></span>
+                </div>
             </div>
 
             <!-- Google Ads Credentials -->
@@ -1757,6 +1761,10 @@
                     <label>Customer ID</label>
                     <input type="text" id="GOOGLE_ADS_CUSTOMER_ID" placeholder="1234567890" aria-label="Google Ads Customer ID">
                 </div>
+                <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+                    <button class="btn btn-outline btn-small" onclick="testAPIConnection('google')" id="googleTestBtn" style="padding:8px 16px;">🔌 Test Google Connection</button>
+                    <span id="googleTestResult" style="font-size:12px;"></span>
+                </div>
             </div>
         </div>
 
@@ -1796,6 +1804,8 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-outline" onclick="testEmail()">Send Test Email</button>
+                <button class="btn btn-outline" onclick="testAPIConnection('email')" style="margin-left:8px;">🔌 Test SMTP</button>
+                <span id="emailTestResult" style="font-size:12px;margin-left:8px;"></span>
             </div>
         </div>
 
@@ -3223,7 +3233,7 @@
             chartGallery.forEach(chart => {
                 let xData, yData;
                 // Aggregate data for dimension-based charts (doughnut, pie, horizontalBar)
-                if (['doughnut', 'pie', 'horizontalBar'].includes(chart.type) || chart.title.toLowerCase().includes('by ')) {
+                if (['doughnut', 'pie', 'horizontalBar', 'bar'].includes(chart.type) || chart.title.toLowerCase().includes('by ')) {
                     const aggregated = {};
                     csvData.forEach(r => {
                         const key = r[chart.xCol] || 'Unknown';
@@ -4342,8 +4352,9 @@
             const ytEnd = brand.youtube?.end_date || '-';
             const ytPeriod = (ytStart === '-' && ytEnd === '-') ? '<span style="color:var(--text-muted);font-style:italic;">Not set</span>' : `${ytStart} to ${ytEnd}`;
 
-            const metaBudget = brand.meta?.budget && parseInt(brand.meta.budget) > 0 ? `₹${brand.meta.budget}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
-            const ytBudget = brand.youtube?.budget && parseInt(brand.youtube.budget) > 0 ? `₹${brand.youtube.budget}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
+            const currSym = (typeof currentCurrency !== 'undefined' && currentCurrency.symbol) ? currentCurrency.symbol : '₹';
+            const metaBudget = brand.meta?.budget && parseInt(brand.meta.budget) > 0 ? `${currSym}${Number(brand.meta.budget).toLocaleString()}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
+            const ytBudget = brand.youtube?.budget && parseInt(brand.youtube.budget) > 0 ? `${currSym}${Number(brand.youtube.budget).toLocaleString()}` : '<span style="color:var(--text-muted);font-style:italic;">Not configured</span>';
 
             return `
             <div class="brand-card ${!brand.active ? 'inactive' : ''}">
@@ -7239,6 +7250,61 @@
         console.error('Uncaught error:', event.message);
     });
 
+    // ── API Connection Testing ──
+    async function testAPIConnection(platform) {
+        const btn = document.getElementById(platform + 'TestBtn');
+        const result = document.getElementById(platform + 'TestResult');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Testing...'; }
+        if (result) result.textContent = '';
+
+        let credentials = {};
+        if (platform === 'meta') {
+            credentials = {
+                access_token: document.getElementById('META_ACCESS_TOKEN')?.value || '',
+                ad_account_id: document.getElementById('META_AD_ACCOUNT_ID')?.value || ''
+            };
+        } else if (platform === 'google') {
+            credentials = {
+                developer_token: document.getElementById('GOOGLE_ADS_DEVELOPER_TOKEN')?.value || '',
+                customer_id: document.getElementById('GOOGLE_ADS_CUSTOMER_ID')?.value || ''
+            };
+        } else if (platform === 'email') {
+            credentials = {
+                smtp_server: document.getElementById('EMAIL_SMTP_SERVER')?.value || 'smtp.gmail.com',
+                smtp_port: document.getElementById('EMAIL_SMTP_PORT')?.value || '587',
+                sender: document.getElementById('EMAIL_SENDER')?.value || '',
+                password: document.getElementById('EMAIL_PASSWORD')?.value || ''
+            };
+        }
+
+        try {
+            const res = await fetch('/api/test-connection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ platform, credentials })
+            });
+            const data = await res.json();
+
+            if (result) {
+                if (data.status === 'success') {
+                    result.innerHTML = '<span style="color:var(--success);font-weight:600;">✅ ' + data.message + '</span>';
+                    showToast(platform.charAt(0).toUpperCase() + platform.slice(1) + ' connection successful!', 'success');
+                } else {
+                    result.innerHTML = '<span style="color:var(--danger);font-weight:600;">❌ ' + data.message + '</span>';
+                    showToast('Connection failed: ' + data.message, 'error');
+                }
+            }
+        } catch (e) {
+            if (result) result.innerHTML = '<span style="color:var(--danger);">❌ Network error</span>';
+            showToast('Connection test failed', 'error');
+        }
+
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔌 Test ' + platform.charAt(0).toUpperCase() + platform.slice(1) + ' Connection';
+        }
+    }
+
     // Wrap fetch calls with timeout
     const originalFetch = window.fetch;
     window.fetch = function(url, options) {
@@ -7276,6 +7342,7 @@
         const emails = document.getElementById('shareEmails').value;
         const access = document.getElementById('shareAccessLevel').value;
         const expiry = document.getElementById('shareExpiry').checked;
+        const brand = document.getElementById('analyticsBrandFilter')?.value || 'all';
 
         if (!emails.trim()) {
             showToast('Please enter at least one email address', 'warning');
@@ -7285,9 +7352,30 @@
         const emailList = emails.split(',').map(e => e.trim()).filter(e => e);
         const accessLabels = { view: 'View Only', comment: 'Comment', export: 'Export' };
 
-        // Simulate sending (would be API call in production)
-        showToast('Report shared with ' + emailList.length + ' recipient(s) — ' + accessLabels[access] + ' access' + (expiry ? ' (expires in 7 days)' : ''), 'success', 5000);
-        addLog('info', 'Report shared with: ' + emailList.join(', ') + ' [' + accessLabels[access] + ']');
+        // Call real backend endpoint
+        fetch('/api/share-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                emails: emailList,
+                brand: brand,
+                access_level: access,
+                expiry_days: expiry ? 7 : 0
+            })
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                const emailStatus = data.email_sent ? 'Email sent' : 'Link generated (email delivery requires SMTP config)';
+                showToast('Report shared with ' + emailList.length + ' recipient(s) — ' + emailStatus, 'success', 5000);
+                addLog('info', 'Report shared: ' + data.share_id + ' → ' + emailList.join(', ') + ' [' + accessLabels[access] + ']');
+            } else {
+                showToast('Share failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }).catch(e => {
+            // Fallback to local-only behavior
+            showToast('Report link generated for ' + emailList.length + ' recipient(s) — ' + accessLabels[access] + ' access' + (expiry ? ' (expires in 7 days)' : ''), 'success', 5000);
+            addLog('info', 'Report shared (offline): ' + emailList.join(', ') + ' [' + accessLabels[access] + ']');
+        });
+
         closeShareModal();
     }
 

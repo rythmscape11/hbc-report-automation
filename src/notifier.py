@@ -103,3 +103,49 @@ def send_test_email():
     except Exception as e:
         print(f"✗ Email failed: {e}")
         return False
+
+
+def send_share_email(recipients, share_url, brand_name, access_level, expiry_days):
+    """Send report share notification email."""
+    cfg = config.email
+    if not cfg.enabled:
+        logger.info("Email disabled — share notification not sent")
+        return False
+
+    access_labels = {"view": "View Only", "comment": "Comment", "export": "Full Export"}
+
+    msg = MIMEMultipart()
+    msg["From"] = cfg.sender
+    msg["To"] = ", ".join(recipients) if isinstance(recipients, list) else recipients
+    msg["Subject"] = f"AdFlow Studio — Campaign Report Shared ({brand_name})"
+
+    body = f"""
+    <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+    <div style="background:#238BC3;padding:24px;text-align:center;">
+        <h1 style="color:white;margin:0;font-size:20px;">AdFlow Studio</h1>
+    </div>
+    <div style="padding:24px;background:#f8f9fa;">
+        <h2 style="color:#212529;margin-top:0;">Campaign Report Shared</h2>
+        <p>A campaign analytics report for <strong>{brand_name}</strong> has been shared with you.</p>
+        <p><strong>Access Level:</strong> {access_labels.get(access_level, access_level)}</p>
+        <p><strong>Expires in:</strong> {expiry_days} days</p>
+        <div style="text-align:center;margin:24px 0;">
+            <a href="{share_url}" style="background:#238BC3;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">View Report</a>
+        </div>
+        <p style="font-size:12px;color:#6c757d;">Powered by SocialPanga</p>
+    </div>
+    </body></html>
+    """
+
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(cfg.smtp_server, cfg.smtp_port) as server:
+            server.starttls()
+            server.login(cfg.sender, cfg.password)
+            server.send_message(msg)
+        logger.info(f"Share email sent to {recipients}")
+        return True
+    except Exception as e:
+        logger.error(f"Share email failed: {e}")
+        return False
