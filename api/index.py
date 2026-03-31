@@ -701,19 +701,28 @@ def api_run():
     elif brand_slug:
         report_path = run_brand_pipeline(brand_slug, report_type, dry_run)
         if report_path:
-            base = os.path.basename(report_path)
-            # Collect all generated formats
-            generated = [base]
-            stem = base.rsplit('.', 1)[0]
-            for ext in ['.html', '.pdf', '.pptx']:
-                alt = stem + ext
-                if os.path.exists(os.path.join(REPORTS_DIR, alt)):
-                    generated.append(alt)
+            import base64
+            base_name = os.path.basename(report_path)
+            stem = base_name.rsplit('.', 1)[0]
+            # Collect all generated formats with their data
+            generated = []
+            files_data = {}
+            for ext in ['.xlsx', '.html', '.pdf', '.pptx']:
+                fname = stem + ext
+                fpath = os.path.join(REPORTS_DIR, fname)
+                if os.path.exists(fpath):
+                    generated.append(fname)
+                    try:
+                        with open(fpath, 'rb') as f:
+                            files_data[fname] = base64.b64encode(f.read()).decode('ascii')
+                    except Exception:
+                        pass
             return jsonify({
                 "ok": True,
-                "message": f"Report generated: {base}",
-                "filename": base,
-                "all_formats": generated
+                "message": f"Report generated: {base_name}",
+                "filename": base_name,
+                "all_formats": generated,
+                "files": files_data
             })
         return jsonify({"ok": False, "message": "Pipeline failed — check logs"}), 500
     else:
