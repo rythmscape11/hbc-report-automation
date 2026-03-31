@@ -2878,6 +2878,111 @@
         const objSel = document.getElementById('exportObjective');
         if (audSel) audSel.onchange = updateAudiencePreview;
         if (objSel) objSel.onchange = updateAudiencePreview;
+
+        // ── Auto-register uploaded data as a brand in Analytics ──
+        autoRegisterBrandFromUpload(data, columns);
+    }
+
+    function autoRegisterBrandFromUpload(data, columns) {
+        if (!data || data.length === 0) return;
+
+        // Detect brand name from campaign names or filename
+        const campaignCol = columns.find(c => c.toLowerCase().includes('campaign'));
+        const platformCol = columns.find(c => c.toLowerCase().includes('platform'));
+        const dateCol = columns.find(c => c.toLowerCase().includes('date'));
+        const spendCol = columns.find(c => ['spend', 'cost', 'amount'].some(k => c.toLowerCase().includes(k)));
+
+        // Extract unique campaigns to guess brand name
+        let brandName = 'Uploaded Dataset';
+        if (campaignCol) {
+            const campaigns = [...new Set(data.map(r => r[campaignCol]))];
+            // Try to extract common prefix from campaign names
+            if (campaigns.length > 0) {
+                const parts = campaigns[0].split(/[\s\-–]/);
+                if (parts.length >= 2) {
+                    brandName = parts.slice(0, 2).join(' ').replace(/^\s+|\s+$/g, '');
+                }
+            }
+        }
+
+        // Calculate key metrics from uploaded data
+        let totalSpend = 0, totalImpr = 0, totalClicks = 0;
+        const imprCol = columns.find(c => c.toLowerCase().includes('impr'));
+        const clickCol = columns.find(c => c.toLowerCase().includes('click'));
+        data.forEach(row => {
+            if (spendCol) totalSpend += parseFloat(row[spendCol]) || 0;
+            if (imprCol) totalImpr += parseFloat(row[imprCol]) || 0;
+            if (clickCol) totalClicks += parseFloat(row[clickCol]) || 0;
+        });
+
+        // Detect date range
+        let startDate = '', endDate = '';
+        if (dateCol) {
+            const dates = data.map(r => r[dateCol]).filter(d => d).sort();
+            startDate = dates[0] || '';
+            endDate = dates[dates.length - 1] || '';
+        }
+
+        // Detect platforms
+        const platforms = platformCol ? [...new Set(data.map(r => r[platformCol]))] : ['Unknown'];
+
+        // Build the brand slug
+        const slug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'upload-' + Date.now();
+
+        // Register brand via API
+        const brandPayload = {
+            name: brandName,
+            slug: slug,
+            active: true,
+            meta: {
+                campaign_filter: campaignCol ? data.map(r => r[campaignCol]).filter((v,i,a) => a.indexOf(v) === i).join(', ') : '',
+                start_date: startDate,
+                end_date: endDate,
+                budget: Math.round(totalSpend),
+                regions: []
+            },
+            youtube: {
+                campaign_filter: '',
+                start_date: startDate,
+                end_date: endDate,
+                budget: 0,
+                regions: []
+            }
+        };
+
+        // Try to register via API
+        fetch('/api/brands', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(brandPayload)
+        }).then(res => {
+            if (res.ok) {
+                showToast('Brand "' + brandName + '" auto-registered from upload data (' + data.length + ' rows, ' + platforms.join(' + ') + ')', 'success', 5000);
+                addLog('info', 'Auto-registered brand: ' + brandName + ' [' + startDate + ' to ' + endDate + ', ' + platforms.join('+') + ', Spend: ' + formatCurrencyMulti(totalSpend) + ']');
+                // Refresh brands list and analytics filter
+                if (typeof loadBrands === 'function') loadBrands();
+                // Add to analytics brand filter dropdown
+                const brandFilter = document.getElementById('analyticsBrandFilter');
+                if (brandFilter && !brandFilter.querySelector(`option[value="${slug}"]`)) {
+                    const opt = document.createElement('option');
+                    opt.value = slug;
+                    opt.textContent = brandName;
+                    brandFilter.appendChild(opt);
+                }
+            }
+        }).catch(e => {
+            // Silently fail — brand registration is bonus functionality
+            console.log('Auto-brand registration skipped:', e.message);
+            // Still add to dropdown locally
+            const brandFilter = document.getElementById('analyticsBrandFilter');
+            if (brandFilter && !brandFilter.querySelector(`option[value="${slug}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = slug;
+                opt.textContent = brandName + ' (uploaded)';
+                brandFilter.appendChild(opt);
+                showToast('Brand "' + brandName + '" added to Analytics filter from upload', 'info', 4000);
+            }
+        });
     }
 
     function updateAudiencePreview() {
@@ -4242,9 +4347,12 @@
 
             return `
             <div class="brand-card ${!brand.active ? 'inactive' : ''}">
-                <div class="brand-status ${brand.active ? 'active' : 'inactive'}">
-                    <span class="brand-status-dot"></span>
-                    ${brand.active ? 'Active' : 'Inactive'}
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div class="brand-status ${brand.active ? 'active' : 'inactive'}">
+                        <span class="brand-status-dot"></span>
+                        ${brand.active ? 'Active' : 'Inactive'}
+                    </div>
+                    <button onclick="toggleBrandActive('${brand.slug}', ${!brand.active})" style="font-size:10px;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text-secondary);cursor:pointer;" title="Toggle active/inactive">${brand.active ? 'Deactivate' : 'Activate'}</button>
                 </div>
                 <div class="brand-name">${brand.name}</div>
                 <div class="brand-info">
@@ -4278,6 +4386,7 @@
                     </div>
                     <div class="brand-actions-manage">
                         <button class="btn btn-edit" onclick="editBrand('${brand.slug}')" title="Edit brand">✎ Edit</button>
+                        <button class="btn" onclick="duplicateBrand('${brand.slug}')" title="Duplicate brand" style="font-size:11px;padding:6px 10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);border-radius:6px;cursor:pointer;">⧉ Copy</button>
                         <button class="btn btn-delete" onclick="deleteBrand('${brand.slug}')" title="Delete brand">✕</button>
                     </div>
                 </div>
@@ -4555,6 +4664,48 @@
         } catch (e) {
             console.error(e);
             showToast('Error deleting brand', 'error');
+        }
+    }
+
+    async function toggleBrandActive(slug, active) {
+        try {
+            const res = await fetch(`/api/brands/${slug}`);
+            const brand = await res.json();
+            brand.active = active;
+            const saveRes = await fetch(`/api/brands/${slug}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(brand)
+            });
+            if (saveRes.ok) {
+                showToast(`Brand "${brand.name}" ${active ? 'activated' : 'deactivated'}`, 'success');
+                loadBrands();
+            } else {
+                showToast('Failed to update brand status', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Error updating brand', 'error');
+        }
+    }
+
+    async function duplicateBrand(slug) {
+        try {
+            const res = await fetch(`/api/brands/${slug}`);
+            const brand = await res.json();
+            brand.name = brand.name + ' (Copy)';
+            brand.slug = slug + '-copy-' + Date.now().toString(36).slice(-4);
+            const saveRes = await fetch('/api/brands', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(brand)
+            });
+            if (saveRes.ok) {
+                showToast(`Brand "${brand.name}" duplicated`, 'success');
+                loadBrands();
+            }
+        } catch (e) {
+            showToast('Error duplicating brand', 'error');
         }
     }
 
