@@ -4886,8 +4886,11 @@
 
             if (res.ok) {
                 const data = await res.json();
-                const msg = format === 'all' ? 'all formats' : format;
-                showToast(`Generating ${reportType} report (${msg}) for ${slug}...`, 'success');
+                if (data.all_formats && data.all_formats.length > 1) {
+                    showToast(`✓ Generated ${data.all_formats.length} formats: ${data.all_formats.map(f => f.split('.').pop().toUpperCase()).join(', ')}`, 'success');
+                } else {
+                    showToast(`✓ Report generated: ${data.filename}`, 'success');
+                }
                 fetchStatus();
             } else {
                 const err = await res.json();
