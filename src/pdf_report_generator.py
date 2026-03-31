@@ -297,7 +297,7 @@ class HeaderFooterTemplate(PageTemplate):
         # Footer
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(GRAY_600)
-        canvas.drawString(0.75*inch, 0.5*inch, "Confidential — SocialPanga / AdFlow Studio")
+        canvas.drawString(0.75*inch, 0.5*inch, "Confidential — AdFlow Studio")
         canvas.drawRightString(7.75*inch, 0.5*inch, f"Page {self.page_num[0]}")
 
         # Increment page number

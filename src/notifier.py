@@ -132,7 +132,7 @@ def send_share_email(recipients, share_url, brand_name, access_level, expiry_day
         <div style="text-align:center;margin:24px 0;">
             <a href="{share_url}" style="background:#238BC3;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">View Report</a>
         </div>
-        <p style="font-size:12px;color:#6c757d;">Powered by SocialPanga</p>
+        <p style="font-size:12px;color:#6c757d;">Powered by AdFlow Studio</p>
     </div>
     </body></html>
     """

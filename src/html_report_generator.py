@@ -1194,7 +1194,7 @@ def _build_html_report(meta_data, google_data, brand_config, report_type="full")
 <!-- ═════════════════════════════════════════════════════════════════ -->
 <div class="page cover-page">
     <div class="cover-content">
-        <div class="cover-logo">SocialPanga / AdFlow Studio</div>
+        <div class="cover-logo">AdFlow Studio</div>
         <div class="cover-divider"></div>
         <div class="cover-brand">{brand_name}</div>
         <div class="cover-divider"></div>
@@ -1468,7 +1468,7 @@ def _build_html_report(meta_data, google_data, brand_config, report_type="full")
             <h3 style="color: var(--navy-800); margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">Methodology & Data Freshness</h3>
             <p style="font-size: 0.9rem; color: #4B5563; line-height: 1.6;">
                 This report aggregates data from Meta Ads Manager and Google Ads (YouTube) platforms, processed through
-                the SocialPanga/AdFlow Studio reporting engine. All metrics are pulled with a maximum latency of 24 hours.
+                the AdFlow Studio reporting engine. All metrics are pulled with a maximum latency of 24 hours.
                 Calculations use standardized formulas: CTR = (Clicks / Impressions) × 100, CPM = (Spend / Impressions) × 1000,
                 Engagement Rate = (Engagements / Impressions) × 100. Regional attribution uses last-click model.
                 Data points with fewer than 100 impressions are excluded from comparative analysis to ensure statistical significance.

@@ -91,7 +91,7 @@ function addCoverSlide(pres, data) {
         charSpacing: 6, bold: true
     });
 
-    slide.addText("by SocialPanga", {
+    slide.addText("Campaign Intelligence Platform", {
         x: 0.7, y: 0.85, w: 5, h: 0.3,
         fontSize: 10, fontFace: "Calibri", color: C.gray500, italic: true
     });
@@ -664,7 +664,7 @@ function addClosingSlide(pres, data) {
     });
 
     slide.addText([
-        { text: "SocialPanga / AdFlow Studio", options: { breakLine: true, fontSize: 11, color: C.tealLight, bold: true } },
+        { text: "AdFlow Studio", options: { breakLine: true, fontSize: 11, color: C.tealLight, bold: true } },
         { text: `Generated: ${new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}`, options: { fontSize: 10, color: C.gray500 } },
     ], {
         x: 1, y: 3.8, w: 8, h: 0.8, fontFace: "Calibri", align: "center"
