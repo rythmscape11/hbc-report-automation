@@ -87,6 +87,71 @@
             --accent-glow: rgba(147,180,232,0.08);
         }
 
+        /* ── Dark Mode: Logo opacity boost ── */
+        [data-theme="dark"] .logo-mark svg path,
+        [data-theme="dark"] .page-loader-logo svg path,
+        [data-theme="dark"] .login-logo svg path {
+            opacity:1 !important;
+        }
+        [data-theme="dark"] .logo-mark svg path:nth-child(1),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(1),
+        [data-theme="dark"] .login-logo svg path:nth-child(1) { opacity:0.95 !important; }
+        [data-theme="dark"] .logo-mark svg path:nth-child(2),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(2),
+        [data-theme="dark"] .login-logo svg path:nth-child(2) { opacity:0.55 !important; }
+        [data-theme="dark"] .logo-mark svg path:nth-child(3),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(3),
+        [data-theme="dark"] .login-logo svg path:nth-child(3) { opacity:0.7 !important; }
+        [data-theme="dark"] .logo-mark svg path:nth-child(4),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(4),
+        [data-theme="dark"] .login-logo svg path:nth-child(4) { opacity:0.65 !important; }
+        [data-theme="dark"] .logo-mark svg path:nth-child(5),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(5),
+        [data-theme="dark"] .login-logo svg path:nth-child(5) { opacity:0.4 !important; }
+        [data-theme="dark"] .logo-mark svg path:nth-child(6),
+        [data-theme="dark"] .page-loader-logo svg path:nth-child(6),
+        [data-theme="dark"] .login-logo svg path:nth-child(6) { opacity:0.5 !important; }
+
+        /* ── Dark Mode: Theme toggle icon visibility ── */
+        [data-theme="dark"] .theme-toggle { color:var(--text); }
+        [data-theme="dark"] .theme-toggle:hover { background:rgba(147,180,232,0.1); }
+
+        /* ── Dark Mode: Page loader text & bar visibility ── */
+        [data-theme="dark"] .page-loader-text { color:var(--text-secondary); }
+        [data-theme="dark"] .page-loader-logo { color:var(--primary); }
+        [data-theme="dark"] .login-logo svg { color:var(--primary); }
+
+        /* ── Dark Mode: Form inputs & selects ── */
+        [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+            background:var(--bg-card); border-color:var(--border);
+        }
+        [data-theme="dark"] input:focus, [data-theme="dark"] select:focus {
+            border-color:var(--primary); box-shadow:0 0 0 3px rgba(147,180,232,0.15);
+        }
+
+        /* ── Dark Mode: Login card shadow ── */
+        [data-theme="dark"] .login-card { box-shadow:0 8px 40px rgba(0,0,0,0.4); }
+
+        /* ── Dark Mode: User role badge backgrounds ── */
+        [data-theme="dark"] .user-role-badge.admin { background:rgba(147,180,232,0.15); color:var(--primary); }
+        [data-theme="dark"] .user-role-badge.manager { background:rgba(63,185,80,0.15); color:#3FB950; }
+        [data-theme="dark"] .user-role-badge.viewer { background:rgba(210,153,34,0.15); color:#D29922; }
+
+        /* ── Dark Mode: Table rows ── */
+        [data-theme="dark"] thead { background:var(--bg-card); }
+        [data-theme="dark"] tbody tr:nth-child(even) { background:rgba(255,255,255,0.02); }
+        [data-theme="dark"] tbody tr:hover { background:rgba(147,180,232,0.06); }
+
+        /* ── Dark Mode: Modal content ── */
+        [data-theme="dark"] .modal-content { box-shadow:0 8px 30px rgba(0,0,0,0.5); }
+
+        /* ── Dark Mode: Search button ── */
+        [data-theme="dark"] .search-btn { background:var(--bg-card) !important; border-color:var(--border) !important; }
+
+        /* ── Dark Mode: Loader pulse glow ── */
+        [data-theme="dark"] .page-loader-logo.assembled { animation:loaderPulseDark 1.5s ease-in-out infinite; }
+        @keyframes loaderPulseDark { 0%,100%{opacity:1;filter:drop-shadow(0 0 0 transparent)} 50%{opacity:0.85;filter:drop-shadow(0 0 16px rgba(147,180,232,0.35))} }
+
         /* Skip to Content Link */
         .skip-to-content {
             position: absolute;
@@ -127,7 +192,8 @@
         .logo-text { font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--text); letter-spacing:-0.02em; }
         .logo-text span { font-family:var(--font-body); font-weight:400; color:var(--text-muted); font-size:14px; margin-left:3px; letter-spacing:0.02em; }
         .header-right { display:flex; align-items:center; gap:20px; }
-        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:3px; font-size:10px; font-weight:600; background:var(--bg); color:var(--text-muted); border:1px solid var(--border); letter-spacing:0.04em; text-transform:uppercase; }
+        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:3px; font-size:10px; font-weight:600; background:var(--bg); color:var(--text-secondary); border:1px solid var(--border); letter-spacing:0.04em; text-transform:uppercase; }
+        [data-theme="dark"] .status-badge { color:var(--text-secondary); }
         .status-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation:pulse 2s infinite; }
         .hamburger { display:none; background:none; border:none; color:var(--primary); cursor:pointer; font-size:24px; }
         .theme-toggle { background:none; border:none; font-size:20px; cursor:pointer; padding:8px; border-radius:var(--radius-sm); transition:all .2s; }
@@ -182,6 +248,35 @@
         .tab-content { display:none; opacity:0; }
         .tab-content.active { display:block; animation:pageFadeIn .3s ease forwards; scroll-margin-top:130px; }
         @keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        /* Tab-specific animations */
+        #tab-dashboard.active { animation:cardFlyIn .4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-analytics.active { animation:chartSlideUp .4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-datastudio.active { animation:cardFade .4s ease forwards; }
+        #tab-brands.active { animation:cardSlideIn .4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-api.active { animation:accordionReveal .4s ease forwards; }
+        #tab-schedule.active { animation:rowSlideIn .4s ease forwards; }
+        #tab-templates.active { animation:cardFlip .5s ease forwards; }
+        #tab-logs.active { animation:typewriter .3s ease forwards; }
+        #tab-users.active { animation:cascadeIn .4s ease forwards; }
+        /* Card stagger animations within tabs */
+        #tab-dashboard.active .hero-metric { animation:cardFlyIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-dashboard.active .hero-metric:nth-child(1) { animation-delay:0.05s; }
+        #tab-dashboard.active .hero-metric:nth-child(2) { animation-delay:0.1s; }
+        #tab-dashboard.active .hero-metric:nth-child(3) { animation-delay:0.15s; }
+        #tab-dashboard.active .hero-metric:nth-child(4) { animation-delay:0.2s; }
+        #tab-dashboard.active .card { animation:cardFlyIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-dashboard.active .card:nth-of-type(n+1) { animation-delay:0.25s; }
+        /* Analytics charts cascade */
+        #tab-analytics.active .chart-card { animation:chartSlideUp 0.4s ease forwards; }
+        #tab-analytics.active .chart-card:nth-of-type(1) { animation-delay:0.05s; }
+        #tab-analytics.active .chart-card:nth-of-type(2) { animation-delay:0.1s; }
+        #tab-analytics.active .chart-card:nth-of-type(3) { animation-delay:0.15s; }
+        /* Brands cards slide in */
+        #tab-brands.active .brand-card { animation:cardSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        #tab-brands.active .brand-card:nth-of-type(n) { animation-delay:calc(0.05s * (var(--i, 1))); }
+        /* Users cascade */
+        #tab-users.active .user-row, #tab-users.active [role="row"] { animation:cascadeIn 0.3s ease forwards; }
+        #tab-users.active .user-row:nth-child(n), #tab-users.active [role="row"]:nth-child(n) { animation-delay:calc(0.04s * (var(--i, 1))); }
 
         /* ── Grid Layouts ── */
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
@@ -257,10 +352,7 @@
         .page-loader-bar-fill { height:100%; background:var(--primary); border-radius:2px; width:0; animation:loaderBarFill 1.8s cubic-bezier(0.4,0,0.2,1) .9s forwards; }
         @keyframes loaderBarFill { 0%{width:0} 40%{width:60%} 80%{width:90%} 100%{width:100%} }
         /* Tab transition loader (mini) */
-        .tab-loader { position:absolute; inset:0; background:var(--bg); z-index:50; display:flex; align-items:center; justify-content:center; gap:12px; opacity:0; pointer-events:none; transition:opacity .2s; }
-        .tab-loader.active { opacity:1; pointer-events:auto; }
-        .tab-loader-icon { width:32px; height:32px; animation:loaderPulse 1s ease-in-out infinite; }
-        .tab-loader-icon svg { width:100%; height:100%; color:var(--primary); }
+        #tabMiniLoader.active { opacity:1; pointer-events:auto; }
 
         /* ── Toast ── */
         .toast { position:fixed; top:72px; right:24px; padding:12px 18px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:10px; min-width:300px; max-width:calc(100vw - 48px); z-index:2000; transform:translateX(400px); transition:transform .3s cubic-bezier(.22,1,.36,1); border:1px solid; font-size:12px; font-weight:500; box-shadow:var(--shadow-md); }
@@ -272,7 +364,7 @@
         .toast-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; }
         .toast.success .toast-icon { background:var(--success); color:#fff; }
         .toast.error .toast-icon { background:var(--danger); color:#fff; }
-        .toast.warning .toast-icon { background:var(--warning); color:#333; }
+        .toast.warning .toast-icon { background:var(--warning); color:white; }
         .toast.info .toast-icon { background:var(--meta-blue); color:#fff; }
         .toast-msg { flex:1; }
         .toast-progress { position:absolute; bottom:0; left:0; height:3px; border-radius:0 0 10px 10px; background:currentColor; opacity:0.3; }
@@ -418,6 +510,17 @@
         .skeleton-card .skeleton-text:last-child { width:75%; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
         @keyframes countUp { from{opacity:.5} to{opacity:1} }
+        /* Tab-specific entry animations */
+        @keyframes cardFlyIn { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes chartSlideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes cardFade { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
+        @keyframes cardSlideIn { from{opacity:0;transform:translateX(-30px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes cardSlideInRight { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes accordionReveal { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes rowSlideIn { from{opacity:0;transform:translateX(-30px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes cardFlip { from{opacity:0;transform:rotateY(-90deg)} to{opacity:1;transform:rotateY(0)} }
+        @keyframes typewriter { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes cascadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
         /* ── Responsive ── */
         @media(max-width:480px) {
@@ -603,7 +706,7 @@
 
         /* ── Print ── */
         @media print {
-            body { background:var(--bg-card); color:black; }
+            body { background:var(--bg); color:var(--text); }
             .header,.tabs-bar,.hero,.proof-strip,.btn,.icon-btn,.chart-card-controls { display:none !important; }
             .card,.kpi-card { border:1px solid #ccc; background:var(--bg-card); box-shadow:none; page-break-inside:avoid; }
         }
@@ -622,9 +725,12 @@
         .log-entry { padding:6px 0 6px 8px; border-bottom:1px solid var(--border); transition:background .15s; }
         .log-entry:hover { background:var(--bg-card-hover); }
         .log-time { color:var(--text-muted); margin-right:8px; }
+        .log-entry.info { color:var(--text-secondary); }
         .log-info { color:var(--text-secondary); }
+        .log-entry.error { color:var(--danger); }
         .log-error { color:var(--danger); }
-        .log-warn { color:var(--primary); }
+        .log-entry.warning { color:var(--warning); }
+        .log-warn { color:var(--warning); }
 
         /* ── Brand Cards ── */
         .brand-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:all .25s cubic-bezier(.22,1,.36,1); position:relative; overflow:hidden; box-shadow:var(--shadow); }
@@ -842,7 +948,7 @@
         .user-email { font-size:12px; color:var(--text-muted); }
         .user-role-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
         .user-role-badge.admin { background:rgba(44,62,107,0.12); color:var(--primary); }
-        .user-role-badge.manager { background:rgba(40,200,64,0.12); color:#28C840; }
+        .user-role-badge.manager { background:rgba(40,200,64,0.12); color:var(--success); }
         .user-role-badge.viewer { background:rgba(200,152,90,0.12); color:#C8985A; }
         .user-brands-list { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
         .user-brand-chip { font-size:10px; padding:2px 8px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text-secondary); }
@@ -853,7 +959,7 @@
 <!-- ═══ Page Loading Screen ═══ -->
 <div class="page-loader" id="pageLoader">
     <div class="page-loader-logo" id="pageLoaderLogo">
-        <svg viewBox="0 0 36 36" width="64" height="64">
+        <svg viewBox="0 0 36 36" width="80" height="80" shape-rendering="geometricPrecision">
             <path class="layer-top" d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
             <path class="layer-top-l" d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
             <path class="layer-top-r" d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
@@ -870,7 +976,7 @@
 <div class="login-screen" id="loginScreen">
     <div class="login-card">
         <div class="login-logo">
-            <svg viewBox="0 0 36 36" width="40" height="40">
+            <svg viewBox="0 0 36 36" width="52" height="52" shape-rendering="geometricPrecision">
                 <path d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
                 <path d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
                 <path d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
@@ -930,7 +1036,7 @@
 <div class="header">
     <div class="header-inner">
         <a class="logo" href="/" aria-label="AdFlow Studio Home">
-            <div class="logo-mark"><svg viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
+            <div class="logo-mark"><svg viewBox="0 0 36 36" width="44" height="44" shape-rendering="geometricPrecision" aria-hidden="true">
               <!-- Top isometric layer — primary data surface -->
               <path d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
               <path d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
@@ -973,6 +1079,18 @@
         <button class="tab" role="tab" aria-selected="false" onclick="switchTab('users')" onkeydown="handleTabKeydown(event, 'users')" id="usersTabBtn" style="display:none;">Users</button>
     </div>
 </nav>
+
+<!-- ═══ Tab Transition Mini-Loader ═══ -->
+<div id="tabMiniLoader" style="position:fixed;inset:0;z-index:95;background:var(--bg);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+    <svg viewBox="0 0 36 36" width="40" height="40" shape-rendering="geometricPrecision" style="color:var(--primary);animation:loaderPulse 0.8s ease-in-out infinite;">
+        <path d="M18 3 L33 12 L18 21 L3 12 Z" fill="currentColor" opacity="0.88"/>
+        <path d="M3 12 L3 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.35"/>
+        <path d="M33 12 L33 17.5 L18 26.5 L18 21 Z" fill="currentColor" opacity="0.55"/>
+        <path d="M18 11.5 L33 20.5 L18 29.5 L3 20.5 Z" fill="currentColor" opacity="0.48"/>
+        <path d="M3 20.5 L3 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.18"/>
+        <path d="M33 20.5 L33 25.5 L18 34.5 L18 29.5 Z" fill="currentColor" opacity="0.34"/>
+    </svg>
+</div>
 
 <!-- ═══ Main Container ═══ -->
 <div class="container" id="main-content">
@@ -1041,22 +1159,22 @@
                             <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
                                 <div class="mock-dot" style="background:#1877F2"></div>
                                 <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:40%;height:4px;margin:0"></div></div>
-                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:var(--success);font-weight:600">Connected</span>
                             </div>
                             <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
                                 <div class="mock-dot" style="background:#34A853"></div>
                                 <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:35%;height:4px;margin:0"></div></div>
-                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:var(--success);font-weight:600">Connected</span>
                             </div>
                             <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
                                 <div class="mock-dot" style="background:#FF0000"></div>
                                 <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:45%;height:4px;margin:0"></div></div>
-                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:var(--success);font-weight:600">Connected</span>
                             </div>
                             <div class="mock-card" style="display:flex;align-items:center;gap:10px">
                                 <div class="mock-dot" style="background:#7B61FF"></div>
                                 <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:38%;height:4px;margin:0"></div></div>
-                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:var(--success);font-weight:600">Connected</span>
                             </div>
                         </div>
                     </div>
@@ -2444,7 +2562,7 @@
         </div>
         <div class="form-group">
             <label>Brand Slug (auto-generated)</label>
-            <input type="text" id="formBrandSlug" placeholder="e.g., soap-campaign" readonly style="background:rgba(255,255,255,0.05);color:var(--text-secondary);">
+            <input type="text" id="formBrandSlug" placeholder="e.g., soap-campaign" readonly style="background:var(--bg-card-hover);color:var(--text-secondary);">
         </div>
 
         <!-- Meta Section -->
@@ -3255,29 +3373,50 @@
     }
 
     // ── Tab Switching with mini-loader ──
+    // Tab transition micro-loader
+    let tabTransitionActive = false;
+    function showTabLoader(callback) {
+        if (tabTransitionActive) { callback(); return; }
+        tabTransitionActive = true;
+        const loader = document.getElementById('tabMiniLoader');
+        if (!loader) { callback(); tabTransitionActive = false; return; }
+        loader.classList.add('active');
+        setTimeout(() => {
+            callback();
+            setTimeout(() => {
+                loader.classList.remove('active');
+                tabTransitionActive = false;
+            }, 200);
+        }, 350);
+    }
+
     function switchTab(tab) {
         const targetContent = document.getElementById('tab-' + tab);
         if (!targetContent) return;
 
-        document.querySelectorAll('.tab').forEach(t => {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-        });
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => {
-            if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + tab + "'")) {
-                t.classList.add('active');
-                t.setAttribute('aria-selected', 'true');
-            }
-        });
-        targetContent.classList.add('active');
+        showTabLoader(() => {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + tab + "'")) {
+                    t.classList.add('active');
+                    t.setAttribute('aria-selected', 'true');
+                }
+            });
+            targetContent.classList.add('active');
 
-        if (tab === 'brands') loadBrands();
-        if (tab === 'analytics') loadAnalytics();
-        if (tab === 'datastudio') initDataStudio();
-        if (tab === 'schedule') loadSchedule();
-        if (tab === 'logs') refreshLogs();
-        if (tab === 'users') loadUsers();
+            if (tab === 'brands') loadBrands();
+            if (tab === 'analytics') loadAnalytics();
+            if (tab === 'datastudio') initDataStudio();
+            if (tab === 'schedule') loadSchedule();
+            if (tab === 'logs') refreshLogs();
+            if (tab === 'users') loadUsers();
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ── Fullscreen Chart Functions ──
@@ -6070,7 +6209,7 @@
             <div style="margin-bottom:18px;">
                 <div class="form-group">
                     <label>Template Name</label>
-                    <input type="text" id="tmplEditName" value="${currentTemplate.name || ''}" ${currentTemplateName === 'default' ? 'readonly style="background:rgba(255,255,255,0.05);color:var(--text-secondary);"' : ''}>
+                    <input type="text" id="tmplEditName" value="${currentTemplate.name || ''}" ${currentTemplateName === 'default' ? 'readonly style="background:var(--bg-card-hover);color:var(--text-secondary);"' : ''}>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
