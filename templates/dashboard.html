@@ -702,23 +702,85 @@
         .ic-xl { width:28px; height:28px; }
 
         /* ── How It Works Section ── */
-        .flow-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 44px; margin-bottom:24px; }
-        .flow-section-header { text-align:center; margin-bottom:40px; }
-        .flow-section-header h2 { font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--text); letter-spacing:-0.025em; margin-bottom:8px; }
-        .flow-section-header p { font-size:14px; color:var(--text-secondary); max-width:520px; margin:0 auto; }
-        .flow-steps { display:grid; grid-template-columns:repeat(4, 1fr); gap:0; position:relative; }
-        .flow-step { text-align:center; padding:0 20px; position:relative; }
-        .flow-step-num { width:40px; height:40px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:16px; font-weight:700; margin-bottom:16px; position:relative; z-index:2; }
-        .flow-step:not(:last-child)::after { content:''; position:absolute; top:20px; left:calc(50% + 28px); right:calc(-50% + 28px); height:2px; background:var(--border); z-index:1; }
-        .flow-step h3 { font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--text); margin-bottom:6px; letter-spacing:-0.01em; }
-        .flow-step p { font-size:12px; color:var(--text-muted); line-height:1.6; }
-        .flow-step .flow-icon { width:48px; height:48px; border-radius:12px; background:var(--primary-light); display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px; color:var(--primary); }
+        .flow-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:56px 48px; margin-bottom:24px; overflow:hidden; }
+        .flow-section-header { text-align:center; margin-bottom:56px; }
+        .flow-section-header h2 { font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--text); letter-spacing:-0.03em; margin-bottom:10px; }
+        .flow-section-header p { font-size:15px; color:var(--text-secondary); max-width:520px; margin:0 auto; line-height:1.6; }
+        /* Vertical alternating step layout */
+        .flow-steps { display:flex; flex-direction:column; gap:64px; }
+        .flow-step { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+        .flow-step:nth-child(even) { direction:rtl; }
+        .flow-step:nth-child(even) > * { direction:ltr; }
+        .flow-step-info { display:flex; flex-direction:column; gap:16px; }
+        .flow-step-badge { display:inline-flex; align-items:center; gap:12px; }
+        .flow-step-num { width:40px; height:40px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:16px; font-weight:700; flex-shrink:0; }
+        .flow-step-label { font-family:var(--font-display); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--primary); opacity:0.7; }
+        .flow-step h3 { font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--text); letter-spacing:-0.02em; margin:0; line-height:1.3; }
+        .flow-step p { font-size:14px; color:var(--text-secondary); line-height:1.7; margin:0; }
+        .flow-step p a { color:var(--primary); text-decoration:underline; text-underline-offset:2px; }
+        .flow-step .flow-icon { width:48px; height:48px; border-radius:12px; background:var(--primary-light); display:inline-flex; align-items:center; justify-content:center; color:var(--primary); flex-shrink:0; }
         .flow-step .flow-icon svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        /* Browser mockup card */
+        .flow-mockup { background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04); }
+        .flow-mockup-bar { height:32px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 12px; gap:6px; }
+        .flow-mockup-dot { width:8px; height:8px; border-radius:50%; }
+        .flow-mockup-dot:nth-child(1) { background:#FF5F57; }
+        .flow-mockup-dot:nth-child(2) { background:#FEBC2E; }
+        .flow-mockup-dot:nth-child(3) { background:#28C840; }
+        .flow-mockup-url { margin-left:12px; font-size:10px; color:var(--text-muted); font-family:var(--font-mono); background:var(--bg); border-radius:4px; padding:2px 10px; flex:1; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .flow-mockup-body { padding:16px; min-height:200px; position:relative; }
+        /* Mockup inner content - stylized UI elements */
+        .mock-row { display:flex; gap:8px; margin-bottom:8px; }
+        .mock-card { background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:10px; flex:1; }
+        .mock-line { height:6px; border-radius:3px; background:var(--border); margin-bottom:6px; }
+        .mock-line.short { width:60%; }
+        .mock-line.medium { width:80%; }
+        .mock-line.accent { background:var(--primary); opacity:0.3; }
+        .mock-dot { width:28px; height:28px; border-radius:7px; flex-shrink:0; }
+        .mock-btn { display:inline-block; height:22px; border-radius:5px; padding:0 12px; font-size:8px; line-height:22px; font-family:var(--font-display); font-weight:600; }
+        .mock-btn-primary { background:var(--primary); color:#fff; }
+        .mock-btn-outline { background:transparent; border:1px solid var(--border); color:var(--text-muted); }
+        .mock-stat { text-align:center; padding:6px 0; }
+        .mock-stat-val { font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--text); }
+        .mock-stat-label { font-size:7px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-top:2px; }
+        .mock-chart-bar { display:flex; align-items:flex-end; gap:4px; height:60px; padding-top:8px; }
+        .mock-chart-bar span { flex:1; border-radius:3px 3px 0 0; background:var(--primary); opacity:0.25; min-height:8px; }
+        .mock-chart-bar span:nth-child(2) { opacity:0.4; }
+        .mock-chart-bar span:nth-child(3) { opacity:0.6; }
+        .mock-chart-bar span:nth-child(4) { opacity:0.8; }
+        .mock-chart-bar span:nth-child(5) { opacity:0.5; }
+        .mock-upload-zone { border:2px dashed var(--border); border-radius:8px; padding:20px; text-align:center; }
+        .mock-upload-icon { color:var(--text-muted); margin-bottom:4px; }
+        .mock-tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:7px; font-family:var(--font-mono); background:var(--bg); border:1px solid var(--border); color:var(--text-muted); margin:1px; }
+        /* Scroll-triggered animations */
+        .flow-reveal { opacity:0; transform:translateY(40px); transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .flow-reveal.revealed { opacity:1; transform:translateY(0); }
+        .flow-reveal .flow-mockup { opacity:0; transform:translateY(24px) scale(0.97); transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s, transform 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s; }
+        .flow-reveal.revealed .flow-mockup { opacity:1; transform:translateY(0) scale(1); }
+        .flow-reveal .flow-step-info { opacity:0; transform:translateX(-20px); transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.6s cubic-bezier(0.16,1,0.3,1) 0.15s; }
+        .flow-reveal:nth-child(even) .flow-step-info { transform:translateX(20px); }
+        .flow-reveal.revealed .flow-step-info { opacity:1; transform:translateX(0); }
+        /* Subtle floating animation on mockups */
+        @keyframes mockFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .flow-reveal.revealed .flow-mockup { animation:mockFloat 5s ease-in-out infinite; animation-delay:1s; }
+        /* Mockup inner element stagger */
+        .flow-reveal.revealed .mock-card { animation:mockFadeUp 0.5s ease both; }
+        .flow-reveal.revealed .mock-card:nth-child(1) { animation-delay:0.4s; }
+        .flow-reveal.revealed .mock-card:nth-child(2) { animation-delay:0.5s; }
+        .flow-reveal.revealed .mock-card:nth-child(3) { animation-delay:0.6s; }
+        .flow-reveal.revealed .mock-card:nth-child(4) { animation-delay:0.7s; }
+        .flow-reveal.revealed .mock-card:nth-child(5) { animation-delay:0.8s; }
+        @keyframes mockFadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        /* Connected status dot animation */
+        @keyframes pulse-connected { 0%,100%{box-shadow:0 0 0 0 rgba(40,200,64,0.4)} 50%{box-shadow:0 0 0 4px rgba(40,200,64,0)} }
+        .mock-status-dot { width:6px; height:6px; border-radius:50%; background:#28C840; display:inline-block; animation:pulse-connected 2s ease infinite; }
         @media(max-width:900px) {
-            .flow-steps { grid-template-columns:1fr 1fr; gap:32px; }
-            .flow-step:not(:last-child)::after { display:none; }
+            .flow-step { grid-template-columns:1fr; gap:24px; }
+            .flow-step:nth-child(even) { direction:ltr; }
+            .flow-section { padding:36px 24px; }
+            .flow-steps { gap:48px; }
         }
-        @media(max-width:560px) { .flow-steps { grid-template-columns:1fr; } }
+        @media(max-width:560px) { .flow-section { padding:28px 16px; } .flow-step h3 { font-size:18px; } }
     </style>
 </head>
 <body>
@@ -868,29 +930,134 @@
                 <p>Four steps from raw ad data to client-ready reports. Set up once, automate forever.</p>
             </div>
             <div class="flow-steps">
-                <div class="flow-step">
-                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><circle cx="12" cy="12" r="10"/></svg></div>
-                    <div class="flow-step-num">1</div>
-                    <h3>Connect Platforms</h3>
-                    <p>Add your Meta, Google Ads, YouTube, and DV360 API credentials in <a href="#" onclick="switchTab('api');return false" style="color:var(--primary);text-decoration:underline;">API Settings</a>. Or upload CSV/Excel exports directly.</p>
+                <!-- Step 1: Connect Platforms -->
+                <div class="flow-step flow-reveal">
+                    <div class="flow-step-info">
+                        <div class="flow-step-badge">
+                            <div class="flow-step-num">1</div>
+                            <span class="flow-step-label">Step One</span>
+                        </div>
+                        <h3>Connect Your Ad Platforms</h3>
+                        <p>Add your Meta, Google Ads, YouTube, and DV360 API credentials in <a href="#" onclick="switchTab('api');return false">API Settings</a>. Each brand can pull data from multiple connected accounts simultaneously.</p>
+                    </div>
+                    <div class="flow-mockup">
+                        <div class="flow-mockup-bar"><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-url">hbc-deploy.vercel.app/api-settings</span></div>
+                        <div class="flow-mockup-body">
+                            <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                                <div class="mock-dot" style="background:#1877F2"></div>
+                                <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:40%;height:4px;margin:0"></div></div>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                            </div>
+                            <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                                <div class="mock-dot" style="background:#34A853"></div>
+                                <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:35%;height:4px;margin:0"></div></div>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                            </div>
+                            <div class="mock-card" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                                <div class="mock-dot" style="background:#FF0000"></div>
+                                <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:45%;height:4px;margin:0"></div></div>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                            </div>
+                            <div class="mock-card" style="display:flex;align-items:center;gap:10px">
+                                <div class="mock-dot" style="background:#7B61FF"></div>
+                                <div style="flex:1"><div class="mock-line short" style="margin-bottom:3px"></div><div class="mock-line" style="width:38%;height:4px;margin:0"></div></div>
+                                <span class="mock-status-dot"></span><span style="font-size:8px;color:#28C840;font-weight:600">Connected</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="flow-step">
-                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-                    <div class="flow-step-num">2</div>
-                    <h3>Upload & Map Data</h3>
-                    <p>Drop your campaign exports into <a href="#" onclick="switchTab('datastudio');return false" style="color:var(--primary);text-decoration:underline;">Data Studio</a>. Smart detection auto-maps columns to the right metrics.</p>
+
+                <!-- Step 2: Upload & Map Data -->
+                <div class="flow-step flow-reveal">
+                    <div class="flow-step-info">
+                        <div class="flow-step-badge">
+                            <div class="flow-step-num">2</div>
+                            <span class="flow-step-label">Step Two</span>
+                        </div>
+                        <h3>Upload & Map Campaign Data</h3>
+                        <p>Drop your campaign exports into <a href="#" onclick="switchTab('datastudio');return false">Data Studio</a>. Smart column detection auto-maps fields to the right metrics — no manual mapping needed.</p>
+                    </div>
+                    <div class="flow-mockup">
+                        <div class="flow-mockup-bar"><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-url">hbc-deploy.vercel.app/data-studio</span></div>
+                        <div class="flow-mockup-body">
+                            <div class="mock-row" style="margin-bottom:12px">
+                                <div class="mock-card" style="text-align:center;padding:6px 8px"><div class="mock-dot" style="background:#1877F2;width:24px;height:24px;border-radius:6px;margin:0 auto 4px"></div><div style="font-size:7px;color:var(--text-muted)">Meta Ads</div></div>
+                                <div class="mock-card" style="text-align:center;padding:6px 8px"><div class="mock-dot" style="background:#FF0000;width:24px;height:24px;border-radius:6px;margin:0 auto 4px"></div><div style="font-size:7px;color:var(--text-muted)">YouTube</div></div>
+                                <div class="mock-card" style="text-align:center;padding:6px 8px"><div class="mock-dot" style="background:#34A853;width:24px;height:24px;border-radius:6px;margin:0 auto 4px"></div><div style="font-size:7px;color:var(--text-muted)">Google Ads</div></div>
+                                <div class="mock-card" style="text-align:center;padding:6px 8px"><div class="mock-dot" style="background:#7B61FF;width:24px;height:24px;border-radius:6px;margin:0 auto 4px"></div><div style="font-size:7px;color:var(--text-muted)">DV360</div></div>
+                            </div>
+                            <div class="mock-upload-zone">
+                                <div class="mock-upload-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                                <div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Drag and drop your data file here</div>
+                                <div><span class="mock-tag">XLSX</span><span class="mock-tag">CSV</span><span class="mock-tag">JSON</span><span class="mock-tag">XML</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="flow-step">
-                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
-                    <div class="flow-step-num">3</div>
-                    <h3>Analyze & Visualize</h3>
-                    <p>Open <a href="#" onclick="switchTab('analytics');return false" style="color:var(--primary);text-decoration:underline;">Analytics</a> for auto-generated charts, KPIs, AI insights, and cross-platform comparisons.</p>
+
+                <!-- Step 3: Analyze & Visualize -->
+                <div class="flow-step flow-reveal">
+                    <div class="flow-step-info">
+                        <div class="flow-step-badge">
+                            <div class="flow-step-num">3</div>
+                            <span class="flow-step-label">Step Three</span>
+                        </div>
+                        <h3>Analyze & Visualize Performance</h3>
+                        <p>Open <a href="#" onclick="switchTab('analytics');return false">Analytics</a> for auto-generated charts, KPIs, AI-powered insights, and cross-platform comparisons across every metric that matters.</p>
+                    </div>
+                    <div class="flow-mockup">
+                        <div class="flow-mockup-bar"><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-url">hbc-deploy.vercel.app/analytics</span></div>
+                        <div class="flow-mockup-body">
+                            <div class="mock-row" style="margin-bottom:10px">
+                                <div class="mock-card mock-stat"><div class="mock-stat-val" style="font-size:13px">36.98 L</div><div class="mock-stat-label">Total Spend</div></div>
+                                <div class="mock-card mock-stat"><div class="mock-stat-val" style="font-size:13px">2.86 Cr</div><div class="mock-stat-label">Impressions</div></div>
+                                <div class="mock-card mock-stat"><div class="mock-stat-val" style="font-size:13px">0.47%</div><div class="mock-stat-label">Avg CTR</div></div>
+                            </div>
+                            <div class="mock-card" style="padding:12px">
+                                <div class="mock-line" style="width:50%;height:4px;margin-bottom:8px"></div>
+                                <div class="mock-chart-bar">
+                                    <span style="height:45%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:90%"></span><span style="height:60%"></span><span style="height:80%"></span><span style="height:40%"></span><span style="height:65%"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="flow-step">
-                    <div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-                    <div class="flow-step-num">4</div>
-                    <h3>Generate Reports</h3>
-                    <p>Hit "Run All" below to export PDF, Excel, HTML, or PPTX reports. <a href="#" onclick="switchTab('schedule');return false" style="color:var(--primary);text-decoration:underline;">Schedule</a> them to run daily or weekly.</p>
+
+                <!-- Step 4: Generate Reports -->
+                <div class="flow-step flow-reveal">
+                    <div class="flow-step-info">
+                        <div class="flow-step-badge">
+                            <div class="flow-step-num">4</div>
+                            <span class="flow-step-label">Step Four</span>
+                        </div>
+                        <h3>Generate & Schedule Reports</h3>
+                        <p>Hit "Run All" to export PDF, Excel, HTML, or PPTX reports. <a href="#" onclick="switchTab('schedule');return false">Schedule</a> automated daily, weekly, or monthly report delivery to your team.</p>
+                    </div>
+                    <div class="flow-mockup">
+                        <div class="flow-mockup-bar"><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-dot"></span><span class="flow-mockup-url">hbc-deploy.vercel.app/dashboard</span></div>
+                        <div class="flow-mockup-body">
+                            <div class="mock-card" style="margin-bottom:8px;padding:10px 12px">
+                                <div style="font-size:8px;font-weight:600;color:var(--text);margin-bottom:8px;font-family:var(--font-display)">Quick Actions</div>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                    <span class="mock-btn mock-btn-primary">Run All (Daily)</span>
+                                    <span class="mock-btn mock-btn-outline">Run All (Weekly)</span>
+                                    <span class="mock-btn mock-btn-outline">Run All (Monthly)</span>
+                                    <span class="mock-btn mock-btn-outline">Full Report</span>
+                                </div>
+                            </div>
+                            <div class="mock-card" style="padding:10px 12px">
+                                <div style="font-size:8px;font-weight:600;color:var(--text);margin-bottom:8px;font-family:var(--font-display)">AI-Powered Insights</div>
+                                <div style="display:flex;align-items:start;gap:6px;margin-bottom:6px">
+                                    <div style="width:3px;height:24px;border-radius:2px;background:var(--primary);flex-shrink:0;margin-top:2px"></div>
+                                    <div><div class="mock-line" style="width:70%;margin-bottom:3px"></div><div class="mock-line" style="width:90%;height:4px;margin:0"></div></div>
+                                </div>
+                                <div style="display:flex;align-items:start;gap:6px">
+                                    <div style="width:3px;height:24px;border-radius:2px;background:#1877F2;flex-shrink:0;margin-top:2px"></div>
+                                    <div><div class="mock-line" style="width:55%;margin-bottom:3px"></div><div class="mock-line" style="width:85%;height:4px;margin:0"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -7814,6 +7981,21 @@
             if (analyticsData && analyticsData.kpis) generateOptimizations();
         }, 3000);
     }
+
+    /* ── Scroll-triggered reveal animations for How It Works ── */
+    (function initFlowReveal() {
+        const els = document.querySelectorAll('.flow-reveal');
+        if (!els.length) return;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        els.forEach(el => observer.observe(el));
+    })();
 
     </script>
 
