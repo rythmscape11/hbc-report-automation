@@ -99,7 +99,7 @@ def generate_csrf_token():
 
 
 def verify_csrf(f):
-    """Decorator to verify CSRF token (soft validation - logs warning but allows)."""
+    """Decorator to verify CSRF token — rejects requests with invalid tokens."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Only check CSRF on POST/PUT/DELETE
@@ -108,8 +108,13 @@ def verify_csrf(f):
             token_header = request.headers.get('X-CSRF-Token')
             expected_token = _csrf_tokens.get(client_key)
 
-            if not token_header or token_header != expected_token:
-                add_log(f"CSRF validation warning for {request.path} from {client_key}", "warn")
+            if not expected_token:
+                # No token generated yet for this client — issue a fresh one
+                # (handles cold-start edge case where client had a token but server forgot)
+                add_log(f"CSRF: no server token for {client_key} on {request.path}, allowing first request", "warn")
+            elif not token_header or token_header != expected_token:
+                add_log(f"CSRF validation REJECTED for {request.path} from {client_key}", "warn")
+                return jsonify({"error": "CSRF token invalid or missing. Please refresh and try again."}), 403
 
         return f(*args, **kwargs)
     return decorated_function
@@ -239,6 +244,37 @@ def create_user(email, name, password, role="viewer", assigned_brands=None):
     UserStore.save(user_id, user_data)
     return user_id, None
 
+def load_users():
+    """Load all users from the store (Postgres or file fallback)."""
+    return UserStore.load_all()
+
+
+def save_users(users):
+    """Save all users back to the store (Postgres or file fallback)."""
+    for user_id, user_data in users.items():
+        UserStore.save(user_id, user_data)
+
+
+def delete_user_from_store(user_id):
+    """Delete a single user from the store."""
+    if USE_POSTGRES:
+        from src.storage import _get_pg, _put_pg
+        conn = _get_pg()
+        try:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"delete_user_from_store error: {e}")
+        finally:
+            _put_pg(conn)
+    else:
+        users = load_users()
+        users.pop(user_id, None)
+        save_users(users)
+
+
 def get_user_by_email(email):
     """Get user by email."""
     return UserStore.get_by_email(email)
@@ -325,18 +361,34 @@ def require_admin(f):
     return decorated_function
 
 def seed_default_admin():
-    """Seed a default admin user if no users exist."""
+    """Seed a default admin user if no users exist.
+
+    Uses ADMIN_EMAIL and ADMIN_PASSWORD env vars if set.
+    Falls back to ADMIN_EMAIL=admin@adflow.studio with a secure random password.
+    The random password is logged once at startup so the deployer can see it.
+    """
     users = UserStore.load_all()
     if len(users) == 0:
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@adflow.studio")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "")
+
+        if not admin_password:
+            # Generate a secure random password instead of using a hardcoded one
+            admin_password = secrets.token_urlsafe(16)
+            add_log(f"No ADMIN_PASSWORD env var set. Generated temporary admin password — check Vercel function logs.", "warn")
+            # Log to function stdout so deployer can retrieve it from Vercel logs
+            logger.warning(f"AUTO-GENERATED ADMIN PASSWORD for {admin_email}: {admin_password}")
+            logger.warning("Set ADMIN_EMAIL and ADMIN_PASSWORD env vars in Vercel to use fixed credentials.")
+
         user_id, error = create_user(
-            email="admin@adflow.studio",
+            email=admin_email,
             name="Admin",
-            password="admin123",
+            password=admin_password,
             role="admin",
             assigned_brands=[]
         )
         if user_id:
-            add_log(f"Seeded default admin user: admin@adflow.studio", "info")
+            add_log(f"Seeded default admin user: {admin_email}", "info")
         else:
             add_log(f"Failed to seed admin: {error}", "error")
 
@@ -2334,6 +2386,10 @@ def api_platform_stats():
 @verify_csrf
 def api_auth_register():
     """Register a new user."""
+    # Rate limit: 5 registrations per IP per 10 minutes
+    client_ip = request.remote_addr or "unknown"
+    if not check_rate_limit(client_ip + ":register", limit=5, window=600):
+        return jsonify({"error": "Too many registration attempts. Please try again later."}), 429
     try:
         data = request.json or {}
         email = data.get("email", "").strip()
@@ -2342,6 +2398,9 @@ def api_auth_register():
 
         if not email or not name or not password:
             return jsonify({"error": "Missing email, name, or password"}), 400
+
+        if len(password) < 8:
+            return jsonify({"error": "Password must be at least 8 characters"}), 400
 
         # Check if user already exists
         if get_user_by_email(email):
@@ -2380,6 +2439,10 @@ def api_auth_register():
 @verify_csrf
 def api_auth_login():
     """Login with email and password."""
+    # Rate limit: 10 login attempts per IP per 5 minutes (brute-force protection)
+    client_ip = request.remote_addr or "unknown"
+    if not check_rate_limit(client_ip + ":login", limit=10, window=300):
+        return jsonify({"error": "Too many login attempts. Please try again later."}), 429
     try:
         data = request.json or {}
         email = data.get("email", "").strip()
@@ -2537,8 +2600,7 @@ def api_delete_user(user_id):
             return jsonify({"error": "User not found"}), 404
 
         deleted_email = users[user_id].get("email")
-        del users[user_id]
-        save_users(users)
+        delete_user_from_store(user_id)
 
         add_log(f"User deleted: {deleted_email}", "info", {
             "ip": request.remote_addr,
