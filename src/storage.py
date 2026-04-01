@@ -4,7 +4,7 @@ Storage Abstraction Layer for AdFlow Studio
 Provides a unified interface for data persistence with graceful fallback:
 
 - Neon Postgres  → Users & Brands (set DATABASE_URL env var)
-- Upstash Redis  → Auth sessions/tokens (set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN)
+- Upstash Redis  → Auth sessions/tokens (auto-detected from Vercel integration or manual env vars)
 - Vercel Blob    → Report files (set BLOB_READ_WRITE_TOKEN)
 
 If env vars are not configured, falls back to the original /tmp file-based storage.
@@ -20,7 +20,11 @@ logger = logging.getLogger(__name__)
 
 # ── Feature Flags ──────────────────────────────────────────────────────
 USE_POSTGRES = bool(os.environ.get("DATABASE_URL"))
-USE_REDIS = bool(os.environ.get("UPSTASH_REDIS_REST_URL")) and bool(os.environ.get("UPSTASH_REDIS_REST_TOKEN"))
+# Upstash Redis: Vercel integration creates vars like UPSTASH_REDIS_REST_KV_REST_API_URL
+# but manual setup might use UPSTASH_REDIS_REST_URL — support both patterns
+_REDIS_URL = os.environ.get("UPSTASH_REDIS_REST_KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL") or ""
+_REDIS_TOKEN = os.environ.get("UPSTASH_REDIS_REST_KV_REST_API_TOKEN") or os.environ.get("UPSTASH_REDIS_REST_TOKEN") or ""
+USE_REDIS = bool(_REDIS_URL) and bool(_REDIS_TOKEN)
 USE_BLOB = bool(os.environ.get("BLOB_READ_WRITE_TOKEN"))
 
 logger.info(f"Storage backends: Postgres={USE_POSTGRES}, Redis={USE_REDIS}, Blob={USE_BLOB}")
@@ -302,10 +306,7 @@ def _get_redis():
     global _redis_client
     if _redis_client is None:
         from upstash_redis import Redis
-        _redis_client = Redis(
-            url=os.environ["UPSTASH_REDIS_REST_URL"],
-            token=os.environ["UPSTASH_REDIS_REST_TOKEN"]
-        )
+        _redis_client = Redis(url=_REDIS_URL, token=_REDIS_TOKEN)
     return _redis_client
 
 
