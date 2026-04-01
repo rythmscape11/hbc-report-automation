@@ -56,8 +56,37 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 # In-memory log buffer (resets on cold start, persists during warm invocations)
 _logs = []
 
-# In-memory CSRF token storage (session/IP-based)
-_csrf_tokens = {}
+# CSRF token storage — uses Redis when available so tokens survive cold starts,
+# falls back to in-memory dict for local development.
+_csrf_tokens_mem = {}
+
+
+def _csrf_store_set(key, token, ttl=3600):
+    """Store a CSRF token (Redis-backed if available, else in-memory)."""
+    try:
+        from src.storage import USE_REDIS, SessionStore
+        if USE_REDIS:
+            from src.storage import _get_redis
+            r = _get_redis()
+            r.set(f"csrf:{key}", token, ex=ttl)
+            return
+    except Exception:
+        pass
+    _csrf_tokens_mem[key] = token
+
+
+def _csrf_store_get(key):
+    """Retrieve a CSRF token (Redis-backed if available, else in-memory)."""
+    try:
+        from src.storage import USE_REDIS
+        if USE_REDIS:
+            from src.storage import _get_redis
+            r = _get_redis()
+            val = r.get(f"csrf:{key}")
+            return val if val else None
+    except Exception:
+        pass
+    return _csrf_tokens_mem.get(key)
 
 
 def add_log(msg, level="info", request_info=None):
@@ -91,27 +120,31 @@ def get_client_key():
 
 
 def generate_csrf_token():
-    """Generate a new CSRF token."""
+    """Generate a new CSRF token and persist it (Redis or memory)."""
     token = secrets.token_urlsafe(32)
     client_key = get_client_key()
-    _csrf_tokens[client_key] = token
+    _csrf_store_set(client_key, token, ttl=3600)
     return token
 
 
 def verify_csrf(f):
-    """Decorator to verify CSRF token — rejects requests with invalid tokens."""
+    """Decorator to verify CSRF token — rejects requests with invalid tokens.
+
+    Uses Redis-backed storage so tokens survive Vercel cold starts.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Only check CSRF on POST/PUT/DELETE
         if request.method in ['POST', 'PUT', 'DELETE']:
             client_key = get_client_key()
             token_header = request.headers.get('X-CSRF-Token')
-            expected_token = _csrf_tokens.get(client_key)
+            expected_token = _csrf_store_get(client_key)
 
             if not expected_token:
-                # No token generated yet for this client — issue a fresh one
-                # (handles cold-start edge case where client had a token but server forgot)
-                add_log(f"CSRF: no server token for {client_key} on {request.path}, allowing first request", "warn")
+                # Client never fetched a CSRF token (or it expired).
+                # Allow the request but issue a warning — the client JS
+                # should call /api/csrf-token on page load.
+                add_log(f"CSRF: no stored token for {client_key} on {request.path}", "warn")
             elif not token_header or token_header != expected_token:
                 add_log(f"CSRF validation REJECTED for {request.path} from {client_key}", "warn")
                 return jsonify({"error": "CSRF token invalid or missing. Please refresh and try again."}), 403
