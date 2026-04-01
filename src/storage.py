@@ -19,7 +19,10 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 # ── Feature Flags ──────────────────────────────────────────────────────
-USE_POSTGRES = bool(os.environ.get("DATABASE_URL"))
+# Neon Postgres: Vercel integration creates DATABASE_POSTGRES_URL (with prefix "DATABASE")
+# but manual setup might use DATABASE_URL — support both patterns
+_DATABASE_URL = os.environ.get("DATABASE_POSTGRES_URL") or os.environ.get("DATABASE_URL") or ""
+USE_POSTGRES = bool(_DATABASE_URL)
 # Upstash Redis: Vercel integration creates vars like UPSTASH_REDIS_REST_KV_REST_API_URL
 # but manual setup might use UPSTASH_REDIS_REST_URL — support both patterns
 _REDIS_URL = os.environ.get("UPSTASH_REDIS_REST_KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL") or ""
@@ -42,9 +45,8 @@ def _get_pg():
     if _pg_pool is None:
         import psycopg2
         import psycopg2.pool
-        database_url = os.environ["DATABASE_URL"]
         # Use a small pool — serverless functions are short-lived
-        _pg_pool = psycopg2.pool.SimpleConnectionPool(1, 5, database_url)
+        _pg_pool = psycopg2.pool.SimpleConnectionPool(1, 5, _DATABASE_URL)
     return _pg_pool.getconn()
 
 
