@@ -27,11 +27,7 @@
         "GOOGLE_ADS_REFRESH_TOKEN": "",
         "GOOGLE_ADS_CUSTOMER_ID": "",
         "GOOGLE_ADS_LOGIN_CUSTOMER_ID": "",
-        "EMAIL_ENABLED": "false",
-        "DATABASE_URL": "",
-        "UPSTASH_REDIS_REST_URL": "",
-        "UPSTASH_REDIS_REST_TOKEN": "",
-        "BLOB_READ_WRITE_TOKEN": ""
+        "EMAIL_ENABLED": "false"
     },
     "crons": [
         {
