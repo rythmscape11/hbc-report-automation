@@ -938,12 +938,12 @@
         .ic-xl { width:28px; height:28px; }
 
         /* ── How It Works Section ── */
-        .flow-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:56px 48px; margin-bottom:24px; overflow:hidden; }
-        .flow-section-header { text-align:center; margin-bottom:56px; }
+        .flow-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:40px 48px; margin-bottom:24px; overflow:hidden; }
+        .flow-section-header { text-align:center; margin-bottom:32px; }
         .flow-section-header h2 { font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--text); letter-spacing:-0.03em; margin-bottom:10px; }
         .flow-section-header p { font-size:15px; color:var(--text-secondary); max-width:520px; margin:0 auto; line-height:1.6; }
         /* Vertical alternating step layout */
-        .flow-steps { display:flex; flex-direction:column; gap:64px; }
+        .flow-steps { display:flex; flex-direction:column; gap:48px; }
         .flow-step { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
         .flow-step:nth-child(even) { direction:rtl; }
         .flow-step:nth-child(even) > * { direction:ltr; }
@@ -9705,7 +9705,7 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
         els.forEach(el => observer.observe(el));
     })();
 

@@ -614,6 +614,14 @@ def api_status():
 def api_get_config():
     """Return config status (not actual secrets on Vercel)."""
     from src import config as cfg
+    # Get brand data for platform/count info
+    brands_list = list_brands()
+    platforms = set()
+    for b in brands_list:
+        if b.get("meta_budget", 0) > 0:
+            platforms.update(["meta", "google_ads"])
+        if b.get("yt_budget", 0) > 0:
+            platforms.add("youtube")
     return jsonify({
         "META_ACCESS_TOKEN": "••••" if cfg.meta.access_token else "",
         "META_AD_ACCOUNT_ID": cfg.meta.ad_account_id or "",
@@ -622,6 +630,9 @@ def api_get_config():
         "GOOGLE_ADS_DEVELOPER_TOKEN": "••••" if cfg.google.developer_token else "",
         "GOOGLE_ADS_CLIENT_ID": cfg.google.client_id or "",
         "GOOGLE_ADS_CUSTOMER_ID": cfg.google.customer_id or "",
+        "brands": {b["slug"]: b["name"] for b in brands_list},
+        "brand_count": len(brands_list),
+        "platforms": sorted(platforms),
         "_note": "On Vercel, update API credentials via Vercel Dashboard → Settings → Environment Variables",
         "_storage": {
             "postgres": "connected" if USE_POSTGRES else "not configured",
