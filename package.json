@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/rythmscape11/hbc-report-automation#readme",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "pptxgenjs": "^4.0.1",
     "vercel": "^50.37.1"
   }
