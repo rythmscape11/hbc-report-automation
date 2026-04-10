@@ -6118,9 +6118,18 @@
                 const name = typeof r === 'string' ? r : r.filename;
                 const size = r.size_kb ? ` (${r.size_kb} KB)` : '';
                 const fmt = r.format ? `<span style="font-size:11px;padding:2px 6px;background:var(--accent-glow);color:var(--accent);border-radius:4px;margin-left:8px;">${r.format}</span>` : '';
+                // Extract slug, type, format from filename for generate-download
+                const ext = name.split('.').pop() || 'xlsx';
+                const nameBase = name.replace(/\.[^.]+$/, '');
+                // Try to parse "Brand - Type Report - Date" pattern
+                const parts = nameBase.split(' - ');
+                const brandName = parts[0] || '';
+                const typeMatch = (parts[1] || '').match(/Daily|Weekly|Monthly|Full/i);
+                const rType = typeMatch ? typeMatch[0].toLowerCase() : 'daily';
+                const rSlug = brandName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
                 return `<div class="report-item">
                     <span class="name">${name}${fmt}${size}</span>
-                    <button class="download-btn" onclick="window.open('/api/download/${encodeURIComponent(name)}')">Download</button>
+                    <button class="download-btn" onclick="downloadSampleReport('${rSlug}','${rType}','${ext}')">Download</button>
                 </div>`;
             }).join('');
         } else if (reportsEl && reportsEl.querySelector('.skeleton')) {
