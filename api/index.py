@@ -763,6 +763,7 @@ def api_reports_history():
 # ── Routes: Multi-API Account Management ──────────────────────────────
 
 @app.route("/api/api-accounts", methods=["GET"])
+@require_auth
 def api_list_accounts():
     """List configured API accounts (in-memory for this session)."""
     # In production, these would be stored in database/file
@@ -773,6 +774,7 @@ def api_list_accounts():
 
 
 @app.route("/api/api-accounts", methods=["POST"])
+@require_admin
 def api_add_account():
     """Add a new API account (stored in session memory)."""
     data = request.json or {}
@@ -797,6 +799,7 @@ def api_add_account():
 
 
 @app.route("/api/api-accounts/<account_id>", methods=["DELETE"])
+@require_admin
 def api_delete_account(account_id):
     """Delete an API account."""
     if not hasattr(_api_accounts, 'data'):
@@ -1157,20 +1160,90 @@ def api_download(filename):
     # Prevent path traversal attacks
     filename = os.path.basename(filename)
     path = os.path.join(REPORTS_DIR, filename)
+
+    # 1) Try local /tmp first (works within same warm invocation)
     if os.path.exists(path):
-        add_log(f"File downloaded: {filename}", "success", {
+        add_log(f"File downloaded (local): {filename}", "success", {
             "ip": request.remote_addr,
             "method": request.method,
             "path": request.path
         })
         return send_file(path, as_attachment=True, download_name=filename)
-    return jsonify({"error": "File not found. Reports on Vercel are stored in /tmp and may be cleared between requests."}), 404
+
+    # 2) Fallback: try Blob storage (persists across cold starts)
+    if USE_BLOB:
+        try:
+            from src.storage import blob_list, blob_download
+            blobs = blob_list(prefix=f"reports/{filename}")
+            if blobs:
+                blob_url = blobs[0].get("url") or blobs[0].get("pathname", "")
+                if blob_url:
+                    file_bytes = blob_download(blob_url)
+                    if file_bytes:
+                        # Determine mimetype
+                        ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+                        mime_map = {
+                            "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "html": "text/html",
+                            "pdf": "application/pdf",
+                            "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        }
+                        mimetype = mime_map.get(ext, "application/octet-stream")
+                        add_log(f"File downloaded (blob): {filename}", "success", {
+                            "ip": request.remote_addr,
+                            "method": request.method,
+                            "path": request.path
+                        })
+                        return Response(
+                            file_bytes,
+                            mimetype=mimetype,
+                            headers={
+                                "Content-Disposition": f'attachment; filename="{filename}"',
+                                "Content-Length": str(len(file_bytes)),
+                            }
+                        )
+        except Exception as e:
+            logger.error(f"Blob download fallback failed for {filename}: {e}")
+
+    # 3) Also check Postgres reports_meta for a stored blob_url
+    if USE_POSTGRES:
+        try:
+            from src.storage import pg_list_reports, blob_download as bd
+            records = pg_list_reports(limit=200)
+            for rec in records:
+                if rec.get("filename") == filename and rec.get("blob_url"):
+                    file_bytes = bd(rec["blob_url"])
+                    if file_bytes:
+                        ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+                        mime_map = {
+                            "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "html": "text/html",
+                            "pdf": "application/pdf",
+                            "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        }
+                        mimetype = mime_map.get(ext, "application/octet-stream")
+                        add_log(f"File downloaded (postgres+blob): {filename}", "success")
+                        return Response(
+                            file_bytes,
+                            mimetype=mimetype,
+                            headers={
+                                "Content-Disposition": f'attachment; filename="{filename}"',
+                                "Content-Length": str(len(file_bytes)),
+                            }
+                        )
+        except Exception as e:
+            logger.error(f"Postgres+Blob download fallback failed for {filename}: {e}")
+
+    return jsonify({"error": "File not found. The report may not have been generated yet, or it was cleared from temporary storage. Try generating the report again."}), 404
 
 
 @app.route("/api/reports", methods=["GET"])
 def api_list_reports():
-    """List all available reports."""
+    """List all available reports (local /tmp + Blob storage)."""
     reports_list = []
+    seen_filenames = set()
+
+    # 1) Local /tmp reports
     if os.path.exists(REPORTS_DIR):
         for f in sorted(os.listdir(REPORTS_DIR), reverse=True):
             if f.endswith((".xlsx", ".html", ".pdf", ".pptx")):
@@ -1180,8 +1253,29 @@ def api_list_reports():
                     "filename": f,
                     "size_kb": round(os.path.getsize(fpath) / 1024, 1),
                     "format": ext,
-                    "created": datetime.fromtimestamp(os.path.getctime(fpath)).isoformat()
+                    "created": datetime.fromtimestamp(os.path.getctime(fpath)).isoformat(),
+                    "source": "local"
                 })
+                seen_filenames.add(f)
+
+    # 2) Postgres-tracked reports (Blob-stored, persistent)
+    if USE_POSTGRES:
+        try:
+            pg_reports = ReportStore.list_recent(limit=50)
+            for r in pg_reports:
+                fname = r.get("filename", "")
+                if fname and fname not in seen_filenames:
+                    reports_list.append({
+                        "filename": fname,
+                        "size_kb": 0,
+                        "format": r.get("format", "").upper(),
+                        "created": r.get("created_at", ""),
+                        "source": "blob"
+                    })
+                    seen_filenames.add(fname)
+        except Exception as e:
+            logger.error(f"Error listing Postgres reports: {e}")
+
     return jsonify({"reports": reports_list[:50]})
 
 

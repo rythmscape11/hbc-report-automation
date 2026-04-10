@@ -3538,7 +3538,7 @@
         fetch('/api/users/' + userId, {
             method: 'PUT',
             headers: getAuthHeaders(),
-            body: JSON.stringify({ role: newRole, brands })
+            body: JSON.stringify({ role: newRole, assigned_brands: brands })
         }).then(res => {
             if (res.ok) {
                 showToast('User updated', 'success');
